@@ -7,6 +7,7 @@ description: |
   "个股新闻"、"公告"、"题材"、"概念板块"、"行业板块"、"财联社"、"电报"、"A股"时触发。
   也用于查某只股票的实时价格、历史K线、财务研报、新闻公告等。
 homepage: https://github.com/birdilsss-byte/stoke
+platforms: [macos, linux, windows]
 metadata:
   openclaw:
     emoji: 🔥
@@ -17,11 +18,14 @@ metadata:
         - akshare
         - pandas
         - requests
+  hermes:
+    tags: [stock, finance, a-share, market-data, quant, free, zero-api-key]
+    category: finance
 ---
 
 # Stoke — A股数据层技能
 
-纯数据获取层，**零 API Key 依赖**，所有数据源免注册。兼容 **Claude Code** 和 **OpenClaw**。
+纯数据获取层，**零 API Key 依赖**，所有数据源免注册。兼容 **Claude Code** · **OpenClaw** · **Hermes**。
 
 ## 🔧 首次安装
 
@@ -182,10 +186,16 @@ print(f'全市场 PB: {pb[\"middlePB\"].iloc[-1]:.2f} (日期: {pb[\"date\"].ilo
 
 ## 平台兼容性
 
-| 特性 | Claude Code | OpenClaw |
-|------|:--:|:--:|
-| `name` / `description` 触发 | ✅ | ✅ |
-| `metadata.openclaw` | 忽略（安全） | ✅ |
-| `homepage` | 忽略 | ✅ |
-| `requires: {}` | — | ✅ 零依赖 |
-| `uv run` 执行 | ✅ | ✅ |
+基于 `agentskills.io` 开放标准，兼容 27+ 个 AI Agent 平台。
+
+| 特性 | Claude Code | OpenClaw | Hermes |
+|------|:--:|:--:|:--:|
+| `name` / `description` 触发 | ✅ | ✅ | ✅ |
+| `homepage` | — | ✅ | ✅ |
+| `platforms` | — | ✅ | ✅ |
+| `metadata.openclaw` | — | ✅ | — |
+| `metadata.hermes` | — | — | ✅ |
+| `requires: {}` | — | ✅ 零依赖 | — |
+| `uv run` 执行 | ✅ | ✅ | ✅ |
+
+**Hermes 安装路径：** `~/.hermes/skills/stoke/SKILL.md`
