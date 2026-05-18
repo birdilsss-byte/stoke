@@ -26,12 +26,12 @@
 
 | 层面 | 数据 | 来源 |
 |------|------|------|
-| 📈 行情 | 实时行情（5 档盘口）、历史 K 线 | 通达信 TCP |
-| 💹 估值 | 指数 PE 历史、全市场 PB | 腾讯财经 |
+| 📈 行情 | 实时行情（5 档盘口）、历史 K 线、PE/PB 估值 | 通达信 TCP + 腾讯 |
+| 📊 基础数据 | F10 财务快照 | 通达信 |
 | 📰 新闻 | 个股新闻、财联社电报（分钟级） | 东财 + 财联社 |
-| 📊 研报 | 机构研报（含 PDF 下载 + 盈利预测） | 东财 |
+| 📋 研报 | 机构研报（含 PDF 下载 + 盈利预测） | 东财 |
 | 🚀 信号 | **涨停板 + 强势涨停题材归因** + 概念/行业板块 | 同花顺 |
-| 📋 公告 | 巨潮资讯网公告 | 巨潮 |
+| 📑 公告 | 巨潮资讯网公告 | 巨潮 |
 
 **14 个接口，6 大层面，覆盖量化投研的核心数据需求。**
 
@@ -46,9 +46,9 @@ uv sync
 
 # 3. 查实时行情
 uv run python3 -c "
-from stoke.sources.mootdx_source import MootdxSource
-m = MootdxSource()
-df = m.get_realtime(['000001', '600000', '000858'])
+from stoke import Stoke
+s = Stoke()
+df = s.realtime(['000001', '600000', '000858'])
 print(df[['code', 'price', 'high', 'low', 'vol']].to_string())
 "
 ```
@@ -60,7 +60,7 @@ print(df[['code', 'price', 'high', 'low', 'vol']].to_string())
 Stoke 遵循 `agentskills.io` 开放标准，可在 **27+** 个 AI Agent 平台中直接安装：
 
 ```bash
-# 克隆到本地（macOS / Linux / Windows 通用）
+# 克隆到本地（macOS / Windows 通用）
 git clone https://github.com/birdilsss-byte/stoke.git ~/stoke
 cd ~/stoke && uv sync
 ```

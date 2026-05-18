@@ -109,14 +109,34 @@ t = TencentSource()
 
 ---
 
+## 统一入口（Stoke 门面类）
+
+所有数据源通过一个类访问，无需记忆哪个接口来自哪个源：
+
+```python
+from stoke import Stoke
+s = Stoke()
+
+s.realtime(["000001"])       # 实时行情     → mootdx
+s.kline("000001")            # K线          → mootdx
+s.news("000001")             # 个股新闻     → akshare
+s.research("000001")         # 研报         → akshare
+s.limit_up()                 # 涨停板       → akshare
+s.strong_stocks()            # 强势涨停     → akshare
+s.index_pe("上证50")          # PE估值       → tencent
+s.market_pb()                # PB估值       → tencent
+```
+
+各底层 Source 仍可直接访问：`s.mootdx.get_kline(...)`、`s.akshare.get_news(...)`。
+
 ## 常用查询模板
 
-### 查实时行情
+### 查实时行情（统一入口）
 ```bash
 cd "$STOKE_HOME" && uv run python3 -c "
-from stoke.sources.mootdx_source import MootdxSource
-m = MootdxSource()
-df = m.get_realtime(['000001', '600000', '000858'])
+from stoke import Stoke
+s = Stoke()
+df = s.realtime(['000001', '600000', '000858'])
 print(df[['code', 'price', 'open', 'high', 'low', 'vol', 'amount']].to_string())
 "
 ```
@@ -124,9 +144,9 @@ print(df[['code', 'price', 'open', 'high', 'low', 'vol', 'amount']].to_string())
 ### 查K线
 ```bash
 cd "$STOKE_HOME" && uv run python3 -c "
-from stoke.sources.mootdx_source import MootdxSource
-m = MootdxSource()
-df = m.get_kline('000001')
+from stoke import Stoke
+s = Stoke()
+df = s.kline('000001')
 print(df.tail(5)[['open', 'close', 'high', 'low', 'volume']].to_string())
 "
 ```
@@ -134,9 +154,9 @@ print(df.tail(5)[['open', 'close', 'high', 'low', 'volume']].to_string())
 ### 查今日强势涨停（含题材归因）
 ```bash
 cd "$STOKE_HOME" && uv run python3 -c "
-from stoke.sources.akshare_source import AKShareSource
-a = AKShareSource()
-df = a.get_strong_stocks()
+from stoke import Stoke
+s = Stoke()
+df = s.strong_stocks()
 print(df[['代码', '名称', '涨跌幅', '入选理由', '所属行业']].head(20).to_string())
 "
 ```
@@ -144,9 +164,9 @@ print(df[['代码', '名称', '涨跌幅', '入选理由', '所属行业']].head
 ### 查研报
 ```bash
 cd "$STOKE_HOME" && uv run python3 -c "
-from stoke.sources.akshare_source import AKShareSource
-a = AKShareSource()
-df = a.get_research_report('000001')
+from stoke import Stoke
+s = Stoke()
+df = s.research('000001')
 print(df[['报告名称', '机构', '东财评级', '日期']].head(10).to_string())
 "
 ```
@@ -154,16 +174,18 @@ print(df[['报告名称', '机构', '东财评级', '日期']].head(10).to_strin
 ### 查PE/PB估值
 ```bash
 cd "$STOKE_HOME" && uv run python3 -c "
-from stoke.sources.tencent_source import TencentSource
-t = TencentSource()
-pe = t.get_index_pe('上证50')
-pb = t.get_market_pb()
+from stoke import Stoke
+s = Stoke()
+pe = s.index_pe('上证50')
+pb = s.market_pb()
 print(f'上证50 PE: {pe[\"滚动市盈率\"].iloc[-1]:.2f} (日期: {pe[\"日期\"].iloc[-1]})')
 print(f'全市场 PB: {pb[\"middlePB\"].iloc[-1]:.2f} (日期: {pb[\"date\"].iloc[-1]})')
 "
 ```
 
 ---
+
+## 执行规则
 
 ## 执行规则
 
