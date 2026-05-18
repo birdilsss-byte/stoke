@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://pypi.org/project/stoke/"><img src="https://img.shields.io/badge/Python-3.11+-blue.svg" alt="Python"></a>
   <a href="https://github.com/birdilsss-byte/stoke/blob/master/LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License"></a>
-  <a href="https://github.com/birdilsss-byte/stoke/releases"><img src="https://img.shields.io/badge/version-1.0.0-brightgreen.svg" alt="Version"></a>
+  <a href="https://github.com/birdilsss-byte/stoke/releases"><img src="https://img.shields.io/badge/version-1.3.0-brightgreen.svg" alt="Version"></a>
   <img src="https://img.shields.io/badge/API%20Key-不需要-orange.svg" alt="No API Key">
 </p>
 
@@ -33,7 +33,7 @@
 | 🚀 信号 | **涨停板 + 强势涨停题材归因** + 概念/行业板块 | 同花顺 |
 | 📋 公告 | 巨潮资讯网公告 | 巨潮 |
 
-**13 个接口，6 大层面，覆盖量化投研的核心数据需求。**
+**14 个接口，6 大层面，覆盖量化投研的核心数据需求。**
 
 ## 3 秒开始
 
@@ -42,7 +42,7 @@
 git clone https://github.com/birdilsss-byte/stoke.git && cd stoke
 
 # 2. 安装（需要 Python 3.11+）
-pip install uv && uv sync && uv pip install -e .
+uv sync
 
 # 3. 查实时行情
 uv run python3 -c "
@@ -62,7 +62,7 @@ Stoke 遵循 `agentskills.io` 开放标准，可在 **27+** 个 AI Agent 平台�
 ```bash
 # 克隆到本地（macOS / Linux / Windows 通用）
 git clone https://github.com/birdilsss-byte/stoke.git ~/stoke
-cd ~/stoke && uv sync && uv pip install -e .
+cd ~/stoke && uv sync
 ```
 
 安装后设置环境变量 `STOKE_HOME` 指向克隆目录。然后在 Claude Code、OpenClaw 或 Hermes 中直接说 **"看看今天的涨停板"** 或 **"查一下平安银行行情"**，Skill 自动触发。
@@ -80,7 +80,7 @@ stoke/
 │   │   └── tencent_source.py     # PE / PB 估值
 │   ├── rate_limiter.py           # 限流器（带随机抖动）
 │   └── config.py                 # 配置
-├── tests/                        # 测试（13 个接口全部可测）
+├── tests/                        # 测试（14 个接口全部可测）
 ├── SKILL.md                      # Claude Code Skill 定义
 └── pyproject.toml                # uv 依赖管理
 ```
