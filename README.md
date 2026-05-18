@@ -55,28 +55,19 @@ print(df[['code', 'price', 'high', 'low', 'vol']].to_string())
 
 **不需要 API Key。不需要注册。不需要付费。**
 
-## 作为 Claude Code Skill 使用
+## 作为 Skill 使用（Claude Code · OpenClaw · Hermes）
 
-如果你用 [Claude Code](https://claude.ai/code)，Stoke 可以直接作为 Skill 安装：
+Stoke 遵循 `agentskills.io` 开放标准，可在 **27+** 个 AI Agent 平台中直接安装：
 
 ```bash
-# 方式一：克隆到本地
+# 克隆到本地（macOS / Linux / Windows 通用）
 git clone https://github.com/birdilsss-byte/stoke.git ~/stoke
 cd ~/stoke && uv sync && uv pip install -e .
-
-# 方式二：使用 skills 管理器安装（即将支持）
-npx skills add birdilsss-byte/stoke
 ```
 
-安装后设置环境变量：
+安装后设置环境变量 `STOKE_HOME` 指向克隆目录。然后在 Claude Code、OpenClaw 或 Hermes 中直接说 **"看看今天的涨停板"** 或 **"查一下平安银行行情"**，Skill 自动触发。
 
-```bash
-echo 'export STOKE_HOME=~/stoke' >> ~/.zshrc
-```
-
-然后在 Claude Code 中直接说 **"看看今天的涨停板"** 或 **"查一下平安银行行情"** 就能自动触发。
-
-Skill 配置文件 `SKILL.md` 同时兼容 **Claude Code** 和 **OpenClaw**，包含完整的触发词和使用说明。
+`SKILL.md` 同时兼容 **Claude Code** · **OpenClaw** · **Hermes**，一套文件，三平台通用。
 
 ## 项目结构
 

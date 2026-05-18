@@ -27,19 +27,24 @@ metadata:
 
 纯数据获取层，**零 API Key 依赖**，所有数据源免注册。兼容 **Claude Code** · **OpenClaw** · **Hermes**。
 
-## 🔧 首次安装
+## 🔧 安装（macOS / Linux / Windows 通用）
+
+**1. 克隆项目：**
 
 ```bash
-# 克隆并设置环境变量
 git clone https://github.com/birdilsss-byte/stoke.git ~/stoke
-cd ~/stoke
-export STOKE_HOME=~/stoke
-
-# 安装依赖
-uv sync && uv pip install -e .
+cd ~/stoke && uv sync && uv pip install -e .
 ```
 
-> 建议把 `export STOKE_HOME=~/stoke` 加入 `~/.zshrc` 或 `~/.bashrc`，以后就不用重复设置。
+**2. 设置 STOKE_HOME 环境变量：**
+
+| 系统 | 命令 |
+|------|------|
+| macOS / Linux | `echo 'export STOKE_HOME=~/stoke' >> ~/.bashrc` |
+| Windows PowerShell | `[Environment]::SetEnvironmentVariable('STOKE_HOME', "$env:USERPROFILE\stoke", 'User')` |
+| Windows CMD | `setx STOKE_HOME "%USERPROFILE%\stoke"` |
+
+环境变量只需设置一次，重启终端后生效。也可手动 `export` 当前会话立即使用。
 
 ---
 
