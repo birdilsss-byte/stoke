@@ -6,18 +6,45 @@ description: |
   当用户提到"股票"、"行情"、"K线"、"涨停"、"强势股"、"研报"、"PE"、"PB"、"估值"、
   "个股新闻"、"公告"、"题材"、"概念板块"、"行业板块"、"财联社"、"电报"、"A股"时触发。
   也用于查某只股票的实时价格、历史K线、财务研报、新闻公告等。
+homepage: https://github.com/birdilsss-byte/stoke
 metadata:
   openclaw:
     emoji: 🔥
     requires: {}
+    install:
+      uv:
+        - mootdx
+        - akshare
+        - pandas
+        - requests
 ---
 
 # Stoke — A股数据层技能
 
-纯数据获取层，**零 API Key 依赖**，所有数据源免注册。
+纯数据获取层，**零 API Key 依赖**，所有数据源免注册。兼容 **Claude Code** 和 **OpenClaw**。
 
-项目路径：`/Volumes/Black/Stoke/`
-运行方式：`uv run python3 -c "..."` （必须在项目根目录执行）
+## 🔧 环境检测（首次使用自动执行）
+
+```bash
+# 自动检测项目路径
+if [ -z "$STOKE_HOME" ]; then
+  # 优先用环境变量，其次查找本地克隆
+  if [ -d "/Volumes/Black/Stoke" ]; then
+    export STOKE_HOME="/Volumes/Black/Stoke"
+  else
+    STOKE_HOME=$(find / -maxdepth 5 -name "pyproject.toml" -exec grep -l 'name = "stoke"' {} \; 2>/dev/null | head -1 | xargs dirname 2>/dev/null)
+    if [ -z "$STOKE_HOME" ]; then
+      echo "⚠️ 未找到 stoke 项目，请设置 STOKE_HOME 环境变量或克隆仓库："
+      echo "   git clone https://github.com/birdilsss-byte/stoke.git ~/stoke"
+      echo "   export STOKE_HOME=~/stoke"
+      exit 1
+    fi
+  fi
+fi
+
+# 确保包已安装
+cd "$STOKE_HOME" && uv pip install -e . 2>/dev/null
+```
 
 ---
 
@@ -47,7 +74,7 @@ m = MootdxSource()
 | `health_check()` | 连通性 | `m.health_check()` |
 | `get_kline(symbol)` | 日K线，800条 | `m.get_kline("000001")` |
 | `get_realtime(symbols)` | 实时行情（5档盘口） | `m.get_realtime(["000001","600000"])` |
-| `get_stock_list()` | 全市场股票列表 | `m.get_stock_list()` |
+| `get_stock_list()` | 全市场股票列表（27046只） | `m.get_stock_list()` |
 | `get_f10(symbol)` | F10财务快照 | `m.get_f10("000001")` |
 
 ### 📰 akshare（东财/同花顺/巨潮/财联社）— 新闻+研报+公告+信号
@@ -86,7 +113,7 @@ t = TencentSource()
 
 ### 查实时行情
 ```bash
-cd /Volumes/Black/Stoke && uv run python3 -c "
+cd "$STOKE_HOME" && uv run python3 -c "
 from stoke.sources.mootdx_source import MootdxSource
 m = MootdxSource()
 df = m.get_realtime(['000001', '600000', '000858'])
@@ -96,18 +123,17 @@ print(df[['code', 'price', 'open', 'high', 'low', 'vol', 'amount']].to_string())
 
 ### 查K线
 ```bash
-cd /Volumes/Black/Stoke && uv run python3 -c "
+cd "$STOKE_HOME" && uv run python3 -c "
 from stoke.sources.mootdx_source import MootdxSource
 m = MootdxSource()
 df = m.get_kline('000001')
-# 显示最近5条
 print(df.tail(5)[['open', 'close', 'high', 'low', 'volume']].to_string())
 "
 ```
 
 ### 查今日强势涨停（含题材归因）
 ```bash
-cd /Volumes/Black/Stoke && uv run python3 -c "
+cd "$STOKE_HOME" && uv run python3 -c "
 from stoke.sources.akshare_source import AKShareSource
 a = AKShareSource()
 df = a.get_strong_stocks()
@@ -117,7 +143,7 @@ print(df[['代码', '名称', '涨跌幅', '入选理由', '所属行业']].head
 
 ### 查研报
 ```bash
-cd /Volumes/Black/Stoke && uv run python3 -c "
+cd "$STOKE_HOME" && uv run python3 -c "
 from stoke.sources.akshare_source import AKShareSource
 a = AKShareSource()
 df = a.get_research_report('000001')
@@ -127,7 +153,7 @@ print(df[['报告名称', '机构', '东财评级', '日期']].head(10).to_strin
 
 ### 查PE/PB估值
 ```bash
-cd /Volumes/Black/Stoke && uv run python3 -c "
+cd "$STOKE_HOME" && uv run python3 -c "
 from stoke.sources.tencent_source import TencentSource
 t = TencentSource()
 pe = t.get_index_pe('上证50')
@@ -141,12 +167,13 @@ print(f'全市场 PB: {pb[\"middlePB\"].iloc[-1]:.2f} (日期: {pb[\"date\"].ilo
 
 ## 执行规则
 
-1. **运行前先 cd 到项目根目录**：`cd /Volumes/Black/Stoke`
-2. **akshare 查询必须单条执行**：每次调用自动 5 秒限流，不能并行
-3. **结果中有中文时**：用 `to_string()` 而非直接 print DataFrame，避免编码问题
-4. **单次查询数据量过大时**：用 `.head(N)` 或 `.tail(N)` 截断显示
-5. **日期格式**：`YYYYMMDD`，如 `20260518`。不传则默认今天
-6. **股票代码**：mootdx 用纯数字（`"000001"`），akshare 也用纯数字（`"000001"`）
+1. **运行前先检测 STOKE_HOME**：优先用环境变量，其次查找本地克隆
+2. **首次使用需安装**：`cd "$STOKE_HOME" && uv sync && uv pip install -e .`
+3. **akshare 查询必须单条执行**：每次调用自动 5 秒限流，不能并行
+4. **结果中有中文时**：用 `to_string()` 而非直接 print DataFrame
+5. **单次查询数据量过大时**：用 `.head(N)` 或 `.tail(N)` 截断
+6. **日期格式**：`YYYYMMDD`，如 `20260518`。不传则默认今天
+7. **股票代码**：mootdx 用纯数字（`"000001"`），akshare 也用纯数字
 
 ---
 
@@ -154,7 +181,20 @@ print(f'全市场 PB: {pb[\"middlePB\"].iloc[-1]:.2f} (日期: {pb[\"date\"].ilo
 
 | 问题 | 原因 | 解决 |
 |------|------|------|
-| `connection aborted` | 东财限流触发 | 等待 10 秒后重试 |
-| `ModuleNotFoundError: stoke` | 包未安装 | `cd /Volumes/Black/Stoke && uv pip install -e .` |
+| `STOKE_HOME` 未设置 | 首次使用 | `export STOKE_HOME=/path/to/stoke` |
+| `connection aborted` | 东财限流 | 等待 10 秒后重试 |
+| `ModuleNotFoundError: stoke` | 包未安装 | `cd "$STOKE_HOME" && uv pip install -e .` |
 | mootdx K线数据为空 | 非交易日 | 检查日期是否为交易日 |
 | F10 返回异常 | pandas 3.0 兼容 | 暂时用 akshare 替代 |
+
+---
+
+## 平台兼容性
+
+| 特性 | Claude Code | OpenClaw |
+|------|:--:|:--:|
+| `name` / `description` 触发 | ✅ | ✅ |
+| `metadata.openclaw` | 忽略（安全） | ✅ |
+| `homepage` | 忽略 | ✅ |
+| `requires: {}` | — | ✅ 零依赖 |
+| `uv run` 执行 | ✅ | ✅ |
