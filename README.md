@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://pypi.org/project/stoke/"><img src="https://img.shields.io/badge/Python-3.11+-blue.svg" alt="Python"></a>
+  <a href="https://github.com/birdilsss-byte/stoke"><img src="https://img.shields.io/badge/Python-3.11+-blue.svg" alt="Python"></a>
   <a href="https://github.com/birdilsss-byte/stoke/blob/master/LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License"></a>
   <a href="https://github.com/birdilsss-byte/stoke/releases"><img src="https://img.shields.io/badge/version-1.3.0-brightgreen.svg" alt="Version"></a>
   <img src="https://img.shields.io/badge/API%20Key-不需要-orange.svg" alt="No API Key">
@@ -118,5 +118,5 @@ MIT — 拿去用，随便改，随便商用。
 
 <p align="center">
   <sub>Built with ❤️ by <a href="https://github.com/birdilsss-byte">birdilsss-byte</a> · 
-  Powered by <a href="https://github.com/birdilsss-byte/stoke">mootdx</a> + <a href="https://github.com/akfamily/akshare">akshare</a></sub>
+  Powered by <a href="https://github.com/mootdx/mootdx">mootdx</a> + <a href="https://github.com/akfamily/akshare">akshare</a></sub>
 </p>
