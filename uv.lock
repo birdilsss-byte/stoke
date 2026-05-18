@@ -793,8 +793,8 @@ wheels = [
 
 [[package]]
 name = "stoke"
-version = "0.1.0"
-source = { virtual = "." }
+version = "1.3.0"
+source = { editable = "." }
 dependencies = [
     { name = "akshare" },
     { name = "mootdx" },

@@ -20,14 +20,16 @@
 ```
 stoke/
 ├── stoke/                    # Python 包
-│   ├── __init__.py
+│   ├── __init__.py           # 导出 Stoke 统一入口
+│   ├── client.py             # Stoke 门面类（自动路由数据源）
 │   ├── config.py             # 全局配置
 │   ├── rate_limiter.py       # 统一限流器
+│   ├── utils.py              # 自动重试装饰器
 │   └── sources/              # 数据源适配层
 │       ├── __init__.py
-│       ├── mootdx_source.py
-│       ├── akshare_source.py
-│       └── tencent_source.py
+│       ├── mootdx_source.py  # 通达信：K线、实时行情、股票列表
+│       ├── akshare_source.py # 新闻、电报、研报、公告、涨停、板块
+│       └── tencent_source.py # PE / PB 估值
 ├── tests/                    # 测试
 ├── pyproject.toml
 └── CLAUDE.md

@@ -7,7 +7,7 @@ description: |
   "个股新闻"、"公告"、"题材"、"概念板块"、"行业板块"、"财联社"、"电报"、"A股"时触发。
   也用于查某只股票的实时价格、历史K线、财务研报、新闻公告等。
 homepage: https://github.com/birdilsss-byte/stoke
-platforms: [macos, linux, windows]
+platforms: [macos, windows]
 metadata:
   openclaw:
     emoji: 🔥
@@ -27,20 +27,20 @@ metadata:
 
 纯数据获取层，**零 API Key 依赖**，所有数据源免注册。兼容 **Claude Code** · **OpenClaw** · **Hermes**。
 
-## 🔧 安装（macOS / Linux / Windows 通用）
+## 🔧 安装（macOS / Windows 通用）
 
 **1. 克隆项目：**
 
 ```bash
 git clone https://github.com/birdilsss-byte/stoke.git ~/stoke
-cd ~/stoke && uv sync && uv pip install -e .
+cd ~/stoke && uv sync
 ```
 
 **2. 设置 STOKE_HOME 环境变量：**
 
 | 系统 | 命令 |
 |------|------|
-| macOS / Linux | `echo 'export STOKE_HOME=~/stoke' >> ~/.bashrc` |
+| macOS | `echo 'export STOKE_HOME=~/stoke' >> ~/.bashrc` |
 | Windows PowerShell | `[Environment]::SetEnvironmentVariable('STOKE_HOME', "$env:USERPROFILE\stoke", 'User')` |
 | Windows CMD | `setx STOKE_HOME "%USERPROFILE%\stoke"` |
 
@@ -168,7 +168,7 @@ print(f'全市场 PB: {pb[\"middlePB\"].iloc[-1]:.2f} (日期: {pb[\"date\"].ilo
 ## 执行规则
 
 1. **运行前先检测 STOKE_HOME**：优先用环境变量，其次查找本地克隆
-2. **首次使用需安装**：`cd "$STOKE_HOME" && uv sync && uv pip install -e .`
+2. **首次使用需安装**：`cd "$STOKE_HOME" && uv sync`
 3. **akshare 查询必须单条执行**：每次调用自动 5 秒限流，不能并行
 4. **结果中有中文时**：用 `to_string()` 而非直接 print DataFrame
 5. **单次查询数据量过大时**：用 `.head(N)` 或 `.tail(N)` 截断
@@ -183,7 +183,7 @@ print(f'全市场 PB: {pb[\"middlePB\"].iloc[-1]:.2f} (日期: {pb[\"date\"].ilo
 |------|------|------|
 | `STOKE_HOME` 未设置 | 首次使用 | `export STOKE_HOME=/path/to/stoke` |
 | `connection aborted` | 东财限流 | 等待 10 秒后重试 |
-| `ModuleNotFoundError: stoke` | 包未安装 | `cd "$STOKE_HOME" && uv pip install -e .` |
+| `ModuleNotFoundError: stoke` | 包未安装 | `cd "$STOKE_HOME" && uv sync` |
 | mootdx K线数据为空 | 非交易日 | 检查日期是否为交易日 |
 | F10 返回异常 | pandas 3.0 兼容性问题 | 用 `a.get_research_report(symbol)` 获取财务数据替代 |
 

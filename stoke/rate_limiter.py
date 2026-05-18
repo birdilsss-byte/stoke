@@ -3,10 +3,15 @@
 
 每个数据源实例化一个独立的 RateLimiter，调用前必须先 wait()。
 等待时间 = interval - elapsed + 随机抖动(0.1~0.5秒)。
+
+限流等待时会输出日志，方便观察调用节奏。
 """
 
 import time
 import random
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class RateLimiter:
@@ -31,6 +36,7 @@ class RateLimiter:
         if elapsed < self.interval:
             # 加上 0.1~0.5 秒的随机抖动，避免多个并发请求的同步
             sleep_time = self.interval - elapsed + random.uniform(0.1, 0.5)
+            logger.debug("限流等待 %.2f 秒", sleep_time)
             time.sleep(sleep_time)
 
         self.last_request_time = time.time()

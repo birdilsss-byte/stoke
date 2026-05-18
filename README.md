@@ -74,12 +74,15 @@ cd ~/stoke && uv sync
 ```
 stoke/
 ├── stoke/                        # Python 包
-│   ├── sources/                  # 数据源适配
-│   │   ├── mootdx_source.py      # 通达信：K线、实时行情、股票列表
-│   │   ├── akshare_source.py     # 新闻、电报、研报、公告、涨停、概念
-│   │   └── tencent_source.py     # PE / PB 估值
-│   ├── rate_limiter.py           # 限流器（带随机抖动）
-│   └── config.py                 # 配置
+│   ├── __init__.py               # 导出 Stoke 统一入口
+│   ├── client.py                 # Stoke 门面类（自动路由数据源）
+│   ├── config.py                 # 配置
+│   ├── rate_limiter.py           # 限流器（带随机抖动+日志）
+│   ├── utils.py                  # 自动重试装饰器
+│   └── sources/                  # 数据源适配
+│       ├── mootdx_source.py      # 通达信：K线、实时行情、股票列表
+│       ├── akshare_source.py     # 新闻、电报、研报、公告、涨停、概念
+│       └── tencent_source.py     # PE / PB 估值
 ├── tests/                        # 测试（14 个接口全部可测）
 ├── SKILL.md                      # Claude Code Skill 定义
 └── pyproject.toml                # uv 依赖管理
