@@ -50,3 +50,4 @@ stoke/
 2. **保持简单** — 不做缓存、不做过度抽象、三个 Source 各自独立不强制统一接口
 3. **health_check() 必实现** — 每个 Source 都要能快速验证连通性
 4. **返回 DataFrame** — 行情/K线/公告用 DataFrame，纯文本类（如新闻、财联社电报）可用 list[dict]
+5. **改代码前先 pull，改完后 rebase + push** — `git pull --rebase && git push`，多实例协作不互相踩脚
