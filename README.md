@@ -60,10 +60,23 @@ print(df[['code', 'price', 'high', 'low', 'vol']].to_string())
 如果你用 [Claude Code](https://claude.ai/code)，Stoke 可以直接作为 Skill 安装：
 
 ```bash
-# 安装后，直接说"看看今天的涨停板"就能触发
+# 方式一：克隆到本地
+git clone https://github.com/birdilsss-byte/stoke.git ~/stoke
+cd ~/stoke && uv sync && uv pip install -e .
+
+# 方式二：使用 skills 管理器安装（即将支持）
+npx skills add birdilsss-byte/stoke
 ```
 
-Skill 配置文件已在项目根目录 `SKILL.md`，包含完整的触发词和使用说明。
+安装后设置环境变量：
+
+```bash
+echo 'export STOKE_HOME=~/stoke' >> ~/.zshrc
+```
+
+然后在 Claude Code 中直接说 **"看看今天的涨停板"** 或 **"查一下平安银行行情"** 就能自动触发。
+
+Skill 配置文件 `SKILL.md` 同时兼容 **Claude Code** 和 **OpenClaw**，包含完整的触发词和使用说明。
 
 ## 项目结构
 

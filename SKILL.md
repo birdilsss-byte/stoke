@@ -23,28 +23,19 @@ metadata:
 
 纯数据获取层，**零 API Key 依赖**，所有数据源免注册。兼容 **Claude Code** 和 **OpenClaw**。
 
-## 🔧 环境检测（首次使用自动执行）
+## 🔧 首次安装
 
 ```bash
-# 自动检测项目路径
-if [ -z "$STOKE_HOME" ]; then
-  # 优先用环境变量，其次查找本地克隆
-  if [ -d "/Volumes/Black/Stoke" ]; then
-    export STOKE_HOME="/Volumes/Black/Stoke"
-  else
-    STOKE_HOME=$(find / -maxdepth 5 -name "pyproject.toml" -exec grep -l 'name = "stoke"' {} \; 2>/dev/null | head -1 | xargs dirname 2>/dev/null)
-    if [ -z "$STOKE_HOME" ]; then
-      echo "⚠️ 未找到 stoke 项目，请设置 STOKE_HOME 环境变量或克隆仓库："
-      echo "   git clone https://github.com/birdilsss-byte/stoke.git ~/stoke"
-      echo "   export STOKE_HOME=~/stoke"
-      exit 1
-    fi
-  fi
-fi
+# 克隆并设置环境变量
+git clone https://github.com/birdilsss-byte/stoke.git ~/stoke
+cd ~/stoke
+export STOKE_HOME=~/stoke
 
-# 确保包已安装
-cd "$STOKE_HOME" && uv pip install -e . 2>/dev/null
+# 安装依赖
+uv sync && uv pip install -e .
 ```
+
+> 建议把 `export STOKE_HOME=~/stoke` 加入 `~/.zshrc` 或 `~/.bashrc`，以后就不用重复设置。
 
 ---
 
@@ -185,7 +176,7 @@ print(f'全市场 PB: {pb[\"middlePB\"].iloc[-1]:.2f} (日期: {pb[\"date\"].ilo
 | `connection aborted` | 东财限流 | 等待 10 秒后重试 |
 | `ModuleNotFoundError: stoke` | 包未安装 | `cd "$STOKE_HOME" && uv pip install -e .` |
 | mootdx K线数据为空 | 非交易日 | 检查日期是否为交易日 |
-| F10 返回异常 | pandas 3.0 兼容 | 暂时用 akshare 替代 |
+| F10 返回异常 | pandas 3.0 兼容性问题 | 用 `a.get_research_report(symbol)` 获取财务数据替代 |
 
 ---
 
