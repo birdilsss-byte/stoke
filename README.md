@@ -38,13 +38,18 @@
 ## 3 秒开始
 
 ```bash
-# 1. 克隆
+# 1. 安装 uv（如果还没有）
+#    macOS: brew install uv
+#    Windows: winget install astral.uv
+#    或官方脚本: https://docs.astral.sh/uv/getting-started/installation/
+
+# 2. 克隆
 git clone https://github.com/birdilsss-byte/stoke.git && cd stoke
 
-# 2. 安装（需要 Python 3.11+）
+# 3. 安装依赖（需要 Python 3.11+）
 uv sync
 
-# 3. 查实时行情
+# 4. 查实时行情
 uv run python3 -c "
 from stoke import Stoke
 s = Stoke()
@@ -60,7 +65,8 @@ print(df[['code', 'price', 'high', 'low', 'vol']].to_string())
 Stoke 遵循 `agentskills.io` 开放标准，可在 **27+** 个 AI Agent 平台中直接安装：
 
 ```bash
-# 克隆到本地（macOS / Windows 通用）
+# 先安装 uv（如果还没有）：brew install uv 或 winget install astral.uv
+# 然后：
 git clone https://github.com/birdilsss-byte/stoke.git ~/stoke
 cd ~/stoke && uv sync
 ```

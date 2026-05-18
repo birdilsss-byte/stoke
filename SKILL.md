@@ -29,14 +29,18 @@ metadata:
 
 ## 🔧 安装（macOS / Windows 通用）
 
-**1. 克隆项目：**
+**1. 安装 uv（如果还没有）：**
+   macOS: `brew install uv` | Windows: `winget install astral.uv`
+   或官网脚本：https://docs.astral.sh/uv/getting-started/installation/
+
+**2. 克隆项目：**
 
 ```bash
 git clone https://github.com/birdilsss-byte/stoke.git ~/stoke
 cd ~/stoke && uv sync
 ```
 
-**2. 设置 STOKE_HOME 环境变量：**
+**3. 设置 STOKE_HOME 环境变量：**
 
 | 系统 | 命令 |
 |------|------|
@@ -184,8 +188,6 @@ print(f'全市场 PB: {pb[\"middlePB\"].iloc[-1]:.2f} (日期: {pb[\"date\"].ilo
 ```
 
 ---
-
-## 执行规则
 
 ## 执行规则
 
