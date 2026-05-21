@@ -328,6 +328,8 @@ class Store:
         Returns:
             DataFrame（已写入缓存的数据）
         """
+        _validate_identifier(table, "表名")
+        _validate_identifier(key_column, "列名")
         now = datetime.now().isoformat()
 
         # 日期 key 统一为 YYYY-MM-DD 格式（与存储格式一致）
