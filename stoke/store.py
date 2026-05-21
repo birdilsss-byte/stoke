@@ -403,7 +403,7 @@ class Store:
             logger.info("预热: 股票列表")
             self.get_or_fetch("stock_list", "all",
                 lambda: s.mootdx.get_stock_list(),
-                max_age_sec=TTL["stocklist"], mode="overwrite")
+                max_age_sec=TTL["stock_list"], mode="overwrite")
             warmed.append("stock_list")
         except Exception as e:
             logger.warning("预热失败 stock_list: %s", e)
