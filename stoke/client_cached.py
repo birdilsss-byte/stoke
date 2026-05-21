@@ -6,7 +6,7 @@ StokeCached — 带 SQLite 缓存的 Stoke 包装器
 """
 
 import logging
-from typing import Optional
+from typing import Optional, Callable
 
 import pandas as pd
 
@@ -25,7 +25,33 @@ class StokeCached:
     def __init__(self, stoke: Optional[StokeRaw] = None):
         self._s = stoke or StokeRaw()
         self.store = Store()
+        self._degraded = False
         logger.info("StokeCached 初始化完成（缓存已开启）")
+
+    def _cached_call(
+        self,
+        table: str,
+        key: str,
+        fetcher: Callable[[], pd.DataFrame],
+        fallback: Callable[[], pd.DataFrame],
+        max_age_sec: int,
+        mode: str,
+        key_column: str = "symbol",
+        column_map: Optional[dict] = None,
+    ) -> pd.DataFrame:
+        """缓存读写 + 故障自动降级，降级后置 _degraded 标志避免重复触发限流"""
+        if self._degraded:
+            return fallback()
+        try:
+            return self.store.get_or_fetch(
+                table, key, fetcher,
+                max_age_sec=max_age_sec, mode=mode,
+                key_column=key_column, column_map=column_map,
+            )
+        except Exception:
+            logger.warning("缓存故障，降级直连 %s", table)
+            self._degraded = True
+            return fallback()
 
     # ===== 12 个缓存方法 =====
 
@@ -39,159 +65,124 @@ class StokeCached:
                     if "datetime" in df.columns:
                         df["date"] = pd.to_datetime(df["datetime"]).dt.strftime("%Y-%m-%d")
                 return df
-            try:
-                return self.store.get_or_fetch(
-                    "kline_daily", symbol, _fetch,
-                    max_age_sec=STORE_TTL["klinedaily"], mode="append",
-                )
-            except Exception:
-                logger.warning("缓存故障，降级直连 kline(%s)", symbol)
+            return self._cached_call(
+                "kline_daily", symbol, _fetch,
+                lambda: self._s.mootdx.get_kline(symbol, frequency, start, offset),
+                max_age_sec=STORE_TTL["kline_daily"], mode="append",
+            )
         return self._s.mootdx.get_kline(symbol, frequency, start, offset)
 
     def limit_up(self, date: Optional[str] = None) -> pd.DataFrame:
         real_date = date or today_str()
-        try:
-            return self.store.get_or_fetch(
-                "limit_up", real_date,
-                lambda: self._s.akshare.get_limit_up_pool(real_date),
-                max_age_sec=STORE_TTL["limitup"], mode="replace", key_column="date",
-                column_map={"代码": "symbol", "名称": "name", "涨跌幅": "change_pct",
-                            "连板数": "board_count", "所属行业": "industry"},
-            )
-        except Exception:
-            logger.warning("缓存故障，降级直连 limit_up")
-        return self._s.akshare.get_limit_up_pool(date)
+        return self._cached_call(
+            "limit_up", real_date,
+            lambda: self._s.akshare.get_limit_up_pool(real_date),
+            lambda: self._s.akshare.get_limit_up_pool(date),
+            max_age_sec=STORE_TTL["limit_up"], mode="replace", key_column="date",
+            column_map={"代码": "symbol", "名称": "name", "涨跌幅": "change_pct",
+                        "连板数": "board_count", "所属行业": "industry"},
+        )
 
     def strong_stocks(self, date: Optional[str] = None) -> pd.DataFrame:
         real_date = date or today_str()
-        try:
-            return self.store.get_or_fetch(
-                "strong_stocks", real_date,
-                lambda: self._s.akshare.get_strong_stocks(real_date),
-                max_age_sec=STORE_TTL["strongstocks"], mode="replace", key_column="date",
-                column_map={"代码": "symbol", "名称": "name", "涨跌幅": "change_pct",
-                            "入选理由": "reason", "所属行业": "industry"},
-            )
-        except Exception:
-            logger.warning("缓存故障，降级直连 strong_stocks")
-        return self._s.akshare.get_strong_stocks(date)
+        return self._cached_call(
+            "strong_stocks", real_date,
+            lambda: self._s.akshare.get_strong_stocks(real_date),
+            lambda: self._s.akshare.get_strong_stocks(date),
+            max_age_sec=STORE_TTL["strong_stocks"], mode="replace", key_column="date",
+            column_map={"代码": "symbol", "名称": "name", "涨跌幅": "change_pct",
+                        "入选理由": "reason", "所属行业": "industry"},
+        )
 
     def sector_rank(self) -> pd.DataFrame:
         real_date = today_str()
-        try:
-            return self.store.get_or_fetch(
-                "sector_rank", real_date,
-                lambda: self._s.akshare.get_sector_rank(),
-                max_age_sec=STORE_TTL["sector_rank"], mode="replace", key_column="date",
-                column_map={"名称": "sector_name", "涨跌幅": "change_pct"},
-            )
-        except Exception:
-            logger.warning("缓存故障，降级直连 sector_rank")
-        return self._s.akshare.get_sector_rank()
+        return self._cached_call(
+            "sector_rank", real_date,
+            lambda: self._s.akshare.get_sector_rank(),
+            lambda: self._s.akshare.get_sector_rank(),
+            max_age_sec=STORE_TTL["sector_rank"], mode="replace", key_column="date",
+            column_map={"名称": "sector_name", "涨跌幅": "change_pct"},
+        )
 
     def market_breadth(self) -> pd.DataFrame:
         real_date = today_str()
-        try:
-            return self.store.get_or_fetch(
-                "market_breadth", real_date,
-                lambda: self._s.akshare.get_market_breadth(),
-                max_age_sec=STORE_TTL["marketbreadth"], mode="replace", key_column="date",
-            )
-        except Exception:
-            logger.warning("缓存故障，降级直连 market_breadth")
-        return self._s.akshare.get_market_breadth()
+        return self._cached_call(
+            "market_breadth", real_date,
+            lambda: self._s.akshare.get_market_breadth(),
+            lambda: self._s.akshare.get_market_breadth(),
+            max_age_sec=STORE_TTL["market_breadth"], mode="replace", key_column="date",
+        )
 
     def market_volume(self) -> pd.DataFrame:
-        try:
-            return self.store.get_or_fetch(
-                "market_volume", today_str(),
-                lambda: self._s.akshare.get_market_volume(),
-                max_age_sec=STORE_TTL["market_volume"], mode="append", key_column="date",
-                column_map={"日期": "date", "上证-收盘价": "sh_close", "上证-涨跌幅": "sh_change",
-                            "深证-收盘价": "sz_close", "深证-涨跌幅": "sz_change",
-                            "主力净流入-净额": "main_net"},
-            )
-        except Exception:
-            logger.warning("缓存故障，降级直连 market_volume")
-        return self._s.akshare.get_market_volume()
+        return self._cached_call(
+            "market_volume", today_str(),
+            lambda: self._s.akshare.get_market_volume(),
+            lambda: self._s.akshare.get_market_volume(),
+            max_age_sec=STORE_TTL["market_volume"], mode="append", key_column="date",
+            column_map={"日期": "date", "上证-收盘价": "sh_close", "上证-涨跌幅": "sh_change",
+                        "深证-收盘价": "sz_close", "深证-涨跌幅": "sz_change",
+                        "主力净流入-净额": "main_net"},
+        )
 
     def northbound_flow(self) -> pd.DataFrame:
-        try:
-            return self.store.get_or_fetch(
-                "northbound_flow", today_str(),
-                lambda: self._s.akshare.get_northbound_flow(),
-                max_age_sec=STORE_TTL["northboundflow"], mode="append", key_column="date",
-                column_map={"日期": "date", "当日成交净买额": "net_buy",
-                            "买入成交额": "buy_amount", "卖出成交额": "sell_amount",
-                            "持股市值": "hold_balance"},
-            )
-        except Exception:
-            logger.warning("缓存故障，降级直连 northbound_flow")
-        return self._s.akshare.get_northbound_flow()
+        return self._cached_call(
+            "northbound_flow", today_str(),
+            lambda: self._s.akshare.get_northbound_flow(),
+            lambda: self._s.akshare.get_northbound_flow(),
+            max_age_sec=STORE_TTL["northbound_flow"], mode="append", key_column="date",
+            column_map={"日期": "date", "当日成交净买额": "net_buy",
+                        "买入成交额": "buy_amount", "卖出成交额": "sell_amount",
+                        "持股市值": "hold_balance"},
+        )
 
     def dragon_tiger(self) -> pd.DataFrame:
         real_date = today_str()
-        try:
-            return self.store.get_or_fetch(
-                "dragon_tiger", real_date,
-                lambda: self._s.efinance.get_daily_billboard(),
-                max_age_sec=STORE_TTL["dragon_tiger"], mode="replace", key_column="date",
-                column_map={"股票代码": "symbol", "股票名称": "name",
-                            "龙虎榜净买额": "net_buy_amount", "涨跌幅": "change_pct",
-                            "换手率": "turnover", "解读": "reason"},
-            )
-        except Exception:
-            logger.warning("缓存故障，降级直连 dragon_tiger")
-        return self._s.efinance.get_daily_billboard()
+        return self._cached_call(
+            "dragon_tiger", real_date,
+            lambda: self._s.efinance.get_daily_billboard(),
+            lambda: self._s.efinance.get_daily_billboard(),
+            max_age_sec=STORE_TTL["dragon_tiger"], mode="replace", key_column="date",
+            column_map={"股票代码": "symbol", "股票名称": "name",
+                        "龙虎榜净买额": "net_buy_amount", "涨跌幅": "change_pct",
+                        "换手率": "turnover", "解读": "reason"},
+        )
 
     def hot_keywords(self) -> pd.DataFrame:
-        try:
-            return self.store.get_or_fetch(
-                "hot_keywords", today_str(),
-                lambda: self._s.akshare.get_hot_keywords(),
-                max_age_sec=STORE_TTL["hotkeywords"], mode="replace", key_column="date",
-                column_map={"概念名称": "concept_name", "股票代码": "symbol", "热度": "heat"},
-            )
-        except Exception:
-            logger.warning("缓存故障，降级直连 hot_keywords")
-        return self._s.akshare.get_hot_keywords()
+        return self._cached_call(
+            "hot_keywords", today_str(),
+            lambda: self._s.akshare.get_hot_keywords(),
+            lambda: self._s.akshare.get_hot_keywords(),
+            max_age_sec=STORE_TTL["hot_keywords"], mode="replace", key_column="date",
+            column_map={"概念名称": "concept_name", "股票代码": "symbol", "热度": "heat"},
+        )
 
     def stock_comment_all(self) -> pd.DataFrame:
-        try:
-            return self.store.get_or_fetch(
-                "stock_comment", today_str(),
-                lambda: self._s.akshare.get_stock_comment_all(),
-                max_age_sec=STORE_TTL["stock_comment"], mode="replace", key_column="date",
-                column_map={"代码": "symbol", "名称": "name", "综合得分": "score",
-                            "主力成本": "main_cost", "关注指数": "focus_index"},
-            )
-        except Exception:
-            logger.warning("缓存故障，降级直连 stock_comment_all")
-        return self._s.akshare.get_stock_comment_all()
+        return self._cached_call(
+            "stock_comment", today_str(),
+            lambda: self._s.akshare.get_stock_comment_all(),
+            lambda: self._s.akshare.get_stock_comment_all(),
+            max_age_sec=STORE_TTL["stock_comment"], mode="replace", key_column="date",
+            column_map={"代码": "symbol", "名称": "name", "综合得分": "score",
+                        "主力成本": "main_cost", "关注指数": "focus_index"},
+        )
 
     def index_pe(self, index_name: str = "上证50") -> pd.DataFrame:
-        try:
-            return self.store.get_or_fetch(
-                "index_pe", index_name,
-                lambda: self._s.tencent.get_index_pe(index_name),
-                max_age_sec=STORE_TTL["indexpe"], mode="append", key_column="index_name",
-                column_map={"日期": "date", "指数": "index_name",
-                            "滚动市盈率": "pe_ttm", "静态市盈率": "pe_static"},
-            )
-        except Exception:
-            logger.warning("缓存故障，降级直连 index_pe(%s)", index_name)
-        return self._s.tencent.get_index_pe(index_name)
+        return self._cached_call(
+            "index_pe", index_name,
+            lambda: self._s.tencent.get_index_pe(index_name),
+            lambda: self._s.tencent.get_index_pe(index_name),
+            max_age_sec=STORE_TTL["index_pe"], mode="append", key_column="index_name",
+            column_map={"日期": "date", "指数": "index_name",
+                        "滚动市盈率": "pe_ttm", "静态市盈率": "pe_static"},
+        )
 
     def market_pb(self) -> pd.DataFrame:
-        try:
-            return self.store.get_or_fetch(
-                "market_pb", today_str(),
-                lambda: self._s.tencent.get_market_pb(),
-                max_age_sec=STORE_TTL["marketpb"], mode="append", key_column="date",
-            )
-        except Exception:
-            logger.warning("缓存故障，降级直连 market_pb")
-        return self._s.tencent.get_market_pb()
+        return self._cached_call(
+            "market_pb", today_str(),
+            lambda: self._s.tencent.get_market_pb(),
+            lambda: self._s.tencent.get_market_pb(),
+            max_age_sec=STORE_TTL["market_pb"], mode="append", key_column="date",
+        )
 
     # ===== 透传：其余 36 个方法自动代理到裸 Stoke =====
 
