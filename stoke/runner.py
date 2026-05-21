@@ -23,7 +23,7 @@ def daily_routine() -> MarketContext:
     Returns:
         MarketContext — 包含市场阶段、风险等级、建议仓位、候选标的
     """
-    s = Stoke()  # 默认 StokeCached（带缓存）
+    s = Stoke()  # StokeCached（带缓存），warmup 需传裸 Stoke 实例避免缓存回环
     ctx = MarketContext()
     ctx.trade_date = datetime.now().date()
     ctx.last_update = datetime.now().isoformat()
