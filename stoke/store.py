@@ -455,7 +455,7 @@ class Store:
                 self.get_or_fetch(
                     table_name, key,
                     fetcher_fn,
-                    max_age_sec=TTL.get(table_name.replace("_", ""), 86400),
+                    max_age_sec=TTL.get(table_name, 86400),
                     mode=wr_mode, key_column=key_col,
                     column_map=col_map,
                 )
