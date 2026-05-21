@@ -369,7 +369,7 @@ class Store:
         if "date" not in df.columns and key not in ("all", "today"):
             from datetime import date
             if isinstance(key, str) and len(key) == 8:
-                df["date"] = f"{key[:4]}-{key[2:4]}-{key[4:]}"
+                df["date"] = f"{key[:4]}-{key[4:6]}-{key[6:]}"
             else:
                 df["date"] = str(key)
         # 去重（避免主键冲突导致写入失败）
