@@ -5,10 +5,17 @@ description = "A股量化投研数据层 — 覆盖行情/研报/信号/新闻/�
 requires-python = ">=3.11"
 dependencies = [
     "akshare>=1.18.60",
+    "baostock>=0.9.1",
+    "efinance>=0.5.8",
     "mootdx>=0.11.7",
     "pandas>=3.0.3",
+    "pytdx>=1.72",
     "requests>=2.34.2",
+    "tickflow>=0.1.21",
 ]
+
+[tool.setuptools.packages.find]
+exclude = ["Team*"]
 
 [build-system]
 requires = ["setuptools"]

@@ -161,3 +161,26 @@ class MootdxSource:
         except Exception as e:
             logger.error("获取 F10 失败 %s: %s", symbol, e)
             return None
+
+    # ---------- 板块数据 ----------
+
+    def get_sector_members(self, sector_name: str) -> pd.DataFrame:
+        """
+        获取板块/指数成分股列表
+
+        数据来源：通达信 block 数据库，含所有板块/指数的成分股关系。
+        用 blockname 过滤，如需获取行业板块成分股名称，先通过 akshare
+        的 get_sector_rank() 获取板块名称列表。
+
+        Args:
+            sector_name: 板块名称，如 '沪深300'、'精选指数'
+
+        Returns:
+            DataFrame，含 blockname、block_type、code_index、code 等列
+        """
+        self.limiter.wait()
+        logger.info("获取板块成分股: %s", sector_name)
+        blocks = self._call("get_sector_members", self.client.block)
+        result = blocks[blocks['blockname'] == sector_name].copy()
+        logger.info("板块 %s: 共 %d 只成分股", sector_name, len(result))
+        return result

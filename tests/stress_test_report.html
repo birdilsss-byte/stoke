@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stoke 全接口压力测试报告</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f5f7fa; color: #333; padding: 30px; }
+.container { max-width: 1400px; margin: 0 auto; }
+h1 { font-size: 26px; margin-bottom: 8px; color: #2c3e50; }
+.subtitle { color: #7f8c8d; font-size: 14px; margin-bottom: 25px; }
+
+/* 汇总卡片 */
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
+.card { background: white; border-radius: 12px; padding: 18px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.card .num { font-size: 28px; font-weight: 700; }
+.card .label { font-size: 12px; color: #95a5a6; margin-top: 4px; }
+.card.pass .num { color: #27ae60; }
+.card.warn .num { color: #f39c12; }
+.card.fail .num { color: #e74c3c; }
+.card.info .num { color: #2980b9; }
+.card.time .num { color: #8e44ad; }
+
+/* 分类统计 */
+.category-section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.category-section h2 { font-size: 18px; margin-bottom: 15px; color: #2c3e50; border-left: 4px solid #3498db; padding-left: 12px; }
+.category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.cat-card { border: 1px solid #eee; border-radius: 8px; padding: 14px; }
+.cat-card .cat-name { font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+.cat-card .cat-stat { font-size: 13px; color: #666; }
+.cat-card .cat-bar { height: 6px; border-radius: 3px; margin-top: 8px; background: #ecf0f1; overflow: hidden; }
+.cat-card .cat-bar-inner { height: 100%; border-radius: 3px; transition: width 0.5s; }
+
+/* 表格 */
+table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+th { background: #2c3e50; color: white; padding: 12px 10px; font-size: 13px; text-align: left; font-weight: 500; }
+td { padding: 10px; border-bottom: 1px solid #ecf0f1; font-size: 13px; vertical-align: middle; }
+tr:hover { background: #f8f9fa; }
+tr.fail-row { background: #fdf0ef; }
+tr.warn-row { background: #fef9e7; }
+
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+.tag-行情 { background: #e8f8f5; color: #1abc9c; }
+.tag-信号 { background: #fef9e7; color: #f39c12; }
+.tag-新闻 { background: #ebf5fb; color: #3498db; }
+.tag-研报 { background: #f4ecf7; color: #9b59b6; }
+.tag-公告 { background: #fdedec; color: #e74c3c; }
+.tag-板块 { background: #eafaf1; color: #27ae60; }
+.tag-资金流 { background: #fdf2e9; color: #e67e22; }
+.tag-情绪 { background: #f5eef8; color: #8e44ad; }
+.tag-估值 { background: #e8f6f3; color: #1abc9c; }
+.tag-基础数据 { background: #f0f3f4; color: #7f8c8d; }
+
+.footer { margin-top: 20px; text-align: center; color: #95a5a6; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>📊 Stoke 全接口压力测试报告</h1>
+<p class="subtitle">测试时间: 2026-05-19 15:26:49 &nbsp;|&nbsp; 总耗时: 189.9s</p>
+
+<div class="summary-grid">
+    <div class="card pass"><div class="num">39</div><div class="label">✅ 通过</div></div>
+    <div class="card warn"><div class="num">0</div><div class="label">⚠️ 告警</div></div>
+    <div class="card fail"><div class="num">1</div><div class="label">❌ 失败</div></div>
+    <div class="card info"><div class="num">40</div><div class="label">📦 总计</div></div>
+    <div class="card time"><div class="num">4.75s</div><div class="label">⏱ 均响应</div></div>
+    <div class="card info"><div class="num">94.2</div><div class="label">🏆 均分</div></div>
+    <div class="card info"><div class="num">71,313</div><div class="label">📄 总行数</div></div>
+</div>
+
+<!-- 分类统计 -->
+<div class="category-section">
+<h2>分类表现</h2>
+<div class="category-grid">
+
+    <div class="cat-card">
+        <div class="cat-name">估值</div>
+        <div class="cat-stat">通过 3/4 &nbsp;|&nbsp; 均分 78 &nbsp;|&nbsp; 均耗时 2.6s</div>
+        <div class="cat-bar"><div class="cat-bar-inner" style="width:75%;background:#1abc9c"></div></div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-name">信号</div>
+        <div class="cat-stat">通过 2/2 &nbsp;|&nbsp; 均分 97 &nbsp;|&nbsp; 均耗时 3.7s</div>
+        <div class="cat-bar"><div class="cat-bar-inner" style="width:100%;background:#f39c12"></div></div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-name">公告</div>
+        <div class="cat-stat">通过 2/2 &nbsp;|&nbsp; 均分 95 &nbsp;|&nbsp; 均耗时 6.8s</div>
+        <div class="cat-bar"><div class="cat-bar-inner" style="width:100%;background:#e74c3c"></div></div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-name">基础数据</div>
+        <div class="cat-stat">通过 3/3 &nbsp;|&nbsp; 均分 99 &nbsp;|&nbsp; 均耗时 0.6s</div>
+        <div class="cat-bar"><div class="cat-bar-inner" style="width:100%;background:#7f8c8d"></div></div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-name">情绪</div>
+        <div class="cat-stat">通过 11/11 &nbsp;|&nbsp; 均分 94 &nbsp;|&nbsp; 均耗时 7.4s</div>
+        <div class="cat-bar"><div class="cat-bar-inner" style="width:100%;background:#8e44ad"></div></div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-name">新闻</div>
+        <div class="cat-stat">通过 3/3 &nbsp;|&nbsp; 均分 97 &nbsp;|&nbsp; 均耗时 3.6s</div>
+        <div class="cat-bar"><div class="cat-bar-inner" style="width:100%;background:#3498db"></div></div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-name">板块</div>
+        <div class="cat-stat">通过 2/2 &nbsp;|&nbsp; 均分 94 &nbsp;|&nbsp; 均耗时 7.1s</div>
+        <div class="cat-bar"><div class="cat-bar-inner" style="width:100%;background:#27ae60"></div></div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-name">研报</div>
+        <div class="cat-stat">通过 2/2 &nbsp;|&nbsp; 均分 96 &nbsp;|&nbsp; 均耗时 6.3s</div>
+        <div class="cat-bar"><div class="cat-bar-inner" style="width:100%;background:#9b59b6"></div></div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-name">行情</div>
+        <div class="cat-stat">通过 4/4 &nbsp;|&nbsp; 均分 99 &nbsp;|&nbsp; 均耗时 0.1s</div>
+        <div class="cat-bar"><div class="cat-bar-inner" style="width:100%;background:#1abc9c"></div></div>
+    </div>
+
+    <div class="cat-card">
+        <div class="cat-name">资金流</div>
+        <div class="cat-stat">通过 7/7 &nbsp;|&nbsp; 均分 96 &nbsp;|&nbsp; 均耗时 5.3s</div>
+        <div class="cat-bar"><div class="cat-bar-inner" style="width:100%;background:#e67e22"></div></div>
+    </div>
+</div>
+</div>
+
+<!-- 明细表格 -->
+<table>
+<thead>
+<tr>
+    <th>#</th><th>接口名称</th><th>类别</th><th>源</th><th>状态</th>
+    <th>准确度</th><th>耗时</th><th>格式</th><th>行×列</th><th>字段预览</th><th>备注</th><th>评分</th>
+</tr>
+</thead>
+<tbody>
+
+        <tr>
+            <td>1</td>
+            <td>realtime(多只)</td>
+            <td><span class="tag tag-行情">行情</span></td>
+            <td>mootdx</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">0.24s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>3 行 × 46 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">market, code, active1, price, last_close, open</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">99</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>realtime(单只)</td>
+            <td><span class="tag tag-行情">行情</span></td>
+            <td>mootdx</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">0.05s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>1 行 × 46 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">market, code, active1, price, last_close, open</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">99</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>kline 历史K线(日线)</td>
+            <td><span class="tag tag-行情">行情</span></td>
+            <td>mootdx</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">0.06s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>800 行 × 13 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">open, close, high, low, vol, amount</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">99</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>kline 历史K线(周线)</td>
+            <td><span class="tag tag-行情">行情</span></td>
+            <td>mootdx</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">0.05s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>800 行 × 13 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">open, close, high, low, vol, amount</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">99</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>stock_list 全市场列表</td>
+            <td><span class="tag tag-基础数据">基础数据</span></td>
+            <td>mootdx</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">1.55s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>27054 行 × 5 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">code, volunit, decimal_point, name, pre_close</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">98</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>f10 财务快照(平安银行)</td>
+            <td><span class="tag tag-基础数据">基础数据</span></td>
+            <td>mootdx</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">0.05s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>1 行 × 37 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">market, code, liutongguben, province, industry, updated_date</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">99</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>f10 财务快照(浦发银行)</td>
+            <td><span class="tag tag-基础数据">基础数据</span></td>
+            <td>mootdx</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">0.05s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>1 行 × 37 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">market, code, liutongguben, province, industry, updated_date</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">99</td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td>news 个股新闻(平安)</td>
+            <td><span class="tag tag-新闻">新闻</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">0.2s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>10 行 × 6 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">关键词, 新闻标题, 新闻内容, 发布时间, 文章来源, 新闻链接</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">99</td>
+        </tr>
+        <tr>
+            <td>9</td>
+            <td>news 个股新闻(浦发)</td>
+            <td><span class="tag tag-新闻">新闻</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">5.09s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>10 行 × 6 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">关键词, 新闻标题, 新闻内容, 发布时间, 文章来源, 新闻链接</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">96</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td>telegraph 财联社电报</td>
+            <td><span class="tag tag-新闻">新闻</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">5.46s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>20 行 × 4 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">标题, 内容, 发布日期, 发布时间</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">96</td>
+        </tr>
+        <tr>
+            <td>11</td>
+            <td>research 研报(平安)</td>
+            <td><span class="tag tag-研报">研报</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">5.88s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>224 行 × 16 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">序号, 股票代码, 股票简称, 报告名称, 东财评级, 机构</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">96</td>
+        </tr>
+        <tr>
+            <td>12</td>
+            <td>research 研报(茅台)</td>
+            <td><span class="tag tag-研报">研报</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">6.71s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>758 行 × 16 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">序号, 股票代码, 股票简称, 报告名称, 东财评级, 机构</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">95</td>
+        </tr>
+        <tr>
+            <td>13</td>
+            <td>announcements 公告(平安)</td>
+            <td><span class="tag tag-公告">公告</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">9.99s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>1732 行 × 6 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">代码, 名称, 公告标题, 公告类型, 公告日期, 网址</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">93</td>
+        </tr>
+        <tr>
+            <td>14</td>
+            <td>announcements 公告(茅台)</td>
+            <td><span class="tag tag-公告">公告</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">3.64s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>1049 行 × 6 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">代码, 名称, 公告标题, 公告类型, 公告日期, 网址</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">97</td>
+        </tr>
+        <tr>
+            <td>15</td>
+            <td>limit_up 涨停板</td>
+            <td><span class="tag tag-信号">信号</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">1.88s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>82 行 × 16 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">序号, 代码, 名称, 涨跌幅, 最新价, 成交额</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">98</td>
+        </tr>
+        <tr>
+            <td>16</td>
+            <td>strong_stocks 强势涨停</td>
+            <td><span class="tag tag-信号">信号</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">5.61s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>289 行 × 16 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">序号, 代码, 名称, 涨跌幅, 最新价, 涨停价</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">96</td>
+        </tr>
+        <tr>
+            <td>17</td>
+            <td>concepts 概念板块</td>
+            <td><span class="tag tag-板块">板块</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#f39c12">14.12s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>372 行 × 2 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">name, code</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">90</td>
+        </tr>
+        <tr>
+            <td>18</td>
+            <td>industries 行业板块</td>
+            <td><span class="tag tag-板块">板块</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">0.15s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>90 行 × 2 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">name, code</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">99</td>
+        </tr>
+        <tr>
+            <td>19</td>
+            <td>northbound_flow 北向</td>
+            <td><span class="tag tag-资金流">资金流</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">6.76s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>2670 行 × 13 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">日期, 当日成交净买额, 买入成交额, 卖出成交额, 历史累计净买额, 当日资金流入</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">95</td>
+        </tr>
+        <tr>
+            <td>20</td>
+            <td>dragon_tiger 龙虎榜</td>
+            <td><span class="tag tag-资金流">资金流</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">6.34s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>215 行 × 7 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">序号, 营业部名称, 今日最高操作, 今日最高金额, 今日最高买入金额, 累计参与金额</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">95</td>
+        </tr>
+        <tr>
+            <td>21</td>
+            <td>margin_shanghai 融资融券(沪)</td>
+            <td><span class="tag tag-资金流">资金流</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">3.37s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>2000 行 × 7 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">信用交易日期, 融资余额, 融资买入额, 融券余量, 融券余量金额, 融券卖出量</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">97</td>
+        </tr>
+        <tr>
+            <td>22</td>
+            <td>margin_shenzhen 融资融券(深)</td>
+            <td><span class="tag tag-资金流">资金流</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">5.06s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>1 行 × 6 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">融资买入额, 融资余额, 融券卖出量, 融券余量, 融券余额, 融资融券余额</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">96</td>
+        </tr>
+        <tr>
+            <td>23</td>
+            <td>market_fund_flow 市场资金</td>
+            <td><span class="tag tag-资金流">资金流</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">5.29s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>121 行 × 15 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">日期, 上证-收盘价, 上证-涨跌幅, 深证-收盘价, 深证-涨跌幅, 主力净流入-净额</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">96</td>
+        </tr>
+        <tr>
+            <td>24</td>
+            <td>individual_fund_flow(平安)</td>
+            <td><span class="tag tag-资金流">资金流</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">5.12s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>121 行 × 13 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">日期, 收盘价, 涨跌幅, 主力净流入-净额, 主力净流入-净占比, 超大单净流入-净额</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">96</td>
+        </tr>
+        <tr>
+            <td>25</td>
+            <td>individual_fund_flow(茅台)</td>
+            <td><span class="tag tag-资金流">资金流</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">5.23s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>121 行 × 13 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">日期, 收盘价, 涨跌幅, 主力净流入-净额, 主力净流入-净占比, 超大单净流入-净额</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">96</td>
+        </tr>
+        <tr>
+            <td>26</td>
+            <td>hot_detail 热度详情(平安)</td>
+            <td><span class="tag tag-情绪">情绪</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">5.84s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>366 行 × 5 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">时间, 排名, 证券代码, 新晋粉丝, 铁杆粉丝</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">96</td>
+        </tr>
+        <tr>
+            <td>27</td>
+            <td>hot_detail 热度详情(茅台)</td>
+            <td><span class="tag tag-情绪">情绪</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">5.04s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>366 行 × 5 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">时间, 排名, 证券代码, 新晋粉丝, 铁杆粉丝</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">96</td>
+        </tr>
+        <tr>
+            <td>28</td>
+            <td>hot_latest 最新排名(平安)</td>
+            <td><span class="tag tag-情绪">情绪</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">5.11s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>10 行 × 2 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">item, value</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">96</td>
+        </tr>
+        <tr>
+            <td>29</td>
+            <td>hot_realtime 实时排名(平安)</td>
+            <td><span class="tag tag-情绪">情绪</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">5.09s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>93 行 × 2 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">时间, 排名</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">96</td>
+        </tr>
+        <tr>
+            <td>30</td>
+            <td>hot_keywords 热搜关键词</td>
+            <td><span class="tag tag-情绪">情绪</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">5.24s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>5 行 × 5 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">时间, 股票代码, 概念名称, 概念代码, 热度</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">96</td>
+        </tr>
+        <tr>
+            <td>31</td>
+            <td>stock_comment_all 千股千评</td>
+            <td><span class="tag tag-情绪">情绪</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">9.36s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>5185 行 × 14 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">序号, 代码, 名称, 最新价, 涨跌幅, 换手率</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">93</td>
+        </tr>
+        <tr>
+            <td>32</td>
+            <td>xueqiu_hot 雪球最热门</td>
+            <td><span class="tag tag-情绪">情绪</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#f39c12">18.09s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>5599 行 × 4 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">股票代码, 股票简称, 关注, 最新价</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">87</td>
+        </tr>
+        <tr>
+            <td>33</td>
+            <td>xueqiu_hot 雪球本周新增</td>
+            <td><span class="tag tag-情绪">情绪</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#f39c12">16.86s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>5599 行 × 4 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">股票代码, 股票简称, 关注, 最新价</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">88</td>
+        </tr>
+        <tr>
+            <td>34</td>
+            <td>stock_desire 参与意愿(平安)</td>
+            <td><span class="tag tag-情绪">情绪</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">0.23s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>5 行 × 6 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">交易日期, 股票代码, 参与意愿, 5日平均参与意愿, 参与意愿变化, 5日平均变化</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">99</td>
+        </tr>
+        <tr>
+            <td>35</td>
+            <td>stock_focus 关注指数(平安)</td>
+            <td><span class="tag tag-情绪">情绪</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">5.3s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>30 行 × 2 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">交易日, 用户关注指数</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">96</td>
+        </tr>
+        <tr>
+            <td>36</td>
+            <td>limit_down 跌停板</td>
+            <td><span class="tag tag-情绪">情绪</span></td>
+            <td>akshare</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">5.39s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>18 行 × 16 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">序号, 代码, 名称, 涨跌幅, 最新价, 成交额</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">96</td>
+        </tr>
+        <tr>
+            <td>37</td>
+            <td>index_pe 上证50 PE</td>
+            <td><span class="tag tag-估值">估值</span></td>
+            <td>tencent</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">0.74s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>5186 行 × 8 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">日期, 指数, 等权静态市盈率, 静态市盈率, 静态市盈率中位数, 等权滚动市盈率</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">99</td>
+        </tr>
+        <tr>
+            <td>38</td>
+            <td>index_pe 沪深300 PE</td>
+            <td><span class="tag tag-估值">估值</span></td>
+            <td>tencent</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">3.16s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>5126 行 × 8 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">日期, 指数, 等权静态市盈率, 静态市盈率, 静态市盈率中位数, 等权滚动市盈率</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">97</td>
+        </tr>
+        <tr>
+            <td>39</td>
+            <td>index_pe 创业板指 PE</td>
+            <td><span class="tag tag-估值">估值</span></td>
+            <td>tencent</td>
+            <td><span style="color:#e74c3c;font-weight:bold">FAIL</span></td>
+            <td style="color:#e74c3c">0%<br><small>异常</small></td>
+            <td style="color:#27ae60">2.52s</td>
+            <td style="color:#e74c3c">✗</td>
+            <td>0 行 × 0 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">-</td>
+            <td style="font-size:12px;color:#e74c3c">KeyError: '创业板指'</td>
+            <td style="font-weight:bold">18</td>
+        </tr>
+        <tr>
+            <td>40</td>
+            <td>market_pb 全市场 PB</td>
+            <td><span class="tag tag-估值">估值</span></td>
+            <td>tencent</td>
+            <td><span style="color:#27ae60;font-weight:bold">PASS</span></td>
+            <td style="color:#27ae60">100%<br><small>完美</small></td>
+            <td style="color:#27ae60">3.97s</td>
+            <td style="color:#27ae60">✓</td>
+            <td>5180 行 × 8 列</td>
+            <td style="font-size:12px;color:#666;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">date, middlePB, equalWeightAveragePB, close, quantileInAllHi</td>
+            <td style="font-size:12px;color:#27ae60">正常</td>
+            <td style="font-weight:bold">97</td>
+        </tr></tbody>
+</table>
+<div class="footer">
+评测标准：准确度 60% + 响应时间 20% + 格式正确性 20% &nbsp;|&nbsp; 准确度 = 行数达标则满分，不足按比例折算 &nbsp;|&nbsp; 响应时间 ≥30s 得 0 分
+</div>
+</div>
+</body>
+</html>

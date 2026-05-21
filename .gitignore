@@ -18,3 +18,4 @@ wheels/
 
 # Claude
 .claude/
+.stoke_cache.db

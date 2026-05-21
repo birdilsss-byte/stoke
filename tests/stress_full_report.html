@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Stoke 100 轮全层压力测试报告</title>
+<style>
+body { font-family: -apple-system, 'SF Mono', monospace; background: #1a1a2e; color: #e0e0e0; padding: 30px; max-width: 1200px; margin: 0 auto; }
+h1 { color: #00d4aa; border-bottom: 2px solid #333; padding-bottom: 10px; }
+h2 { color: #7ec8e3; margin-top: 30px; }
+.badge { display: inline-block; padding: 4px 12px; border-radius: 4px; font-weight: bold; margin: 0 5px; }
+.badge-pass { background: #00d4aa33; color: #00d4aa; }
+.badge-warn { background: #ffaa0033; color: #ffaa00; }
+.badge-fail { background: #ff444433; color: #ff4444; }
+table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+th { background: #16213e; padding: 10px; text-align: left; border-bottom: 2px solid #333; }
+td { padding: 8px 10px; border-bottom: 1px solid #222; }
+tr:hover { background: #16213e55; }
+.chart-bar { display: inline-block; height: 20px; border-radius: 3px; min-width: 2px; }
+.chart-hit { background: #00d4aa; }
+.chart-miss { background: #ff6b6b; }
+.chart-error { background: #ffaa00; }
+.summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }
+.summary-card { background: #16213e; padding: 20px; border-radius: 8px; text-align: center; }
+.summary-card .value { font-size: 2em; font-weight: bold; color: #00d4aa; margin: 10px 0; }
+.summary-card .label { font-size: 0.85em; color: #888; }
+.log-row { font-size: 0.85em; padding: 2px 5px; }
+pre { background: #111; padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 0.8em; }
+</style>
+</head>
+<body>
+
+<h1>Stoke 全层压力测试报告</h1>
+<p>测试时间: 2026-05-21 20:05:48 | 轮次: 100 | 冷启动(无预热)</p>
+
+<div class="summary-grid">
+<div class="summary-card">
+<div class="label">缓存命中率</div>
+<div class="value" style="color: #00d4aa">84.1%</div>
+<div class="label">3363/4000 次命中</div>
+</div>
+<div class="summary-card">
+<div class="label">总耗时</div>
+<div class="value">3040.9s</div>
+<div class="label">100 轮累计</div>
+</div>
+<div class="summary-card">
+<div class="label">平均每轮</div>
+<div class="value">30409ms</div>
+<div class="label">首50轮 30728ms | 后50轮 30089ms</div>
+</div>
+<div class="summary-card">
+<div class="label">异常次数</div>
+<div class="value" style="color: #ff4444">100</div>
+<div class="label">总调用 4000 次</div>
+</div>
+</div>
+
+<h2>逐轮趋势</h2>
+<table>
+<tr><th>轮次</th><th>耗时</th><th>命中</th><th>命中率</th><th>每层耗时(发/时/执/沉)</th><th>图表</th></tr>
+<tr>
+<td>1</td>
+<td style="background:rgb(255,50,50)33">60597ms</td>
+<td>23/40</td>
+<td>57%</td>
+<td><span style="font-size:0.75em">D:17315 T:17273 E:11002 R:15006</span></td>
+<td><span class="chart-bar" style="width:300.0px;background:rgb(255,50,50)"></span></td>
+</tr><tr>
+<td>2</td>
+<td style="background:rgb(237,146,146)33">29760ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:21 T:32 E:15297 R:14409</span></td>
+<td><span class="chart-bar" style="width:147.33493543505963px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>3</td>
+<td style="background:rgb(237,144,144)33">30558ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:9 T:20 E:15568 R:14959</span></td>
+<td><span class="chart-bar" style="width:151.28163416736768px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>4</td>
+<td style="background:rgb(237,146,146)33">29830ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:11 T:11 E:15205 R:14603</span></td>
+<td><span class="chart-bar" style="width:147.68102467655916px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>5</td>
+<td style="background:rgb(237,146,146)33">29873ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:28 T:26 E:15167 R:14651</span></td>
+<td><span class="chart-bar" style="width:147.8915044322076px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>6</td>
+<td style="background:rgb(238,141,141)33">31361ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:18 T:25 E:16015 R:15303</span></td>
+<td><span class="chart-bar" style="width:155.25766439696355px;background:rgb(238,141,141)"></span></td>
+</tr><tr>
+<td>7</td>
+<td style="background:rgb(237,145,145)33">29998ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:19 T:14 E:15584 R:14380</span></td>
+<td><span class="chart-bar" style="width:148.5110718198885px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>8</td>
+<td style="background:rgb(237,146,146)33">29866ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:19 T:13 E:15396 R:14437</span></td>
+<td><span class="chart-bar" style="width:147.85743386201793px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>9</td>
+<td style="background:rgb(237,146,146)33">29951ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:20 T:13 E:15104 R:14813</span></td>
+<td><span class="chart-bar" style="width:148.27702535700269px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>10</td>
+<td style="background:rgb(237,144,144)33">30392ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:23 T:15 E:15865 R:14489</span></td>
+<td><span class="chart-bar" style="width:150.46261613915533px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>11</td>
+<td style="background:rgb(237,145,145)33">30218ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:23 T:14 E:15156 R:15024</span></td>
+<td><span class="chart-bar" style="width:149.59860347606926px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>12</td>
+<td style="background:rgb(236,147,147)33">29408ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:7 T:7 E:15184 R:14209</span></td>
+<td><span class="chart-bar" style="width:145.5912741191663px;background:rgb(236,147,147)"></span></td>
+</tr><tr>
+<td>13</td>
+<td style="background:rgb(237,146,146)33">29665ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:23 T:13 E:15334 R:14293</span></td>
+<td><span class="chart-bar" style="width:146.86169149704799px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>14</td>
+<td style="background:rgb(237,144,144)33">30588ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:16 T:13 E:15395 R:15164</span></td>
+<td><span class="chart-bar" style="width:151.43484845330116px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>15</td>
+<td style="background:rgb(237,147,147)33">29472ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:25 T:14 E:15363 R:14069</span></td>
+<td><span class="chart-bar" style="width:145.90665322398834px;background:rgb(237,147,147)"></span></td>
+</tr><tr>
+<td>16</td>
+<td style="background:rgb(237,143,143)33">30907ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:24 T:14 E:15720 R:15149</span></td>
+<td><span class="chart-bar" style="width:153.0129915988454px;background:rgb(237,143,143)"></span></td>
+</tr><tr>
+<td>17</td>
+<td style="background:rgb(237,146,146)33">29977ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:9 T:9 E:15498 R:14460</span></td>
+<td><span class="chart-bar" style="width:148.40539816640018px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>18</td>
+<td style="background:rgb(237,145,145)33">30109ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:9 T:10 E:15377 R:14712</span></td>
+<td><span class="chart-bar" style="width:149.05966288584256px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>19</td>
+<td style="background:rgb(237,144,144)33">30330ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:19 T:13 E:15105 R:15192</span></td>
+<td><span class="chart-bar" style="width:150.15750364855498px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>20</td>
+<td style="background:rgb(237,144,144)33">30517ms</td>
+<td>33/40</td>
+<td>82%</td>
+<td><span style="font-size:0.75em">D:15 T:12 E:15629 R:14860</span></td>
+<td><span class="chart-bar" style="width:151.0824125131732px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>21</td>
+<td style="background:rgb(237,146,146)33">29856ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:10 T:9 E:15616 R:14220</span></td>
+<td><span class="chart-bar" style="width:147.80964889879053px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>22</td>
+<td style="background:rgb(237,145,145)33">30295ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:13 T:12 E:15964 R:14306</span></td>
+<td><span class="chart-bar" style="width:149.98315061876121px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>23</td>
+<td style="background:rgb(237,144,144)33">30303ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:11 T:21 E:15128 R:15143</span></td>
+<td><span class="chart-bar" style="width:150.02185049005203px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>24</td>
+<td style="background:rgb(237,145,145)33">30256ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:27 T:25 E:15054 R:15149</span></td>
+<td><span class="chart-bar" style="width:149.78685385190192px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>25</td>
+<td style="background:rgb(237,144,144)33">30467ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:23 T:13 E:15406 R:15025</span></td>
+<td><span class="chart-bar" style="width:150.83573757183737px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>26</td>
+<td style="background:rgb(237,145,145)33">30019ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:17 T:13 E:15579 R:14409</span></td>
+<td><span class="chart-bar" style="width:148.61633235369675px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>27</td>
+<td style="background:rgb(237,142,142)33">31164ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:21 T:13 E:15744 R:15386</span></td>
+<td><span class="chart-bar" style="width:154.28503784860868px;background:rgb(237,142,142)"></span></td>
+</tr><tr>
+<td>28</td>
+<td style="background:rgb(237,142,142)33">31036ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:17 T:22 E:15766 R:15229</span></td>
+<td><span class="chart-bar" style="width:153.64964325581178px;background:rgb(237,142,142)"></span></td>
+</tr><tr>
+<td>29</td>
+<td style="background:rgb(237,146,146)33">29836ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:29 T:25 E:15190 R:14591</span></td>
+<td><span class="chart-bar" style="width:147.70974829774627px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>30</td>
+<td style="background:rgb(237,145,145)33">30037ms</td>
+<td>32/40</td>
+<td>80%</td>
+<td><span style="font-size:0.75em">D:23 T:25 E:15198 R:14789</span></td>
+<td><span class="chart-bar" style="width:148.70282072924076px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>31</td>
+<td style="background:rgb(237,146,146)33">29681ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:20 T:25 E:15070 R:14565</span></td>
+<td><span class="chart-bar" style="width:146.94128313461803px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>32</td>
+<td style="background:rgb(237,145,145)33">30002ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:24 T:23 E:15201 R:14753</span></td>
+<td><span class="chart-bar" style="width:148.532413582563px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>33</td>
+<td style="background:rgb(237,147,147)33">29657ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:20 T:25 E:15179 R:14433</span></td>
+<td><span class="chart-bar" style="width:146.82435492070155px;background:rgb(237,147,147)"></span></td>
+</tr><tr>
+<td>34</td>
+<td style="background:rgb(237,144,144)33">30520ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:24 T:25 E:15200 R:15269</span></td>
+<td><span class="chart-bar" style="width:151.09627917032157px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>35</td>
+<td style="background:rgb(237,147,147)33">29496ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:20 T:13 E:15120 R:14342</span></td>
+<td><span class="chart-bar" style="width:146.0246744345442px;background:rgb(237,147,147)"></span></td>
+</tr><tr>
+<td>36</td>
+<td style="background:rgb(237,144,144)33">30605ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:23 T:14 E:15460 R:15108</span></td>
+<td><span class="chart-bar" style="width:151.51587066530635px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>37</td>
+<td style="background:rgb(237,146,146)33">29880ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:26 T:25 E:15190 R:14638</span></td>
+<td><span class="chart-bar" style="width:147.92756505891347px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>38</td>
+<td style="background:rgb(237,143,143)33">30860ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:11 T:10 E:15593 R:15245</span></td>
+<td><span class="chart-bar" style="width:152.7771545572318px;background:rgb(237,143,143)"></span></td>
+</tr><tr>
+<td>39</td>
+<td style="background:rgb(237,144,144)33">30350ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:20 T:13 E:15617 R:14699</span></td>
+<td><span class="chart-bar" style="width:150.25323646219792px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>40</td>
+<td style="background:rgb(237,146,146)33">29735ms</td>
+<td>31/40</td>
+<td>78%</td>
+<td><span style="font-size:0.75em">D:10 T:7 E:15239 R:14478</span></td>
+<td><span class="chart-bar" style="width:147.20983453352864px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>41</td>
+<td style="background:rgb(237,145,145)33">30118ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:28 T:13 E:15161 R:14915</span></td>
+<td><span class="chart-bar" style="width:149.10480978482698px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>42</td>
+<td style="background:rgb(237,146,146)33">29697ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:21 T:13 E:15408 R:14254</span></td>
+<td><span class="chart-bar" style="width:147.02253551330213px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>43</td>
+<td style="background:rgb(237,146,146)33">29866ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:27 T:13 E:15405 R:14420</span></td>
+<td><span class="chart-bar" style="width:147.85698297139564px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>44</td>
+<td style="background:rgb(237,145,145)33">30207ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:22 T:13 E:15616 R:14555</span></td>
+<td><span class="chart-bar" style="width:149.5479597246555px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>45</td>
+<td style="background:rgb(237,145,145)33">30156ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:19 T:12 E:15618 R:14507</span></td>
+<td><span class="chart-bar" style="width:149.29527802317085px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>46</td>
+<td style="background:rgb(237,145,145)33">30092ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:26 T:13 E:15115 R:14936</span></td>
+<td><span class="chart-bar" style="width:148.9747290206377px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>47</td>
+<td style="background:rgb(237,146,146)33">29969ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:27 T:14 E:15276 R:14650</span></td>
+<td><span class="chart-bar" style="width:148.36607979593114px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>48</td>
+<td style="background:rgb(236,149,149)33">28785ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:21 T:12 E:14644 R:14106</span></td>
+<td><span class="chart-bar" style="width:142.50559470277645px;background:rgb(236,149,149)"></span></td>
+</tr><tr>
+<td>49</td>
+<td style="background:rgb(237,144,144)33">30366ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:21 T:24 E:15504 R:14815</span></td>
+<td><span class="chart-bar" style="width:150.33305708610496px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>50</td>
+<td style="background:rgb(237,146,146)33">29720ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:19 T:12 E:15057 R:14631</span></td>
+<td><span class="chart-bar" style="width:147.1368469091306px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>51</td>
+<td style="background:rgb(237,144,144)33">30409ms</td>
+<td>33/40</td>
+<td>82%</td>
+<td><span style="font-size:0.75em">D:191 T:11 E:15661 R:14544</span></td>
+<td><span class="chart-bar" style="width:150.5452707640679px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>52</td>
+<td style="background:rgb(237,146,146)33">29777ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:24 T:26 E:15285 R:14441</span></td>
+<td><span class="chart-bar" style="width:147.41671070522457px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>53</td>
+<td style="background:rgb(237,145,145)33">30148ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:25 T:14 E:15489 R:14619</span></td>
+<td><span class="chart-bar" style="width:149.2518107507716px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>54</td>
+<td style="background:rgb(237,145,145)33">30077ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:23 T:12 E:14828 R:15214</span></td>
+<td><span class="chart-bar" style="width:148.90465684083932px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>55</td>
+<td style="background:rgb(237,144,144)33">30403ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:26 T:26 E:15382 R:14968</span></td>
+<td><span class="chart-bar" style="width:150.51487695903123px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>56</td>
+<td style="background:rgb(237,144,144)33">30339ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:10 T:20 E:15577 R:14730</span></td>
+<td><span class="chart-bar" style="width:150.197798161811px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>57</td>
+<td style="background:rgb(236,148,148)33">29209ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:22 T:12 E:14960 R:14214</span></td>
+<td><span class="chart-bar" style="width:144.60741425653828px;background:rgb(236,148,148)"></span></td>
+</tr><tr>
+<td>58</td>
+<td style="background:rgb(237,146,146)33">29931ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:24 T:13 E:15667 R:14226</span></td>
+<td><span class="chart-bar" style="width:148.1818626485183px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>59</td>
+<td style="background:rgb(237,143,143)33">30835ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:18 T:12 E:15586 R:15218</span></td>
+<td><span class="chart-bar" style="width:152.6565247909815px;background:rgb(237,143,143)"></span></td>
+</tr><tr>
+<td>60</td>
+<td style="background:rgb(237,145,145)33">30295ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:12 T:20 E:15348 R:14914</span></td>
+<td><span class="chart-bar" style="width:149.9823432648721px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>61</td>
+<td style="background:rgb(237,145,145)33">30091ms</td>
+<td>32/40</td>
+<td>80%</td>
+<td><span style="font-size:0.75em">D:306 T:12 E:14886 R:14887</span></td>
+<td><span class="chart-bar" style="width:148.97362067955308px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>62</td>
+<td style="background:rgb(237,145,145)33">29981ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:23 T:12 E:15339 R:14605</span></td>
+<td><span class="chart-bar" style="width:148.4297014070101px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>63</td>
+<td style="background:rgb(237,144,144)33">30447ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:27 T:18 E:15371 R:15030</span></td>
+<td><span class="chart-bar" style="width:150.7325402757458px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>64</td>
+<td style="background:rgb(237,144,144)33">30501ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:28 T:26 E:15364 R:15081</span></td>
+<td><span class="chart-bar" style="width:151.002408936265px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>65</td>
+<td style="background:rgb(237,144,144)33">30353ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:11 T:21 E:15404 R:14917</span></td>
+<td><span class="chart-bar" style="width:150.27045647080686px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>66</td>
+<td style="background:rgb(237,145,145)33">30006ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:17 T:11 E:15092 R:14883</span></td>
+<td><span class="chart-bar" style="width:148.55061563566866px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>67</td>
+<td style="background:rgb(237,144,144)33">30532ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:19 T:25 E:15544 R:14943</span></td>
+<td><span class="chart-bar" style="width:151.15611778547265px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>68</td>
+<td style="background:rgb(237,145,145)33">30071ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:19 T:21 E:15594 R:14436</span></td>
+<td><span class="chart-bar" style="width:148.87075978091534px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>69</td>
+<td style="background:rgb(237,144,144)33">30610ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:26 T:14 E:15575 R:14994</span></td>
+<td><span class="chart-bar" style="width:151.5401691845485px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>70</td>
+<td style="background:rgb(237,145,145)33">30231ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:7 T:7 E:15316 R:14900</span></td>
+<td><span class="chart-bar" style="width:149.66274089657736px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>71</td>
+<td style="background:rgb(237,145,145)33">30160ms</td>
+<td>31/40</td>
+<td>78%</td>
+<td><span style="font-size:0.75em">D:416 T:12 E:14812 R:14919</span></td>
+<td><span class="chart-bar" style="width:149.3118724505499px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>72</td>
+<td style="background:rgb(237,146,146)33">29871ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:25 T:26 E:15423 R:14395</span></td>
+<td><span class="chart-bar" style="width:147.88130509747666px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>73</td>
+<td style="background:rgb(236,148,148)33">29263ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:18 T:11 E:14809 R:14424</span></td>
+<td><span class="chart-bar" style="width:144.87304903050725px;background:rgb(236,148,148)"></span></td>
+</tr><tr>
+<td>74</td>
+<td style="background:rgb(237,145,145)33">30034ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:21 T:7 E:14799 R:15205</span></td>
+<td><span class="chart-bar" style="width:148.68741490619846px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>75</td>
+<td style="background:rgb(237,146,146)33">29717ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:25 T:13 E:15482 R:14195</span></td>
+<td><span class="chart-bar" style="width:147.1222437186097px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>76</td>
+<td style="background:rgb(237,146,146)33">29819ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:25 T:21 E:15347 R:14424</span></td>
+<td><span class="chart-bar" style="width:147.623244577757px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>77</td>
+<td style="background:rgb(237,145,145)33">30254ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:12 T:21 E:15230 R:14991</span></td>
+<td><span class="chart-bar" style="width:149.77941887800188px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>78</td>
+<td style="background:rgb(237,146,146)33">29745ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:41 T:24 E:15183 R:14496</span></td>
+<td><span class="chart-bar" style="width:147.25719339331454px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>79</td>
+<td style="background:rgb(237,144,144)33">30442ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:29 T:28 E:15594 R:14790</span></td>
+<td><span class="chart-bar" style="width:150.70737538551737px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>80</td>
+<td style="background:rgb(237,146,146)33">29685ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:28 T:12 E:15112 R:14532</span></td>
+<td><span class="chart-bar" style="width:146.9610975348181px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>81</td>
+<td style="background:rgb(237,146,146)33">29732ms</td>
+<td>30/40</td>
+<td>75%</td>
+<td><span style="font-size:0.75em">D:25 T:27 E:14992 R:14687</span></td>
+<td><span class="chart-bar" style="width:147.19641404563475px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>82</td>
+<td style="background:rgb(237,144,144)33">30414ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:24 T:13 E:15509 R:14867</span></td>
+<td><span class="chart-bar" style="width:150.57169035778196px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>83</td>
+<td style="background:rgb(237,144,144)33">30311ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:25 T:25 E:15668 R:14591</span></td>
+<td><span class="chart-bar" style="width:150.0612585665087px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>84</td>
+<td style="background:rgb(237,145,145)33">30191ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:19 T:23 E:15119 R:15029</span></td>
+<td><span class="chart-bar" style="width:149.4692415401234px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>85</td>
+<td style="background:rgb(237,147,147)33">29578ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:22 T:24 E:15107 R:14423</span></td>
+<td><span class="chart-bar" style="width:146.43059402880118px;background:rgb(237,147,147)"></span></td>
+</tr><tr>
+<td>86</td>
+<td style="background:rgb(237,145,145)33">30051ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:20 T:24 E:16646 R:13360</span></td>
+<td><span class="chart-bar" style="width:148.77291887656187px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>87</td>
+<td style="background:rgb(237,145,145)33">30189ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:29 T:26 E:15333 R:14800</span></td>
+<td><span class="chart-bar" style="width:149.4559438077916px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>88</td>
+<td style="background:rgb(237,146,146)33">29767ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:29 T:25 E:14846 R:14865</span></td>
+<td><span class="chart-bar" style="width:147.36625462817977px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>89</td>
+<td style="background:rgb(237,146,146)33">29913ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:13 T:10 E:15253 R:14636</span></td>
+<td><span class="chart-bar" style="width:148.0919925933071px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>90</td>
+<td style="background:rgb(237,146,146)33">29962ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:28 T:14 E:14843 R:15076</span></td>
+<td><span class="chart-bar" style="width:148.3337100984816px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>91</td>
+<td style="background:rgb(237,144,144)33">30531ms</td>
+<td>29/40</td>
+<td>72%</td>
+<td><span style="font-size:0.75em">D:25 T:13 E:16919 R:13572</span></td>
+<td><span class="chart-bar" style="width:151.15009804156247px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>92</td>
+<td style="background:rgb(237,146,146)33">29854ms</td>
+<td>30/40</td>
+<td>75%</td>
+<td><span style="font-size:0.75em">D:517 T:13 E:15047 R:14275</span></td>
+<td><span class="chart-bar" style="width:147.7979103981657px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>93</td>
+<td style="background:rgb(237,145,145)33">30256ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:27 T:13 E:15007 R:15208</span></td>
+<td><span class="chart-bar" style="width:149.7885181340418px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>94</td>
+<td style="background:rgb(237,145,145)33">30036ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:9 T:9 E:15415 R:14603</span></td>
+<td><span class="chart-bar" style="width:148.69959957607782px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>95</td>
+<td style="background:rgb(237,145,145)33">30147ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:30 T:26 E:15479 R:14611</span></td>
+<td><span class="chart-bar" style="width:149.24854828564068px;background:rgb(237,145,145)"></span></td>
+</tr><tr>
+<td>96</td>
+<td style="background:rgb(237,144,144)33">30310ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:22 T:10 E:15515 R:14763</span></td>
+<td><span class="chart-bar" style="width:150.05757471930406px;background:rgb(237,144,144)"></span></td>
+</tr><tr>
+<td>97</td>
+<td style="background:rgb(237,146,146)33">29856ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:30 T:26 E:14970 R:14828</span></td>
+<td><span class="chart-bar" style="width:147.80693057129542px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>98</td>
+<td style="background:rgb(237,146,146)33">29900ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:22 T:24 E:15331 R:14522</span></td>
+<td><span class="chart-bar" style="width:148.02547560344158px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>99</td>
+<td style="background:rgb(237,146,146)33">29953ms</td>
+<td>33/40</td>
+<td>82%</td>
+<td><span style="font-size:0.75em">D:35 T:198 E:14712 R:15006</span></td>
+<td><span class="chart-bar" style="width:148.2878231250988px;background:rgb(237,146,146)"></span></td>
+</tr><tr>
+<td>100</td>
+<td style="background:rgb(237,145,145)33">30274ms</td>
+<td>34/40</td>
+<td>85%</td>
+<td><span style="font-size:0.75em">D:35 T:80 E:15415 R:14744</span></td>
+<td><span class="chart-bar" style="width:149.879759746591px;background:rgb(237,145,145)"></span></td>
+</tr>
+</table>
+
+<h2>各方法缓存统计</h2>
+<table>
+<tr><th>方法</th><th>命中</th><th>未命中</th><th>异常</th><th>命中率</th></tr>
+<tr>
+<td>dragon_tiger</td>
+<td class="chart-hit">99</td>
+<td class="chart-miss">1</td>
+<td class="chart-error">0</td>
+<td>99%</td>
+</tr><tr>
+<td>fund_flow_000001</td>
+<td class="chart-hit">0</td>
+<td class="chart-miss">100</td>
+<td class="chart-error">0</td>
+<td>0%</td>
+</tr><tr>
+<td>fund_flow_600519</td>
+<td class="chart-hit">0</td>
+<td class="chart-miss">100</td>
+<td class="chart-error">0</td>
+<td>0%</td>
+</tr><tr>
+<td>fund_flow_601318</td>
+<td class="chart-hit">0</td>
+<td class="chart-miss">100</td>
+<td class="chart-error">0</td>
+<td>0%</td>
+</tr><tr>
+<td>hot_keywords</td>
+<td class="chart-hit">99</td>
+<td class="chart-miss">1</td>
+<td class="chart-error">0</td>
+<td>99%</td>
+</tr><tr>
+<td>index_pe_上证50</td>
+<td class="chart-hit">99</td>
+<td class="chart-miss">1</td>
+<td class="chart-error">0</td>
+<td>99%</td>
+</tr><tr>
+<td>index_pe_沪深300</td>
+<td class="chart-hit">100</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">0</td>
+<td>100%</td>
+</tr><tr>
+<td>kline_disc_000001</td>
+<td class="chart-hit">95</td>
+<td class="chart-miss">5</td>
+<td class="chart-error">0</td>
+<td>95%</td>
+</tr><tr>
+<td>kline_disc_000333</td>
+<td class="chart-hit">100</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">0</td>
+<td>100%</td>
+</tr><tr>
+<td>kline_disc_000858</td>
+<td class="chart-hit">97</td>
+<td class="chart-miss">3</td>
+<td class="chart-error">0</td>
+<td>97%</td>
+</tr><tr>
+<td>kline_disc_002415</td>
+<td class="chart-hit">100</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">0</td>
+<td>100%</td>
+</tr><tr>
+<td>kline_disc_002475</td>
+<td class="chart-hit">100</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">0</td>
+<td>100%</td>
+</tr><tr>
+<td>kline_disc_300750</td>
+<td class="chart-hit">100</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">0</td>
+<td>100%</td>
+</tr><tr>
+<td>kline_disc_600036</td>
+<td class="chart-hit">100</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">0</td>
+<td>100%</td>
+</tr><tr>
+<td>kline_disc_600519</td>
+<td class="chart-hit">98</td>
+<td class="chart-miss">2</td>
+<td class="chart-error">0</td>
+<td>98%</td>
+</tr><tr>
+<td>kline_disc_601318</td>
+<td class="chart-hit">99</td>
+<td class="chart-miss">1</td>
+<td class="chart-error">0</td>
+<td>99%</td>
+</tr><tr>
+<td>kline_disc_603259</td>
+<td class="chart-hit">100</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">0</td>
+<td>100%</td>
+</tr><tr>
+<td>kline_exec_000002</td>
+<td class="chart-hit">100</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">0</td>
+<td>100%</td>
+</tr><tr>
+<td>kline_exec_000725</td>
+<td class="chart-hit">100</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">0</td>
+<td>100%</td>
+</tr><tr>
+<td>kline_exec_002230</td>
+<td class="chart-hit">100</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">0</td>
+<td>100%</td>
+</tr><tr>
+<td>kline_exec_600000</td>
+<td class="chart-hit">100</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">0</td>
+<td>100%</td>
+</tr><tr>
+<td>kline_exec_600030</td>
+<td class="chart-hit">100</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">0</td>
+<td>100%</td>
+</tr><tr>
+<td>kline_refl_000651</td>
+<td class="chart-hit">95</td>
+<td class="chart-miss">5</td>
+<td class="chart-error">0</td>
+<td>95%</td>
+</tr><tr>
+<td>kline_refl_002594</td>
+<td class="chart-hit">97</td>
+<td class="chart-miss">3</td>
+<td class="chart-error">0</td>
+<td>97%</td>
+</tr><tr>
+<td>kline_refl_300124</td>
+<td class="chart-hit">98</td>
+<td class="chart-miss">2</td>
+<td class="chart-error">0</td>
+<td>98%</td>
+</tr><tr>
+<td>kline_refl_600887</td>
+<td class="chart-hit">96</td>
+<td class="chart-miss">4</td>
+<td class="chart-error">0</td>
+<td>96%</td>
+</tr><tr>
+<td>kline_refl_688981</td>
+<td class="chart-hit">99</td>
+<td class="chart-miss">1</td>
+<td class="chart-error">0</td>
+<td>99%</td>
+</tr><tr>
+<td>limit_up</td>
+<td class="chart-hit">99</td>
+<td class="chart-miss">1</td>
+<td class="chart-error">0</td>
+<td>99%</td>
+</tr><tr>
+<td>market_breadth</td>
+<td class="chart-hit">99</td>
+<td class="chart-miss">1</td>
+<td class="chart-error">0</td>
+<td>99%</td>
+</tr><tr>
+<td>market_pb</td>
+<td class="chart-hit">98</td>
+<td class="chart-miss">2</td>
+<td class="chart-error">0</td>
+<td>98%</td>
+</tr><tr>
+<td>market_volume</td>
+<td class="chart-hit">99</td>
+<td class="chart-miss">1</td>
+<td class="chart-error">0</td>
+<td>99%</td>
+</tr><tr>
+<td>northbound_flow</td>
+<td class="chart-hit">99</td>
+<td class="chart-miss">1</td>
+<td class="chart-error">0</td>
+<td>99%</td>
+</tr><tr>
+<td>realtime_000002</td>
+<td class="chart-hit">100</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">0</td>
+<td>100%</td>
+</tr><tr>
+<td>realtime_600000</td>
+<td class="chart-hit">100</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">0</td>
+<td>100%</td>
+</tr><tr>
+<td>realtime_600030</td>
+<td class="chart-hit">100</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">0</td>
+<td>100%</td>
+</tr><tr>
+<td>sector_医药</td>
+<td class="chart-hit">0</td>
+<td class="chart-miss">0</td>
+<td class="chart-error">100</td>
+<td>0%</td>
+</tr><tr>
+<td>sector_半导体</td>
+<td class="chart-hit">0</td>
+<td class="chart-miss">100</td>
+<td class="chart-error">0</td>
+<td>0%</td>
+</tr><tr>
+<td>sector_银行</td>
+<td class="chart-hit">0</td>
+<td class="chart-miss">100</td>
+<td class="chart-error">0</td>
+<td>0%</td>
+</tr><tr>
+<td>stock_comment_all</td>
+<td class="chart-hit">99</td>
+<td class="chart-miss">1</td>
+<td class="chart-error">0</td>
+<td>99%</td>
+</tr><tr>
+<td>strong_stocks</td>
+<td class="chart-hit">99</td>
+<td class="chart-miss">1</td>
+<td class="chart-error">0</td>
+<td>99%</td>
+</tr>
+</table>
+
+<h2>各层耗时统计</h2>
+<table>
+<tr><th>层</th><th>平均/轮</th><th>最小</th><th>最大</th><th>总耗时</th></tr>
+<tr>
+<td>discovery</td>
+<td>208ms</td>
+<td>7ms</td>
+<td>17315ms</td>
+<td>20.8s</td>
+</tr><tr>
+<td>timing</td>
+<td>192ms</td>
+<td>7ms</td>
+<td>17273ms</td>
+<td>19.2s</td>
+</tr><tr>
+<td>execution</td>
+<td>15305ms</td>
+<td>11002ms</td>
+<td>16919ms</td>
+<td>1530.5s</td>
+</tr><tr>
+<td>reflection</td>
+<td>14704ms</td>
+<td>13360ms</td>
+<td>15386ms</td>
+<td>1470.4s</td>
+</tr>
+</table>
+
+<h2>数据库状态</h2>
+<table>
+<tr><th>表名</th><th>行数</th></tr>
+<tr><td>dragon_tiger</td><td style="color:#00d4aa">70</td></tr><tr><td>fund_flow</td><td style="color:#666">0</td></tr><tr><td>hot_keywords</td><td style="color:#00d4aa">1</td></tr><tr><td>index_pe</td><td style="color:#00d4aa">5,189</td></tr><tr><td>kline_daily</td><td style="color:#00d4aa">4,500</td></tr><tr><td>limit_up</td><td style="color:#00d4aa">34</td></tr><tr><td>market_breadth</td><td style="color:#00d4aa">8,644</td></tr><tr><td>market_pb</td><td style="color:#00d4aa">5,183</td></tr><tr><td>market_volume</td><td style="color:#00d4aa">121</td></tr><tr><td>northbound_flow</td><td style="color:#00d4aa">2,673</td></tr><tr><td>realtime_snapshot</td><td style="color:#666">0</td></tr><tr><td>sector_kline</td><td style="color:#666">0</td></tr><tr><td>sector_rank</td><td style="color:#666">0</td></tr><tr><td>stock_comment</td><td style="color:#00d4aa">5,185</td></tr><tr><td>stock_list</td><td style="color:#666">0</td></tr><tr><td>strong_stocks</td><td style="color:#00d4aa">442</td></tr>
+</table>
+
+<h2>结论</h2>
+<div>
+<span class="badge badge-pass">
+缓存命中率 84.1% ≥ 30% 达标
+</span>
+<span class="badge badge-fail">
+异常 100 次 需排查
+</span>
+<span class="badge badge-warn">
+性能收敛 未收敛
+</span>
+</div>
+
+<p style="color:#888;margin-top:40px;">Stoke Stress Test · 2026-05-21 · 数据源: mootdx/akshare/baostock/efinance/tencent · 缓存: SQLite</p>
+</body></html>

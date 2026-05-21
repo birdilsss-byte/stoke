@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stoke 项目中段工程审查报告 — 2026-05-20</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --border: #2a2d3a;
+    --text: #e2e4ea;
+    --muted: #8b8fa3;
+    --accent: #6c8ef5;
+    --green: #4ade80;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --orange: #fb923c;
+    --purple: #a78bfa;
+    --p0-bg: rgba(248,113,113,0.1);
+    --p1-bg: rgba(251,146,60,0.1);
+    --p2-bg: rgba(251,191,36,0.08);
+    --p3-bg: rgba(139,143,163,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+  h1 { font-size: 1.8rem; color: var(--accent); margin-bottom: 0.5rem; }
+  h2 { font-size: 1.3rem; border-left: 4px solid var(--accent); padding-left: 0.8rem; margin: 2rem 0 1rem; }
+  h3 { font-size: 1.05rem; margin: 1.2rem 0 0.6rem; color: var(--text); }
+  h4 { font-size: 0.95rem; color: var(--muted); margin: 0.8rem 0 0.4rem; }
+  p { margin: 0.4rem 0; }
+  code { background: #12141e; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; color: var(--yellow); }
+  pre { background: #12141e; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.82rem; margin: 0.6rem 0; }
+  pre code { background: none; padding: 0; color: var(--text); }
+  ul { padding-left: 1.5rem; }
+  li { margin: 0.3rem 0; }
+
+  .meta { display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.85rem; color: var(--muted); margin-bottom: 1rem; }
+  .meta span { display: flex; align-items: center; gap: 0.4rem; }
+
+  .score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .score-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; }
+  .score-card .label { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .score-card .value { font-size: 1.8rem; font-weight: 700; }
+  .score-card .value.green { color: var(--green); }
+  .score-card .value.yellow { color: var(--yellow); }
+  .score-card .value.orange { color: var(--orange); }
+  .score-card .value.red { color: var(--red); }
+  .score-card .value.purple { color: var(--purple); }
+  .score-card .sub { font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }
+
+  .summary-box { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin: 1.5rem 0; }
+  .summary-box h2 { border: none; padding: 0; margin: 0 0 1rem; }
+
+  .tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    margin-right: 0.3rem;
+    vertical-align: middle;
+  }
+  .tag-p0 { background: rgba(248,113,113,0.2); color: var(--red); }
+  .tag-p1 { background: rgba(251,146,60,0.2); color: var(--orange); }
+  .tag-p2 { background: rgba(251,191,36,0.15); color: var(--yellow); }
+  .tag-p3 { background: rgba(139,143,163,0.15); color: var(--muted); }
+  .tag-file { background: rgba(108,142,245,0.15); color: var(--accent); font-size: 0.65rem; }
+  .tag-fix { background: rgba(74,222,128,0.15); color: var(--green); font-size: 0.65rem; }
+
+  table { width: 100%; border-collapse: collapse; margin: 0.8rem 0; font-size: 0.85rem; }
+  th { background: #12141e; text-align: left; padding: 0.6rem 0.8rem; color: var(--muted); font-weight: 500; }
+  td { padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .section { margin-bottom: 2.5rem; }
+
+  .p0-section { background: var(--p0-bg); border: 1px solid rgba(248,113,113,0.3); border-radius: 10px; padding: 1.5rem; margin: 1rem 0; }
+  .p1-section { background: var(--p1-bg); border: 1px solid rgba(251,146,60,0.3); border-radius: 10px; padding: 1.5rem; margin: 1rem 0; }
+  .p2-section { background: var(--p2-bg); border: 1px solid rgba(251,191,36,0.2); border-radius: 10px; padding: 1.5rem; margin: 1rem 0; }
+
+  .phase-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .phase-num {
+    font-size: 1.2rem;
+    font-weight: 700;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .phase-num.p0 { background: rgba(248,113,113,0.2); color: var(--red); }
+  .phase-num.p1a { background: rgba(251,146,60,0.2); color: var(--orange); }
+  .phase-num.p1b { background: rgba(251,146,60,0.15); color: var(--orange); }
+  .phase-num.p2 { background: rgba(251,191,36,0.15); color: var(--yellow); }
+  .phase-num.p3 { background: rgba(139,143,163,0.1); color: var(--muted); }
+
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin: 1.5rem 0; }
+  .toc h2 { margin: 0 0 0.8rem; }
+  .toc a { color: var(--accent); text-decoration: none; display: block; padding: 0.2rem 0; font-size: 0.88rem; }
+  .toc a:hover { color: var(--text); }
+  .toc .toc-sub { padding-left: 1.2rem; font-size: 0.8rem; color: var(--muted); }
+
+  .conclusion { background: linear-gradient(135deg, rgba(108,142,245,0.08), rgba(167,139,250,0.08)); border: 1px solid rgba(108,142,245,0.3); border-radius: 10px; padding: 1.5rem; margin: 2rem 0; }
+  .conclusion h2 { border: none; padding: 0; color: var(--accent); }
+
+  .badge { display: inline-block; padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+  .badge-green { background: rgba(74,222,128,0.2); color: var(--green); }
+  .badge-yellow { background: rgba(251,191,36,0.2); color: var(--yellow); }
+  .badge-red { background: rgba(248,113,113,0.2); color: var(--red); }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+  .layer-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1rem 0; }
+  .layer-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; }
+  .layer-card h3 { color: var(--accent); margin-bottom: 0.6rem; }
+  .layer-card .score { font-size: 1.5rem; font-weight: 700; color: var(--green); }
+  .layer-card ul { font-size: 0.82rem; color: var(--muted); padding-left: 1.2rem; }
+  .layer-card li { margin: 0.2rem 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Stoke 项目中段工程审查报告</h1>
+<div class="meta">
+  <span>📅 审查日期：2026-05-20</span>
+  <span>👤 审查方式：5 个专业子 agent 并行审查</span>
+  <span>📁 覆盖范围：数据层 + 时机层 + 发现层 + 主流程</span>
+</div>
+
+<div class="toc">
+  <h2>目录</h2>
+  <a href="#overall">一、整体评分</a>
+  <a href="#p0">二、P0 问题（必须立即修复）</a>
+  <a href="#p1">三、P1 问题（高优先级）</a>
+  <a href="#p2">四、P2 问题（中优先级）</a>
+  <a href="#layer-scores">五、各层独立评估</a>
+  <a href="#roadmap">六、修复路线图</a>
+  <a href="#arch-conclusion">七、架构总评与总体结论</a>
+</div>
+
+<!-- ========== 一、整体评分 ========== -->
+<div class="section" id="overall">
+  <h2>一、整体评分</h2>
+  <div class="score-grid">
+    <div class="score-card">
+      <div class="label">架构设计</div>
+      <div class="value yellow">7.2</div>
+      <div class="sub">分层清晰，Client 职责过载</div>
+    </div>
+    <div class="score-card">
+      <div class="label">代码质量</div>
+      <div class="value yellow">B+</div>
+      <div class="sub">P0 漏洞 2 个，P1 问题 7 个</div>
+    </div>
+    <div class="score-card">
+      <div class="label">数据能力</div>
+      <div class="value yellow">7.0</div>
+      <div class="sub">6 大数据源，规范化未落地</div>
+    </div>
+    <div class="score-card">
+      <div class="label">文档规范</div>
+      <div class="value orange">B</div>
+      <div class="sub">核心方法有 docstring，深度参差</div>
+    </div>
+    <div class="score-card">
+      <div class="label">工程成熟度</div>
+      <div class="value yellow">中高</div>
+      <div class="sub">数据层+时机+发现完整，执行层未动</div>
+    </div>
+    <div class="score-card">
+      <div class="label">P0 问题数</div>
+      <div class="value red">3</div>
+      <div class="sub">SQL注入 / 导出不全 / 注释不符</div>
+    </div>
+  </div>
+
+  <div class="summary-box">
+    <h2>项目定位结论</h2>
+    <p>低频个人量化数据中间件。6 大数据源整合框架完整，Store 缓存策略合理（TTL 分级 + 故障降级 + 预热机制），时机层和发现层的注意力机制设计思路正确。架构契合场景，整体处于<strong style="color:var(--yellow)">「可用但需治理」</strong>阶段。</p>
+    <p style="margin-top:0.8rem;color:var(--muted)">最大的优点是<strong>克制</strong>——不用调度框架（一个函数）、不用 EventBus（一个 dataclass）、不用 Redis（SQLite 单文件）、不用全盘扫描（5 条注意力通道）。最大的风险是工程细节粗糙——P0 漏洞和 TTL 键名不一致若不修，时间长了会成为隐性炸弹。</p>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ========== 二、P0 问题 ========== -->
+<div class="section" id="p0">
+  <h2>二、P0 问题（必须立即修复）</h2>
+  <p style="color:var(--muted);font-size:0.85rem">P0 = 致命问题，影响正确性或安全性，必须 24-48 小时内修复。</p>
+
+  <div class="p0-section">
+    <h3><span class="tag tag-p0">P0</span> SQL 注入风险</h3>
+    <p><span class="tag tag-file">store.py</span> <code>_read()</code> / <code>_write()</code> / <code>_is_fresh()</code> 多处使用 f-string 拼接表名列名：<code>f'SELECT * FROM "{table}" WHERE "{key_column}" = ?'</code></p>
+    <p style="color:var(--muted);font-size:0.82rem">风险：攻击者可构造恶意表名列名（如 <code>"; DROP TABLE kline_daily; --"</code>）执行任意 SQL</p>
+    <h4>修复方案</h4>
+    <pre><code># 表名列名白名单校验
+import re
+_VALID_IDENTIFIER = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*$')
+
+def _validate_identifier(name: str) -> str:
+    if not _VALID_IDENTIFIER.match(name):
+        raise ValueError(f"非法标识符: {name}")
+    return name</code></pre>
+    <p><span class="tag tag-fix">修复</span> 表名列名加入正则白名单校验，不合格则抛 <code>ValueError</code></p>
+  </div>
+
+  <div class="p0-section">
+    <h3><span class="tag tag-p0">P0</span> sources/__init__.py 导出不完整</h3>
+    <p><span class="tag tag-file">sources/__init__.py</span> <code>__all__</code> 只导出 3 个类，但项目实际使用了 6 个 Source</p>
+    <pre><code># 当前（不完整）
+__all__ = ["MootdxSource", "AKShareSource", "TencentSource"]
+
+# 实际使用但未导出
+BaostockSource  ← timing.py、client.py 多处使用
+EFinanceSource   ← client.py、client_cached.py 使用
+ZhituSource      ← client.py 使用</code></pre>
+    <p><span class="tag tag-fix">修复</span> 补全 <code>__all__</code> 列表包含全部 6 个类</p>
+  </div>
+
+  <div class="p0-section">
+    <h3><span class="tag tag-p0">P0</span> runner.py 注释与代码不一致</h3>
+    <p><span class="tag tag-file">runner.py</span> L26 注释说「默认 StokeCached」，但 L33 写 <code>s.store.warmup(s._s)</code> 暗示实际需要 StokeCached</p>
+    <pre><code># L26 当前注释（误导）
+s = Stoke()  # 默认 StokeCached（带缓存）
+
+# L33 实际调用
+s.store.warmup(s._s)  # 需传裸 Stoke 实例避免缓存回环</code></pre>
+    <p><span class="tag tag-fix">修复</span> 修正注释：<code># 默认 StokeCached（带缓存），
+# warmup 需传裸 Stoke 实例（._s）避免缓存回环</code></p>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ========== 三、P1 问题 ========== -->
+<div class="section" id="p1">
+  <h2>三、P1 问题（高优先级）</h2>
+  <p style="color:var(--muted);font-size:0.85rem">P1 = 影响数据正确性或系统稳定性，建议 1 周内修复。</p>
+
+  <div class="p1-section">
+    <h3><span class="tag tag-p1">P1-1</span> TTL 键名不一致（连字符 vs 下划线混用）</h3>
+    <p><span class="tag tag-file">store.py</span> + <span class="tag tag-file">client_cached.py</span></p>
+    <p>Store 层定义：<code>"klinedaily"</code> / <code>"marketbreadth"</code> / <code>"sector_rank"</code> / <code>"strongstocks"</code> 混用连字符和下划线</p>
+    <p>warmup 中 fallback 逻辑 <code>TTL.get(table_name.replace("_", ""))</code> 掩盖了部分键名错误</p>
+    <p><span class="tag tag-fix">修复</span> 统一改为下划线命名（<code>kline_daily</code>、<code>market_breadth</code>、<code>sector_rank</code> 等）</p>
+  </div>
+
+  <div class="p1-section">
+    <h3><span class="tag tag-p1">P1-2</span> Store 层与 Client 层双向隐式耦合</h3>
+    <p><span class="tag tag-file">store.py</span> <code>warmup()</code> 依赖传入裸 Stoke 实例，且使用 <code>._s</code> 私有属性</p>
+    <p>违反依赖倒置原则（Store 应依赖抽象接口而非具体 Client 实现），且测试困难</p>
+    <p><span class="tag tag-fix">修复</span> 引入 <code>DataFetcher</code> Protocol 接口，warmup 依赖抽象而非具体类</p>
+  </div>
+
+  <div class="p1-section">
+    <h3><span class="tag tag-p1">P1-3</span> Client 类职责过载（God Class）</h3>
+    <p><span class="tag tag-file">client.py</span> 单一类 48 个方法，涵盖：行情/新闻研报/信号/情绪/资金流/估值/智兔数服</p>
+    <p>难以单独测试某个数据域，新增数据源必须改主类</p>
+    <p><span class="tag tag-fix">修复</span> 按业务域拆分为 <code>market</code> / <code>signal</code> / <code>sentiment</code> / <code>fund</code> / <code>valuation</code> 子模块</p>
+  </div>
+
+  <div class="p1-section">
+    <h3><span class="tag tag-p1">P1-4</span> mootdx 连接失败无降级</h3>
+    <p><span class="tag tag-file">mootdx_source.py</span> <code>Quotes.factory()</code> 失败时直接抛异常，无友好提示</p>
+    <p><span class="tag tag-fix">修复</span> 捕获异常，抛出 <code>SourceNotReadyError</code> 并提示检查通达信客户端是否安装</p>
+  </div>
+
+  <div class="p1-section">
+    <h3><span class="tag tag-p1">P1-5</span> 缓存降级无幂等保护</h3>
+    <p><span class="tag tag-file">client_cached.py</span> Store 损坏时每次请求都触发 except 分支重试网络，可能触发数据源限流封禁</p>
+    <p><span class="tag tag-fix">修复</span> 加 <code>_degraded</code> 标志，首次降级后设置标志，后续请求直接透传</p>
+  </div>
+
+  <div class="p1-section">
+    <h3><span class="tag tag-p1">P1-6</span> 时机层权重硬编码</h3>
+    <p><span class="tag tag-file">timing.py</span> 五维权重写死在 <code>assess()</code> 中，无法切换保守/激进策略</p>
+    <p><span class="tag tag-fix">修复</span> 权重抽到 <code>config.py</code> 的 <code>TIMING_WEIGHTS</code> 字典，<code>Timing.__init__()</code> 接受 <code>profile</code> 参数</p>
+  </div>
+
+  <div class="p1-section">
+    <h3><span class="tag tag-p1">P1-7</span> 限流器多线程不安全</h3>
+    <p><span class="tag tag-file">rate_limiter.py</span> <code>last_request_time</code> 实例变量在多线程并发下存在竞态条件</p>
+    <p><span class="tag tag-fix">修复</span> 添加 <code>threading.Lock()</code>，或使用 <code>time.monotonic()</code> 替代 <code>time.time()</code></p>
+  </div>
+
+  <div class="p1-section">
+    <h3><span class="tag tag-p1">P1-8</span> 重试装饰器异常信息丢失</h3>
+    <p><span class="tag tag-file">utils.py</span> <code>retry_on_empty=True</code> 且 DataFrame 为空时，<code>last_exc</code> 可能未赋值，<code>raise last_exc</code> 抛 <code>None</code></p>
+    <p><span class="tag tag-fix">修复</span> 函数开头初始化 <code>last_exc = None</code>，确保总是有可抛出的异常</p>
+  </div>
+
+  <div class="p1-section">
+    <h3><span class="tag tag-p1">P1-9</span> 交易日历缓存永不刷新</h3>
+    <p><span class="tag tag-file">calendar.py</span> <code>_load_trading_days()</code> 永久缓存在内存中，春节调休调整后程序需重启才能更新</p>
+    <p><span class="tag tag-fix">修复</span> 添加时间窗口校验（如首次加载后超过 7 天则重新加载），或提供手动刷新接口</p>
+  </div>
+
+  <div class="p1-section">
+    <h3><span class="tag tag-p1">P1-10</span> warmup 中日期 key 切分 Bug</h3>
+    <p><span class="tag tag-file">store.py</span> L356 日期字符串切分错误</p>
+    <pre><code># 当前（错误）
+f"{key[:4]}-{key[2:4]}-{key[4:]}"
+# 输入: "20260521"
+# 期望: "2026-05-21"
+# 实际: "2026-0521"  ← 月份丢了一位！</code></pre>
+    <p><span class="tag tag-fix">修复</span> 修正为 <code>f"{key[:4]}-{key[4:6]}-{key[6:]}"</code></p>
+  </div>
+
+  <div class="p1-section">
+    <h3><span class="tag tag-p1">P1-11</span> mootdx 连接状态管理不完善</h3>
+    <p><span class="tag tag-file">baostock_source.py</span> 网络异常后 <code>_logged_in</code> 标志可能与服务器状态不同步</p>
+    <p><span class="tag tag-fix">修复</span> 每次调用前验证连接有效性，失败后主动重连</p>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ========== 四、P2 问题 ========== -->
+<div class="section" id="p2">
+  <h2>四、P2 问题（中优先级）</h2>
+  <p style="color:var(--muted);font-size:0.85rem">P2 = 不影响可用性，但影响代码质量和长期可维护性，建议在下一迭代修复。</p>
+
+  <table>
+    <tr><th style="width:60px">编号</th><th>问题描述</th><th style="width:120px">文件</th><th>修复建议</th></tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-1</span></td>
+      <td>Normalizer 模块定义了但未被实际使用，列名规范化散落在 client_cached.py 各方法的 <code>column_map</code> 参数中</td>
+      <td><code>normalizer.py</code></td>
+      <td>在 Sources 层返回前统一调用 normalizer，集中管理列名映射</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-2</span></td>
+      <td>exceptions.py 定义了异常体系但各数据源未统一使用（抛出的是标准 Exception 而非 StokeError 子类）</td>
+      <td>各 source 文件</td>
+      <td>数据源按异常类型抛出对应 StokeError 子类，上层可差异化处理</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-3</span></td>
+      <td>config.py 的 <code>setup_logging()</code> 在模块导入时自动执行（<code>client_cached.py</code> L18），违反延迟初始化原则</td>
+      <td><code>config.py</code></td>
+      <td>改为惰性初始化，或提供 <code>setup_logging(lazy=True)</code> 参数</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-4</span></td>
+      <td><code>_is_fresh()</code> 的 key 过滤逻辑不精确，replace 模式的每日快照可能返回旧日期数据（MAX(fetched_at) 不过滤特定 key）</td>
+      <td><code>store.py</code></td>
+      <td>按 key_column 和 key 过滤后再判断新鲜度</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-5</span></td>
+      <td>Store 缺少数据版本迁移机制，表结构变更需手动处理</td>
+      <td><code>store.py</code></td>
+      <td>建立 <code>MIGRATIONS</code> 字典记录版本历史，支持 ALTER TABLE</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-6</span></td>
+      <td>时机层 MA 计算数据不足 5 条时返回 NaN，后续比较可能出错（NaN > NaN 为 False 但逻辑上应回退）</td>
+      <td><code>timing.py</code></td>
+      <td>添加数据量检查，样本不足 5 条时回退到 50.0 中性分</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-7</span></td>
+      <td>发现层评分过于简化（仅基于连板数，忽略换手率/量比/封单金额）</td>
+      <td><code>discovery.py</code></td>
+      <td>引入多因子评分模型，综合考虑换手率、封单量、题材热度等</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-8</span></td>
+      <td>Context 类型安全缺失（<code>candidates: list</code> 无具体类型），行业轮动通道返回 symbol 为空</td>
+      <td><code>context.py</code></td>
+      <td>定义 <code>Candidate</code> dataclass，统一所有通道的返回结构</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-9</span></td>
+      <td>行业维度 <code>_assess_sector()</code> 中列名判断逻辑脆弱，多处 fallback 回退到 50.0</td>
+      <td><code>timing.py</code></td>
+      <td>统一依赖 normalizer.py 返回的标准化列名，减少 fallback 分支</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-10</span></td>
+      <td><code>rename(..., inplace=True)</code> 在 pandas 3.0+ 已弃用</td>
+      <td><code>store.py</code></td>
+      <td>改为 <code>df = df.rename(columns=...)</code></td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-11</span></td>
+      <td>baostock 健康检查日期硬编码为 <code>"2026-05-20"</code>，非交易日会失败</td>
+      <td><code>baostock_source.py</code></td>
+      <td>使用 <code>today_str()</code> 替换硬编码日期</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-12</span></td>
+      <td><code>efinance_source.py</code> 中 <code>symbols=None</code> 时 <code>len(symbols)</code> 触发 TypeError</td>
+      <td><code>efinance_source.py</code></td>
+      <td>改为 <code>len(symbols) if symbols is not None else 0</code></td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-13</span></td>
+      <td>akshare 市场判断逻辑对 8 开头（沪 ETF）等处理不当，仅判断 <code>startswith("6")</code></td>
+      <td><code>akshare_source.py</code></td>
+      <td>扩展判断逻辑覆盖 0/3/8/4/9 等开头代码</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-14</span></td>
+      <td>TencentSource 类名误导（实际通过 akshare 获取数据）</td>
+      <td><code>tencent_source.py</code></td>
+      <td>更名为 <code>ValuationSource</code> 更准确</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-15</span></td>
+      <td>多个 lambda 闭包变量捕获存在隐患（部分 lambda 使用默认参数正确，部分可能有问题）</td>
+      <td>多个文件</td>
+      <td>统一检查所有 lambda，确保闭包变量正确捕获</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-p2">P2-16</span></td>
+      <td>多进程/多线程扩展能力缺失（RateLimiter 实例变量、MarketContext 无锁保护、SQLite 并发写入有限制）</td>
+      <td>整体架构</td>
+      <td>预留 <code>Store(backend="redis")</code> 扩展点，未来需要时重构</td>
+    </tr>
+  </table>
+</div>
+
+<hr class="divider">
+
+<!-- ========== 五、各层评估 ========== -->
+<div class="section" id="layer-scores">
+  <h2>五、各层独立评估</h2>
+  <div class="layer-summary">
+    <div class="layer-card">
+      <h3>数据层（client/store/sources）</h3>
+      <div class="score">7.5 / 10</div>
+      <ul>
+        <li>✅ 6 大数据源整合框架完整</li>
+        <li>✅ Store 缓存策略合理（TTL分级+降级+预热）</li>
+        <li>✅ 限流机制覆盖所有数据源</li>
+        <li>⚠️ P0 SQL注入和键名不一致</li>
+        <li>⚠️ Normalizer 未实际使用</li>
+      </ul>
+    </div>
+    <div class="layer-card">
+      <h3>时机层（timing.py）</h3>
+      <div class="score">7.0 / 10</div>
+      <ul>
+        <li>✅ 五维加权模型设计合理</li>
+        <li>✅ 失败统一降级到 50.0 中性分</li>
+        <li>✅ 权重分配符合逻辑</li>
+        <li>⚠️ 权重硬编码，无法切换策略</li>
+        <li>⚠️ NaN 数据处理不足</li>
+      </ul>
+    </div>
+    <div class="layer-card">
+      <h3>发现层（discovery.py）</h3>
+      <div class="score">6.5 / 10</div>
+      <ul>
+        <li>✅ 5 条注意力通道思路正确</li>
+        <li>✅ 不全盘扫描，符合场景</li>
+        <li>✅ 北向通道克制（暂不展开个股）</li>
+        <li>⚠️ 评分模型过于简化</li>
+        <li>⚠️ Context 类型安全缺失</li>
+      </ul>
+    </div>
+    <div class="layer-card">
+      <h3>主流程（runner.py + context.py）</h3>
+      <div class="score">8.0 / 10</div>
+      <ul>
+        <li>✅ MarketContext 轻量值对象设计</li>
+        <li>✅ 4 步流程清晰简洁</li>
+        <li>✅ 风控跳过逻辑正确</li>
+        <li>⚠️ runner.py 注释与代码不一致</li>
+        <li>✅ 无过度工程</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ========== 六、修复路线图 ========== -->
+<div class="section" id="roadmap">
+  <h2>六、修复路线图</h2>
+
+  <div class="phase-box">
+    <div class="phase-num p0">止<br>血</div>
+    <div>
+      <h3 style="margin:0">阶段一：止血（1-2 天）</h3>
+      <p style="color:var(--muted);font-size:0.82rem;margin-top:0.3rem">修完这 4 个问题立刻可以进入实际使用阶段</p>
+      <ul style="margin-top:0.4rem">
+        <li><span class="tag tag-p0">P0-1</span> SQL 注入白名单校验</li>
+        <li><span class="tag tag-p0">P0-2</span> sources/__all__ 补全 6 个类</li>
+        <li><span class="tag tag-p0">P0-3</span> runner.py 注释修正</li>
+        <li><span class="tag tag-p1">P1-10</span> 日期切分 Bug（4 月日期出现 0521 错误）</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase-box">
+    <div class="phase-num p1a">解<br>耦</div>
+    <div>
+      <h3 style="margin:0">阶段二：解耦（3-5 天）</h3>
+      <p style="color:var(--muted);font-size:0.82rem;margin-top:0.3rem">消除架构耦合，降低长期维护成本</p>
+      <ul style="margin-top:0.4rem">
+        <li><span class="tag tag-p1">P1-1</span> 统一 TTL 键名规范（全部下划线）</li>
+        <li><span class="tag tag-p1">P1-5</span> 缓存降级幂等保护（加 <code>_degraded</code> 标志）</li>
+        <li><span class="tag tag-p1">P1-2</span> 消除 Store→Client 耦合（warmup 依赖协议接口）</li>
+        <li><span class="tag tag-p1">P1-4</span> mootdx 连接降级提示</li>
+        <li><span class="tag tag-p1">P1-7</span> 限流器多线程安全改造</li>
+        <li><span class="tag tag-p1">P1-8</span> 重试装饰器异常信息修复</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase-box">
+    <div class="phase-num p1b">完<br>善</div>
+    <div>
+      <h3 style="margin:0">阶段三：完善（1 周）</h3>
+      <p style="color:var(--muted);font-size:0.82rem;margin-top:0.3rem">提升代码质量，为后续迭代奠基</p>
+      <ul style="margin-top:0.4rem">
+        <li><span class="tag tag-p1">P1-3</span> Client 按业务域拆分</li>
+        <li><span class="tag tag-p1">P1-6</span> 时机层权重配置化</li>
+        <li><span class="tag tag-p1">P1-9</span> 交易日历定期刷新</li>
+        <li><span class="tag tag-p1">P1-11</span> baostock 连接管理完善</li>
+        <li><span class="tag tag-p2">P2-1</span> Normalizer 集中管理列名映射</li>
+        <li><span class="tag tag-p2">P2-2</span> 异常体系统一使用</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase-box">
+    <div class="phase-num p2">演<br>进</div>
+    <div>
+      <h3 style="margin:0">阶段四：演进（持续）</h3>
+      <p style="color:var(--muted);font-size:0.82rem;margin-top:0.3rem">从可用到好用，从好用到可扩展</p>
+      <ul style="margin-top:0.4rem">
+        <li><span class="tag tag-p2">P2-7</span> 发现层多因子评分</li>
+        <li><span class="tag tag-p2">P2-8</span> Context 类型化（Candidate dataclass）</li>
+        <li><span class="tag tag-p2">P2-5</span> 数据版本迁移机制</li>
+        <li><span class="tag tag-p2">P2-3</span> setup_logging 惰性初始化</li>
+        <li><span class="tag tag-p2">P2-16</span> 预留 Redis 扩展点</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ========== 七、架构总评 ========== -->
+<div class="section" id="arch-conclusion">
+  <div class="conclusion">
+    <h2>七、架构总评与总体结论</h2>
+
+    <h3>设计哲学正确，具体实现有瑕疵</h3>
+    <p>项目最大的优点是<strong>克制</strong>：不用调度框架（一个函数）、不用 EventBus（一个 dataclass）、不用 Redis（SQLite 单文件）、不用全盘扫描（5 条注意力通道）。这种克制是低频个人量化场景的正确选择。</p>
+
+    <h3>时机层 + 发现层的克制之道</h3>
+    <p>时机层的五维加权模型（大盘/估值/行业/情绪/资金流）用固定权重替代了复杂的多因子动态配置——对于个人低频量化来说，这是正确的工程权衡。北向资金通道只记录方向不展开个股，体现了「知道边界在哪里」的克制。</p>
+    <p>发现层的注意力机制从「选股」变成「跟随市场选出的标的」——这是认知上的根本转变，也避免了「构建完美选股模型」这个几乎无解的问题。</p>
+
+    <h3>最大的架构风险</h3>
+    <p>不是架构设计，而是工程细节的粗糙度。Client 的膨胀路径（48 个方法）是个人项目的常见陷阱——因为「加一个方法很容易」，所以文件会无限膨胀。P0 SQL 注入和 TTL 键名不一致若不修，时间长了会成为隐性炸弹，且极难排查。</p>
+
+    <h3>最终建议</h3>
+    <p><span class="badge badge-green">建议</span> <strong>修完 4 个 P0/P1-10，立刻进入实际使用阶段</strong>。在实战中发现问题、解决问题，比闭门清理工程债务更有效率。等时机层和发现层在实际交易中产生反馈数据后，再针对性优化评分模型，比现在空对空设计更有效。</p>
+
+    <p style="margin-top:1rem;text-align:center;color:var(--muted);font-size:0.82rem">
+      — Stoke 项目中段工程审查 · 2026-05-20 · 5 子 agent 并行审查
+    </p>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

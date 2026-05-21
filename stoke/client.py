@@ -12,6 +12,9 @@ from stoke.rate_limiter import RateLimiter
 from stoke.sources.mootdx_source import MootdxSource
 from stoke.sources.akshare_source import AKShareSource
 from stoke.sources.tencent_source import TencentSource
+from stoke.sources.baostock_source import BaostockSource
+from stoke.sources.efinance_source import EFinanceSource
+from stoke.sources.zhitu_source import ZhituSource
 
 logger = logging.getLogger(__name__)
 
@@ -29,10 +32,33 @@ class Stoke:
         df = s.realtime(["000001", "600000"])
         df = s.kline("000001")
 
-        # 新闻/研报/公告/信号
+        # 新闻/研报/公告/信号/情绪
         df = s.news("000001")
         df = s.limit_up()
         df = s.strong_stocks()
+        df = s.limit_down()  # 跌停
+        df = s.stock_comment_all()  # 千股千评（含主力成本、情绪评分）
+
+        # 资金流
+        df = s.northbound_flow()  # 北向资金
+        df = s.dragon_tiger()  # 龙虎榜
+        df = s.margin_shanghai()  # 融资融券
+        df = s.individual_fund_flow("000001")  # 个股主力资金
+        df = s.market_fund_flow()  # 市场整体资金流
+
+        # 热度（东财主力 + 雪球备选）
+        df = s.hot_detail("000001")  # 东财热度：新晋/铁杆粉丝比例
+        df = s.xueqiu_hot()  # 雪球全市场热度排行榜
+        df = s.hot_keywords()  # 热搜关键词
+
+        # 板块数据
+        df = s.sector_kline("银行")  # 行业板块指数 K 线
+        df = s.sector_rank()  # 行业涨跌幅排名
+        df = s.sector_members("沪深300")  # 板块成分股
+
+        # 市场宽度
+        df = s.market_breadth()  # 上证指数日线
+        df = s.market_volume()  # 沪深成交额
 
         # 估值
         df = s.index_pe("上证50")
@@ -44,17 +70,32 @@ class Stoke:
         mootdx_limiter: Optional[RateLimiter] = None,
         akshare_limiter: Optional[RateLimiter] = None,
         tencent_limiter: Optional[RateLimiter] = None,
+        baostock_limiter: Optional[RateLimiter] = None,
+        efinance_limiter: Optional[RateLimiter] = None,
+        zhitu_limiter: Optional[RateLimiter] = None,
+        zhitu_token: Optional[str] = None,
     ):
         """
+        纯路由 Stoke — 只组装 6 个数据源，不做缓存。
+
         Args:
             mootdx_limiter: mootdx 限流器（默认不限流）
             akshare_limiter: akshare 限流器（默认 5 秒）
             tencent_limiter: 腾讯限流器（默认 3 秒）
+            baostock_limiter: baostock 限流器（默认 1 秒）
+            efinance_limiter: efinance 限流器（默认 0.5 秒）
+            zhitu_limiter: 智兔数服限流器（默认 1 秒）
+            zhitu_token: 智兔数服 API Token（默认从环境变量读取）
+
+        需要缓存？用 StokeCached： from stoke.client_cached import StokeCached
         """
         self.mootdx = MootdxSource(rate_limiter=mootdx_limiter)
         self.akshare = AKShareSource(rate_limiter=akshare_limiter)
         self.tencent = TencentSource(rate_limiter=tencent_limiter)
-        logger.info("Stoke 统一入口初始化完成（mootdx + akshare + tencent）")
+        self.baostock = BaostockSource(rate_limiter=baostock_limiter)
+        self.efinance = EFinanceSource(rate_limiter=efinance_limiter)
+        self.zhitu = ZhituSource(token=zhitu_token, rate_limiter=zhitu_limiter)
+        logger.info("Stoke 初始化完成（6 源，纯路由）")
 
     # ==================== 健康检查 ====================
 
@@ -69,6 +110,9 @@ class Stoke:
             "mootdx": self.mootdx.health_check(),
             "akshare": self.akshare.health_check(),
             "tencent": self.tencent.health_check(),
+            "baostock": self.baostock.health_check(),
+            "efinance": self.efinance.health_check(),
+            "zhitu": self.zhitu.health_check(),
         }
         status = "全部正常" if all(result.values()) else "部分异常"
         logger.info("全源健康检查: %s %s", result, status)
@@ -126,7 +170,7 @@ class Stoke:
         """强势涨停股（含题材归因）"""
         return self.akshare.get_strong_stocks(date)
 
-    # ==================== 板块（akshare） ====================
+    # ==================== 板块数据（mootdx + akshare） ====================
 
     def concepts(self) -> pd.DataFrame:
         """概念板块列表"""
@@ -135,6 +179,209 @@ class Stoke:
     def industries(self) -> pd.DataFrame:
         """行业板块列表"""
         return self.akshare.get_industry_list()
+
+    def sector_members(self, sector_name: str) -> pd.DataFrame:
+        """
+        板块/指数成分股（通达信 block 数据库）
+
+        Args:
+            sector_name: 板块名称，如 '沪深300'、'创业板指'
+        """
+        return self.mootdx.get_sector_members(sector_name)
+
+    def sector_kline(self, symbol: str = "银行",
+                     start_date: str = "20250101",
+                     end_date: str = "") -> pd.DataFrame:
+        """
+        行业板块指数 K 线
+
+        Args:
+            symbol: 行业板块名称，如 '银行'、'半导体'
+            start_date: 起始日期（YYYYMMDD）
+            end_date: 截止日期，默认最近交易日
+        """
+        return self.akshare.get_sector_kline(symbol, start_date, end_date)
+
+    def sector_rank(self) -> pd.DataFrame:
+        """行业板块当日涨跌幅排名"""
+        return self.akshare.get_sector_rank()
+
+    # ==================== 市场宽度（akshare） ====================
+
+    def market_breadth(self) -> pd.DataFrame:
+        """市场宽度：上证指数日线"""
+        return self.akshare.get_market_breadth()
+
+    def market_volume(self) -> pd.DataFrame:
+        """沪深两市每日成交额"""
+        return self.akshare.get_market_volume()
+
+    # ==================== 资金流（akshare） ====================
+
+    def northbound_flow(self) -> pd.DataFrame:
+        """北向资金历史每日成交净买额"""
+        return self.akshare.get_northbound_flow()
+
+    def dragon_tiger(self) -> pd.DataFrame:
+        """龙虎榜营业部资金统计"""
+        return self.efinance.get_daily_billboard()
+
+    def margin_shanghai(self) -> pd.DataFrame:
+        """上海市场融资融券余额"""
+        return self.akshare.get_margin_shanghai()
+
+    def margin_shenzhen(self) -> pd.DataFrame:
+        """深圳市场融资融券余额"""
+        return self.akshare.get_margin_shenzhen()
+
+    def market_fund_flow(self) -> pd.DataFrame:
+        """市场整体资金流（上证+深证）"""
+        return self.akshare.get_market_fund_flow()
+
+    def individual_fund_flow(self, symbol: str) -> pd.DataFrame:
+        """个股主力资金流向（含超大单/大单/中单/小单细分）"""
+        return self.akshare.get_individual_fund_flow(symbol)
+
+    # ==================== 情绪：热度（akshare 东财主力） ====================
+
+    def hot_detail(self, symbol: str) -> pd.DataFrame:
+        """【主力】东方财富个股热度详情（含新晋/铁杆粉丝比例、排名趋势）"""
+        return self.akshare.get_hot_detail(symbol)
+
+    def hot_latest(self, symbol: str) -> pd.DataFrame:
+        """东方财富个股最新排名"""
+        return self.akshare.get_hot_latest(symbol)
+
+    def hot_realtime(self, symbol: str) -> pd.DataFrame:
+        """东方财富个股当天实时排名变动（每 10 分钟）"""
+        return self.akshare.get_hot_realtime(symbol)
+
+    def hot_keywords(self) -> pd.DataFrame:
+        """热搜关键词（概念题材维度）"""
+        return self.akshare.get_hot_keywords()
+
+    # ==================== 情绪：雪球热度（备选） ====================
+
+    def xueqiu_hot(self, mode: str = "最热门") -> pd.DataFrame:
+        """雪球沪深股市热度排行榜（讨论/交易/关注）"""
+        return self.akshare.get_xueqiu_hot(mode)
+
+    # ==================== 情绪：舆情评分（akshare） ====================
+
+    def stock_comment_all(self) -> pd.DataFrame:
+        """全市场千股千评"""
+        return self.akshare.get_stock_comment_all()
+
+    def stock_desire(self, symbol: str) -> pd.DataFrame:
+        """个股参与意愿评分"""
+        return self.akshare.get_stock_desire(symbol)
+
+    def stock_focus(self, symbol: str) -> pd.DataFrame:
+        """个股用户关注指数"""
+        return self.akshare.get_stock_focus(symbol)
+
+    # ==================== 情绪：跌停（akshare） ====================
+
+    def limit_down(self, date: Optional[str] = None) -> pd.DataFrame:
+        """跌停板股票池"""
+        return self.akshare.get_limit_down_pool(date)
+
+    # ==================== K 线复权（baostock） ====================
+
+    def kline_baostock(
+        self,
+        symbol: str,
+        frequency: str = "d",
+        start_date: str = "2025-01-01",
+        end_date: str = "",
+        adjust: str = "none",
+    ) -> pd.DataFrame:
+        """
+        获取复权 K 线（baostock，1 秒限流）
+
+        Args:
+            symbol: 如 'sh.600000' 或 'sz.000001'
+            frequency: "d"(日), "w"(周), "m"(月), "5"(5分钟), "15"(15分钟)
+            start_date: YYYY-MM-DD
+            end_date: YYYY-MM-DD，默认今天
+            adjust: "none"(不复权) / "qfq"(前复权) / "hfq"(后复权)
+        """
+        return self.baostock.get_kline(
+            symbol, frequency, start_date, end_date, adjust,
+        )
+
+    def stock_industry(self) -> pd.DataFrame:
+        """全市场股票行业分类（证监会标准）"""
+        return self.baostock.get_stock_industry()
+
+    def all_stock(self, day: str = "") -> pd.DataFrame:
+        """全市场股票列表（含退市/摘牌），day 默认最近交易日"""
+        return self.baostock.get_all_stock(day)
+
+    # ==================== K 线极速版（efinance） ====================
+
+    def kline_efinance(
+        self, symbol: str,
+        start_date: str = "20250101",
+        end_date: str = "",
+    ) -> pd.DataFrame:
+        """
+        极速日 K 线（efinance，~0.3s，比 akshare 快 15 倍）
+
+        Args:
+            symbol: 6 位代码，如 '600519'
+            start_date: YYYYMMDD
+            end_date: YYYYMMDD，默认今天
+        """
+        return self.efinance.get_kline(symbol, start_date, end_date)
+
+    def daily_billboard(self) -> pd.DataFrame:
+        """今日龙虎榜（efinance，含净买额/上榜原因）"""
+        return self.efinance.get_daily_billboard()
+
+    def top10_holders(self, symbol: str) -> pd.DataFrame:
+        """十大股东（efinance 独有）"""
+        return self.efinance.get_top10_holders(symbol)
+
+    def holder_number(self, symbol: str) -> pd.DataFrame:
+        """股东人数变化趋势（efinance 独有）"""
+        return self.efinance.get_holder_number(symbol)
+
+    def company_info(self, symbol: str) -> pd.DataFrame:
+        """公司基本信息（efinance 独有）"""
+        return self.efinance.get_company_info(symbol)
+
+    # ==================== 智兔数服 REST API ====================
+
+    def zhitu_realtime(self, symbol: str) -> dict:
+        """实时行情快照（智兔，含 PE/PB/市值/换手率一站式）"""
+        return self.zhitu.get_realtime(symbol)
+
+    def zhitu_realtime_batch(self, symbols: list) -> pd.DataFrame:
+        """多股票实时行情批量查询（智兔）"""
+        return self.zhitu.get_realtime_batch(symbols)
+
+    def zhitu_kline(
+        self, symbol: str,
+        start_date: str = "20250101",
+        end_date: str = "",
+        days: int = 100,
+    ) -> pd.DataFrame:
+        """历史 K 线（智兔数服）"""
+        return self.zhitu.get_kline(symbol, start_date, end_date, days)
+
+    def zhitu_macd(
+        self, symbol: str,
+        start_date: str = "20250101",
+        end_date: str = "",
+        days: int = 100,
+    ) -> pd.DataFrame:
+        """MACD 指标（智兔数服）"""
+        return self.zhitu.get_macd(symbol, start_date, end_date, days)
+
+    def zhitu_stock_list(self) -> pd.DataFrame:
+        """A 股全量列表（智兔数服）"""
+        return self.zhitu.get_stock_list()
 
     # ==================== 估值（tencent） ====================
 
