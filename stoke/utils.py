@@ -73,6 +73,10 @@ def retry_on_failure(max_retries: int = 3, base_delay: float = 1.0,
                         raise
                 except Exception:
                     raise
-            raise last_exc  # type: ignore[union-attr]
+            if last_exc is None:
+                raise RuntimeError(
+                    f"{func.__name__} 返回空数据，已重试 {max_retries} 次"
+                )
+            raise last_exc
         return wrapper
     return decorator
