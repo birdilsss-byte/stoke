@@ -26,41 +26,36 @@ logger = logging.getLogger(__name__)
 # ==================== TTL 配置（秒） ====================
 
 TTL = {
-    # 日K线：盘中 5 分钟刷新（当日可能更新），历史永久
-    "klinedaily":       300,
-    # 周/月K线：1 天
-    "klineweekly":     86400,
-    "klinemonthly":    86400,
-    # 实时行情：1 分钟
-    "realtime":          60,
+    # K线
+    "kline_daily":       300,   # 日K线：盘中 5 分钟刷新
+    "kline_weekly":     86400,   # 周K线：1 天
+    "kline_monthly":    86400,   # 月K线：1 天
+    # 实时行情
+    "realtime_snapshot":  60,    # 实时快照：1 分钟
     # 静态参考数据
-    "stocklist":       86400,   # 股票列表：1 天
-    "industrylist":   604800,   # 行业分类：1 周（baostock 不会天天变）
-    "stockindicator": 604800,   # 个股估值指标：1 周
+    "stock_list":       86400,   # 股票列表：1 天
+    "industry_list":   604800,   # 行业分类：1 周
+    "stock_indicator": 604800,   # 个股估值指标：1 周
     # 每日快照数据（收盘后刷新一次即可）
-    "marketbreadth":   86400,
-    "northboundflow":  86400,
-    "margintrading":   86400,
-    "fundflow":        86400,
-    "marketfundflow":  86400,
-    "stockcomment":    86400,
-    "indexpe":         86400,
-    "marketpb":        86400,
-    "dragon_tiger":    86400,
-    "stock_comment":   86400,
-    "sector_rank":      3600,
-    "strongstocks":     3600,
-    "hotkeywords":      3600,
-    "market_volume":   86400,
-    # 盘中高频更新
-    "limitup":          3600,   # 涨停板：1 小时
-    "strongstocks":     3600,
-    "limitdown":        3600,
-    "hotkeywords":      3600,
-    "sectorrank":       3600,
-    "sectorkline":      3600,
-    # 永久追加型（历史不变）
-    "permanent":           0,   # max_age_sec=0 = 永不过期，仅首次拉取
+    "market_breadth":   86400,
+    "northbound_flow":  86400,
+    "margin_trading":   86400,
+    "fund_flow":        86400,
+    "market_fund_flow": 86400,
+    "index_pe":         86400,
+    "market_pb":        86400,
+    "dragon_tiger":     86400,
+    "stock_comment":    86400,
+    "market_volume":    86400,
+    # 盘中高频更新（1 小时）
+    "sector_rank":       3600,
+    "strong_stocks":     3600,
+    "hot_keywords":      3600,
+    "limit_up":          3600,
+    "limit_down":        3600,
+    "sector_kline":      3600,
+    # 永不过期（仅首次拉取）
+    "permanent":            0,
 }
 
 
