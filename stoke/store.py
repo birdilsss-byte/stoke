@@ -11,6 +11,7 @@ Stoke 本地缓存数据库
   - 拉取失败时自动回退旧缓存，容忍单次网络故障
 """
 
+import re
 import sqlite3
 import logging
 from datetime import datetime
