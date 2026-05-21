@@ -64,6 +64,15 @@ TTL = {
 }
 
 
+_IDENTIFIER_RE = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$")
+
+def _validate_identifier(name: str, context: str = "标识符") -> str:
+    """校验 SQL 标识符（表名/列名），防止注入"""
+    if not _IDENTIFIER_RE.match(name):
+        raise ValueError(f"非法{context}: {name!r}")
+    return name
+
+
 class Store:
     """SQLite 本地缓存数据库"""
 
