@@ -30,6 +30,11 @@ def daily_routine() -> MarketContext:
     ctx = MarketContext()
     ctx.trade_date = datetime.now().date()
     ctx.last_update = datetime.now().isoformat()
+    ctx.active_strategies = {
+        "均线金叉": ma_cross,
+        "突破策略": breakout,
+        "放量策略": volume_surge,
+    }
     journal = Journal(s.store)
     executor = Executor(s, ctx)
 
