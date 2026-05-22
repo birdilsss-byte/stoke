@@ -593,18 +593,17 @@ class Store:
                 )
                 df_write.to_sql(table, conn, if_exists="append", index=False)
             elif mode == "append":
+                # 先删除与新数据主键冲突的旧行，避免 UNIQUE constraint
+                pk_cols = self._pk_columns(conn, table)
+                pk_cols = [c for c in pk_cols if c in df_write.columns]
+                if pk_cols:
+                    for _, row in df_write.iterrows():
+                        conds = " AND ".join(f"\"{c}\" = ?" for c in pk_cols)
+                        conn.execute(
+                            f"DELETE FROM \"{table}\" WHERE {conds}",
+                            [row[c] for c in pk_cols],
+                        )
                 df_write.to_sql(table, conn, if_exists="append", index=False)
-                # 去重：动态读取主键列，保留每组中 rowid 最小的行
-                try:
-                    pk_cols = self._pk_columns(conn, table)
-                    group_clause = ", ".join(pk_cols)
-                    conn.execute(
-                        f"DELETE FROM \"{table}\" WHERE rowid NOT IN ("
-                        f"  SELECT MIN(rowid) FROM \"{table}\" GROUP BY {group_clause}"
-                        f")"
-                    )
-                except Exception:
-                    pass  # 表结构可能不同，跳过去重
             elif mode == "overwrite":
                 df_write.to_sql(table, conn, if_exists="replace", index=False)
 
