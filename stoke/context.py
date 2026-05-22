@@ -33,6 +33,11 @@ class MarketContext:
     candidates: list = field(default_factory=list)      # [{symbol, name, score, reason}]
     watch_list: list = field(default_factory=list)      # [{symbol, name, alert_price}]
 
+    # ===== 执行层/沉淀层消费 =====
+
+    positions: list = field(default_factory=list)       # [{symbol, quantity, cost, strategy_name}]
+    active_strategies: dict = field(default_factory=dict)  # {name: strategy_fn}
+
     # ===== 元信息 =====
 
     trade_date: Optional[date] = None
