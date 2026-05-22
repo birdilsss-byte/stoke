@@ -157,6 +157,7 @@ class Backtester:
             start_date: 回测起始日 YYYY-MM-DD
             end_date: 回测结束日 YYYY-MM-DD
             initial_cash: 初始资金
+            frequency: K 线周期，9=日线，7=周线，6=月线
         """
         result = BacktestResult(strategy_name=strategy_fn.__name__)
         cash = initial_cash
