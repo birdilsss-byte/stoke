@@ -280,6 +280,40 @@ class Store:
                     fetched_at  TEXT NOT NULL
                 );
 
+                -- 交易记录（沉淀层）
+                CREATE TABLE IF NOT EXISTS trades (
+                    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                    symbol          TEXT NOT NULL,
+                    name            TEXT,
+                    direction       TEXT NOT NULL,
+                    quantity        INTEGER NOT NULL,
+                    price           REAL NOT NULL,
+                    strategy_name   TEXT NOT NULL,
+                    order_date      TEXT NOT NULL,
+                    fill_date       TEXT,
+                    reason          TEXT,
+                    exit_price      REAL,
+                    exit_date       TEXT,
+                    pnl_pct         REAL,
+                    max_hold_days   INTEGER
+                );
+                CREATE INDEX IF NOT EXISTS idx_trades_strategy
+                    ON trades(strategy_name);
+                CREATE INDEX IF NOT EXISTS idx_trades_date
+                    ON trades(order_date);
+
+                -- 策略表现快照（沉淀层，每日）
+                CREATE TABLE IF NOT EXISTS strategy_snapshots (
+                    date            TEXT NOT NULL,
+                    strategy_name   TEXT NOT NULL,
+                    total_return    REAL,
+                    sharpe          REAL,
+                    max_drawdown    REAL,
+                    win_rate        REAL,
+                    trade_count     INTEGER,
+                    PRIMARY KEY (date, strategy_name)
+                );
+
                 -- 元数据表（跟踪每张表的最后写入时间）
                 CREATE TABLE IF NOT EXISTS _meta (
                     table_name  TEXT PRIMARY KEY,
