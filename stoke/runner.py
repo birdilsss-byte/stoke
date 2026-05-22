@@ -14,7 +14,7 @@ from stoke.timing import Timing
 from stoke.discovery import Discovery
 from stoke.execute import Executor
 from stoke.journal import Journal
-from stoke.backtest import ma_cross, breakout, volume_surge
+from stoke.backtest import ma_cross, breakout, volume_surge, macd
 
 logger = logging.getLogger(__name__)
 
