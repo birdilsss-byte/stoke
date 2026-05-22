@@ -216,6 +216,7 @@ class Backtester:
                             "symbol": symbol,
                             "buy_price": signal.price,
                             "buy_date": today_date,
+                            "buy_idx": i,
                             "quantity": 1,
                             "stop_loss": signal.stop_loss,
                             "take_profit": signal.take_profit,
