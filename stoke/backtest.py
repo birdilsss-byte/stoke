@@ -181,8 +181,10 @@ class Backtester:
                 today_close = df["close"].iloc[i]
                 today_date = df["date"].iloc[i]
 
-                # 有持仓：检查止损止盈
+                # 有持仓：T+1 约束 → 买入当日不能卖出
                 if position and position["symbol"] == symbol:
+                    if i <= position.get("buy_idx", i):
+                        continue
                     if today_close <= position["stop_loss"]:
                         pnl = (today_close / position["buy_price"] - 1) * 100
                         result.trades.append({
