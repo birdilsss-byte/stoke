@@ -138,6 +138,9 @@ class Backtester:
             df = self._s.kline(symbol)
             if df is None or df.empty or len(df) < 20:
                 continue
+            # 统一列名：mootdx 裸数据用 datetime，缓存后用 date
+            if "datetime" in df.columns and "date" not in df.columns:
+                df["date"] = pd.to_datetime(df["datetime"]).dt.strftime("%Y-%m-%d")
             df = df.sort_values("date").reset_index(drop=True)
             mask = (df["date"] >= start_date) & (df["date"] <= end_date)
             df = df[mask].reset_index(drop=True)
