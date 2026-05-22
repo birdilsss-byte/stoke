@@ -98,7 +98,7 @@ class Executor:
             symbol = pos.get("symbol", "")
             cost = pos.get("cost", 0)
             try:
-                rt = self._s.mootdx.get_realtime([symbol])
+                rt = self._s.realtime([symbol])
                 if rt is None or rt.empty:
                     continue
                 current = float(rt.iloc[0]["price"])
