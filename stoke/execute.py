@@ -73,6 +73,13 @@ class Executor:
             logger.info("资金不足: %s 需 %d 股", symbol, quantity)
             return None
 
+        cost = price * quantity
+        if cost > self._cash:
+            logger.info("余额不足: %s 需 %.0f 剩余 %.0f", symbol, cost, self._cash)
+            return None
+
+        self._cash -= cost
+
         order = Order(
             symbol=symbol, name=name, direction="buy",
             quantity=quantity, price=price,
