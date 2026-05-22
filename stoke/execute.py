@@ -50,9 +50,9 @@ class Executor:
         symbol = candidate.get("symbol", "")
         name = candidate.get("name", "")
 
-        # 拿实时行情，取当前价
+        # 拿实时行情，取当前价（走 Stoke 路由，自动 fallback）
         try:
-            rt = self._s.mootdx.get_realtime([symbol])
+            rt = self._s.realtime([symbol])
             if rt is None or rt.empty:
                 logger.warning("无实时行情: %s", symbol)
                 return None
