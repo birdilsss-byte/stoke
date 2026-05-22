@@ -91,7 +91,7 @@ class MootdxSource:
 
         Args:
             symbol: 股票代码，如 '000001'（深市）或 '600000'（沪市）
-            frequency: K 线周期，9=日线，7=周线，6=月线
+            frequency: K 线周期，9=日线，5=周线，6=月线
             start: 起始位置（0=最新）
             offset: 获取条数，默认 800
 
