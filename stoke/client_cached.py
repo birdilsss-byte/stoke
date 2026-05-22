@@ -49,7 +49,7 @@ class StokeCached:
                 key_column=key_column, column_map=column_map,
             )
         except Exception:
-            logger.warning("缓存故障，降级直连 %s", table)
+            logger.exception("缓存故障，降级直连 %s", table)
             self._degraded = True
             return fallback()
 
