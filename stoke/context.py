@@ -36,7 +36,7 @@ class MarketContext:
     # ===== 执行层/沉淀层消费 =====
 
     positions: list = field(default_factory=list)       # [{symbol, quantity, cost, strategy_name}]
-    active_strategies: dict = field(default_factory=dict)  # {name: strategy_fn}
+    active_strategies: dict[str, Callable] = field(default_factory=dict)  # {name: strategy_fn}
 
     # ===== 元信息 =====
 
