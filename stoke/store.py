@@ -514,6 +514,10 @@ class Store:
         logger.info("========== 盘前预热完成 (%d 项) ==========", len(warmed))
         return warmed
 
+    def connection(self) -> sqlite3.Connection:
+        """返回数据库连接（供 Journal 等外部模块使用）"""
+        return sqlite3.connect(self.db_path)
+
     # ==================== 统计 ====================
 
     def stats(self) -> dict:
