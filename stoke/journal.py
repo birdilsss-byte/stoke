@@ -27,7 +27,7 @@ class Journal:
     def log_trade(self, trade_dict: dict):
         """记录一笔成交"""
         now = datetime.now().isoformat()
-        with sqlite3.connect(self._store.db_path) as conn:
+        with self._store.connection() as conn:
             conn.execute(
                 """INSERT INTO trades
                    (symbol, name, direction, quantity, price, strategy_name,
@@ -52,7 +52,7 @@ class Journal:
                  exit_date: Optional[str] = None):
         """更新最近一笔该标的买入的止盈/止损价"""
         edate = exit_date or datetime.now().isoformat()
-        with sqlite3.connect(self._store.db_path) as conn:
+        with self._store.connection() as conn:
             # 找该标的最新买入
             row = conn.execute(
                 """SELECT id, price, order_date FROM trades
@@ -79,7 +79,7 @@ class Journal:
     def snapshot(self, strategy_name: str, result):
         """保存当日策略表现快照"""
         today = date.today().isoformat()
-        with sqlite3.connect(self._store.db_path) as conn:
+        with self._store.connection() as conn:
             conn.execute(
                 """INSERT OR REPLACE INTO strategy_snapshots
                    (date, strategy_name, total_return, sharpe,
@@ -100,7 +100,7 @@ class Journal:
 
     def compare_strategies(self) -> pd.DataFrame:
         """策略对比表（最新快照）"""
-        with sqlite3.connect(self._store.db_path) as conn:
+        with self._store.connection() as conn:
             df = pd.read_sql(
                 """SELECT strategy_name, total_return, sharpe, max_drawdown,
                           win_rate, trade_count
@@ -115,7 +115,7 @@ class Journal:
         import sqlite3
         lines = ["# Stoke 模拟盘周报", "",
                   f"生成时间: {datetime.now().isoformat()}", ""]
-        with sqlite3.connect(self._store.db_path) as conn:
+        with self._store.connection() as conn:
             # 本周交易
             week_ago = (date.today() - pd.Timedelta(days=7)).isoformat()
             trades = pd.read_sql(
