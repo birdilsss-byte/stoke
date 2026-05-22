@@ -164,7 +164,7 @@ class Backtester:
         position = None  # {symbol, buy_price, buy_date, quantity, stop_loss, take_profit}
 
         for symbol in symbols:
-            df = self._s.kline(symbol)
+            df = self._s.kline(symbol, frequency=frequency)
             if df is None or df.empty or len(df) < 20:
                 continue
             # 统一列名：mootdx 裸数据用 datetime，缓存后用 date
