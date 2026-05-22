@@ -78,7 +78,6 @@ class Journal:
 
     def snapshot(self, strategy_name: str, result):
         """保存当日策略表现快照"""
-        import sqlite3
         today = date.today().isoformat()
         with sqlite3.connect(self._store.db_path) as conn:
             conn.execute(
