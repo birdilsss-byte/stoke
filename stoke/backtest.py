@@ -294,12 +294,13 @@ class Backtester:
         symbols: list,
         start_date: str,
         end_date: str,
+        frequency: int = 9,
     ) -> pd.DataFrame:
         """并行跑多个策略，返回对比表"""
         rows = []
         for name, fn in strategies.items():
             logger.info("回测: %s ...", name)
-            r = self.run(fn, symbols, start_date, end_date)
+            r = self.run(fn, symbols, start_date, end_date, frequency=frequency)
             rows.append({
                 "strategy": name,
                 "return_%": round(r.total_return, 2),
