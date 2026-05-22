@@ -100,7 +100,6 @@ class Journal:
 
     def compare_strategies(self) -> pd.DataFrame:
         """策略对比表（最新快照）"""
-        import sqlite3
         with sqlite3.connect(self._store.db_path) as conn:
             df = pd.read_sql(
                 """SELECT strategy_name, total_return, sharpe, max_drawdown,
