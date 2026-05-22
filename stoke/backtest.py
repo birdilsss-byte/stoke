@@ -146,6 +146,7 @@ class Backtester:
         start_date: str,
         end_date: str,
         initial_cash: float = 100_000,
+        frequency: int = 9,
     ) -> BacktestResult:
         """
         对一批标的跑单个策略
