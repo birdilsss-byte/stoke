@@ -51,7 +51,6 @@ class Journal:
     def log_exit(self, symbol: str, exit_price: float,
                  exit_date: Optional[str] = None):
         """更新最近一笔该标的买入的止盈/止损价"""
-        import sqlite3
         edate = exit_date or datetime.now().isoformat()
         with sqlite3.connect(self._store.db_path) as conn:
             # 找该标的最新买入
