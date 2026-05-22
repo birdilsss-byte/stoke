@@ -133,7 +133,6 @@ class Backtester:
         result = BacktestResult(strategy_name=strategy_fn.__name__)
         cash = initial_cash
         position = None  # {symbol, buy_price, buy_date, quantity, stop_loss, take_profit}
-        daily_values = []
 
         for symbol in symbols:
             df = self._s.kline(symbol)
