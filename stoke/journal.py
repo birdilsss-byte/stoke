@@ -26,7 +26,6 @@ class Journal:
 
     def log_trade(self, trade_dict: dict):
         """记录一笔成交"""
-        import sqlite3
         now = datetime.now().isoformat()
         with sqlite3.connect(self._store.db_path) as conn:
             conn.execute(
@@ -41,7 +40,7 @@ class Journal:
                     trade_dict.get("quantity", 0),
                     trade_dict.get("price", 0),
                     trade_dict.get("strategy_name", ""),
-                    trade_dict.get("create_date", now),
+                    trade_dict.get("create_date") or now,
                     now,
                     trade_dict.get("reason", ""),
                 ),
