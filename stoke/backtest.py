@@ -104,6 +104,33 @@ def volume_surge(symbol: str, df: pd.DataFrame, ctx=None) -> Optional[Signal]:
     return None
 
 
+def macd(symbol: str, df: pd.DataFrame, ctx=None) -> Optional[Signal]:
+    """MACD 金叉死叉：DIF 上穿 DEA 买入，下穿卖出"""
+    if len(df) < 35:
+        return None
+    close = df["close"]
+    ema12 = close.ewm(span=12, adjust=False).mean()
+    ema26 = close.ewm(span=26, adjust=False).mean()
+    dif = ema12 - ema26
+    dea = dif.ewm(span=9, adjust=False).mean()
+    # 金叉
+    if dif.iloc[-2] <= dea.iloc[-2] and dif.iloc[-1] > dea.iloc[-1]:
+        price = close.iloc[-1]
+        return Signal(
+            symbol=symbol, direction="buy", price=price,
+            reason="MACD 金叉",
+            stop_loss=price * 0.95, take_profit=price * 1.15,
+        )
+    # 死叉
+    if dif.iloc[-2] >= dea.iloc[-2] and dif.iloc[-1] < dea.iloc[-1]:
+        price = close.iloc[-1]
+        return Signal(
+            symbol=symbol, direction="sell", price=price,
+            reason="MACD 死叉",
+        )
+    return None
+
+
 # ==================== 回测引擎 ====================
 
 class Backtester:
