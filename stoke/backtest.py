@@ -131,6 +131,36 @@ def macd(symbol: str, df: pd.DataFrame, ctx=None) -> Optional[Signal]:
     return None
 
 
+def weekly_rsi(symbol: str, df: pd.DataFrame, ctx=None) -> Optional[Signal]:
+    """周线 RSI 低吸高抛 — RSI(14) < 30 超卖买入，> 70 超买卖出"""
+    if len(df) < 20:
+        return None
+    close = df["close"]
+    delta = close.diff()
+    gain = delta.clip(lower=0)
+    loss = (-delta).clip(lower=0)
+    avg_gain = gain.rolling(14).mean()
+    avg_loss = loss.rolling(14).mean()
+    rs = avg_gain / avg_loss.replace(0, 1e-9)
+    rsi = 100 - (100 / (1 + rs))
+
+    price = close.iloc[-1]
+    # 超卖 → 买入
+    if rsi.iloc[-1] < 30:
+        return Signal(
+            symbol=symbol, direction="buy", price=price,
+            reason=f"周线 RSI 超卖 ({rsi.iloc[-1]:.0f})",
+            stop_loss=price * 0.93, take_profit=price * 1.20,
+        )
+    # 超买 → 卖出
+    if rsi.iloc[-1] > 70:
+        return Signal(
+            symbol=symbol, direction="sell", price=price,
+            reason=f"周线 RSI 超买 ({rsi.iloc[-1]:.0f})",
+        )
+    return None
+
+
 # ==================== 回测引擎 ====================
 
 class Backtester:
