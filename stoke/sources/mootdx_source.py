@@ -37,8 +37,13 @@ class MootdxSource:
     def client(self) -> Quotes:
         """延迟初始化，首次调用时才连接"""
         if self._client is None:
-            self._client = Quotes.factory(market="std")
-            logger.debug("mootdx 客户端已创建")
+            try:
+                self._client = Quotes.factory(market="std")
+                logger.debug("mootdx 客户端已创建")
+            except Exception as e:
+                raise SourceNotReadyError(
+                    "mootdx 连接失败，请检查通达信客户端是否安装"
+                ) from e
         return self._client
 
     def _call(self, method_name: str, method, *args, **kwargs):
