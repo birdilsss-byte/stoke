@@ -422,21 +422,6 @@ class Stoke:
 
     # ==================== 腾讯直连（tencent_direct） ====================
 
-    def realtime_tencent(self, symbols: List[str]) -> pd.DataFrame:
-        """实时行情（腾讯 qt.gtimg.cn，毫秒级，零限制）"""
-        return self._safe_call("realtime_tencent", self.tencent_direct.get_realtime, symbols)
-
-    def kline_tencent(
-        self, symbol: str,
-        freq: str = "day",
-        start_date: str = "",
-        end_date: str = "",
-        adjust: str = "qfq",
-    ) -> pd.DataFrame:
-        """K 线（腾讯直连，前/后复权）"""
-        return self._safe_call(
-            "kline_tencent",
-            self.tencent_direct.get_kline,
-            symbol, freq, start_date, end_date, adjust,
-        )
+    # 实时行情和 K 线已由 realtime()/kline() 统一入口覆盖。
+    # 需要直接调用腾讯直连？用 s.tencent_direct.get_realtime() / get_kline()。
 
