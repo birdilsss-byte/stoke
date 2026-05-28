@@ -164,19 +164,19 @@ class Stoke:
 
     def news(self, symbol: str) -> pd.DataFrame:
         """个股新闻"""
-        return self.akshare.get_news(symbol)
+        return self._safe_call("news", self.akshare.get_news, symbol)
 
     def telegraph(self) -> pd.DataFrame:
         """财联社电报快讯"""
-        return self.akshare.get_cls_telegraph()
+        return self._safe_call("telegraph", self.akshare.get_cls_telegraph)
 
     def research(self, symbol: str) -> pd.DataFrame:
         """东财研报（含 PDF + 盈利预测）"""
-        return self.akshare.get_research_report(symbol)
+        return self._safe_call("research", self.akshare.get_research_report, symbol)
 
     def announcements(self, symbol: str) -> pd.DataFrame:
         """巨潮公告"""
-        return self.akshare.get_announcements(symbol)
+        return self._safe_call("announcements", self.akshare.get_announcements, symbol)
 
     # ==================== 信号（akshare） ====================
 
