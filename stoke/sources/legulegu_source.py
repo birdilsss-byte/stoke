@@ -52,7 +52,7 @@ def _get_session_with_csrf(referer: str) -> tuple:
         ),
     })
     r = session.get(referer, timeout=10)
-    soup = BeautifulSoup(r.text, "lxml")
+    soup = BeautifulSoup(r.text, "html.parser")
     csrf_tag = soup.find(name="meta", attrs={"name": "_csrf"})
     if csrf_tag:
         session.headers["X-CSRF-Token"] = csrf_tag.attrs["content"]
