@@ -484,8 +484,3 @@ class AKShareSource:
         logger.info("获取市场成交额数据")
         return ak.stock_market_fund_flow()
 
-    # ==================== 辅助方法 ====================
-
-    def get_today_str(self) -> str:
-        """获取最近交易日日期字符串（YYYYMMDD）"""
-        return cal_today_str()
