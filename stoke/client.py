@@ -125,12 +125,12 @@ class Stoke:
             dict，如 {"mootdx": True, "akshare": True, "tencent": True}
         """
         result = {
-            "mootdx": self.mootdx.health_check(),
-            "akshare": self.akshare.health_check(),
-            "tencent": self.tencent.health_check(),
-            "baostock": self.baostock.health_check(),
-            "efinance": self.efinance.health_check(),
-            "zhitu": self.zhitu.health_check(),
+            "mootdx": self._safe_call("mootdx.health_check", self.mootdx.health_check),
+            "akshare": self._safe_call("akshare.health_check", self.akshare.health_check),
+            "tencent": self._safe_call("tencent.health_check", self.tencent.health_check),
+            "baostock": self._safe_call("baostock.health_check", self.baostock.health_check),
+            "efinance": self._safe_call("efinance.health_check", self.efinance.health_check),
+            "zhitu": self._safe_call("zhitu.health_check", self.zhitu.health_check),
         }
         status = "全部正常" if all(result.values()) else "部分异常"
         logger.info("全源健康检查: %s %s", result, status)
