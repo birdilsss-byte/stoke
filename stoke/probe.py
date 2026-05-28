@@ -1,7 +1,7 @@
 """
-前导探路 — 快速探测 5 源健康状态
+前导探路 — 快速探测 6 源健康状态
 
-在 FallbackStoke 初始化时运行，5 秒内出结果。
+在 FallbackStoke 初始化时运行，6 秒内出结果。
 后续调用根据探测结果跳过死源、直连备用、优雅降级。
 """
 
@@ -17,12 +17,13 @@ SOURCE_STATUS: dict = {
     "baostock": None,
     "efinance": None,
     "tencent": None,
+    "legulegu": None,
 }
 
 
 def probe_sources(stoke_raw, timeout: float = 3.0) -> dict:
     """
-    快速探测 5 源健康状态，更新全局 SOURCE_STATUS。
+    快速探测 6 源健康状态，更新全局 SOURCE_STATUS。
 
     选取每个源最轻量的端点：
       mootdx:   kline('000001', offset=1)  → TCP
@@ -30,6 +31,7 @@ def probe_sources(stoke_raw, timeout: float = 3.0) -> dict:
       baostock: health_check               → HTTP 证券宝
       efinance: daily_billboard            → HTTP 东方财富
       tencent:  qt.gtimg.cn 实时行情        → HTTP 腾讯
+      legulegu: health_check               → HTTP 乐咕乐股
 
     Returns:
         dict {source_name: bool}
@@ -75,6 +77,15 @@ def probe_sources(stoke_raw, timeout: float = 3.0) -> dict:
         logger.warning("探路 efinance 失败: %s", e)
         results["efinance"] = False
     logger.debug("efinance 探路: %s (%.2fs)", results["efinance"], time.time() - t0)
+
+    # --- legulegu ---
+    t0 = time.time()
+    try:
+        results["legulegu"] = stoke_raw.legulegu.health_check()
+    except Exception as e:
+        logger.warning("探路 legulegu 失败: %s", e)
+        results["legulegu"] = False
+    logger.debug("legulegu 探路: %s (%.2fs)", results["legulegu"], time.time() - t0)
 
     # --- tencent 直连 ---
     t0 = time.time()
