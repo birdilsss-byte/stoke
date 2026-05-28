@@ -193,17 +193,17 @@ if a:
 
 print(f"  akshare: {akshare_ok}/{akshare_total} 通过")
 
-# ========== 4. 腾讯财经 数据源 ==========
-section("4. 腾讯财经（PE / PB 估值）")
+# ========== 4. 乐咕乐股 数据源 ==========
+section("4. 乐咕乐股（PE / PB 估值）")
 
-tencent_ok = 0
-tencent_total = 2
+legulegu_ok = 0
+legulegu_total = 2
 
 try:
-    from stoke.sources.tencent_source import TencentSource
-    t = TencentSource()
+    from stoke.sources.legulegu_source import LeguleguSource
+    t = LeguleguSource()
 except Exception as e:
-    fail(f"初始化 TencentSource: {e}")
+    fail(f"初始化 LeguleguSource: {e}")
     t = None
 
 if t:
@@ -219,11 +219,11 @@ if t:
         assert len(pe) > 0 and len(pb) > 0
         ok(f"上证50 PE: {len(pe)} 条 (最新 PE={pe['滚动市盈率'].iloc[-1]:.2f})")
         ok(f"全市场 PB: {len(pb)} 条 (最新 middlePB={pb['middlePB'].iloc[-1]:.2f})")
-        tencent_ok += 2
+        legulegu_ok += 2
     except Exception as e:
         fail(f"get_index_pe / get_market_pb: {e}")
 
-print(f"  腾讯财经: {tencent_ok}/{tencent_total} 通过")
+print(f"  乐咕乐股: {legulegu_ok}/{legulegu_total} 通过")
 
 # ========== 5. 总结 ==========
 section("5. 验收总结")
