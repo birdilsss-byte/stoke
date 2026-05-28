@@ -12,7 +12,6 @@ RATE_LIMIT = {
     "tencent": 3.0,      # 腾讯财经 lg 接口
     "baostock": 1.0,     # 证券宝 HTTP，稳定 1 秒即可
     "efinance": 0.5,     # 整合多源，无官方限制，0.5 秒即可
-    "zhitu": 1.0,        # 智兔数服 REST，200 次/日，1 秒够用
 }
 
 
