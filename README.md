@@ -85,11 +85,14 @@ stoke/
 │   ├── config.py                 # 配置
 │   ├── rate_limiter.py           # 限流器（带随机抖动+日志）
 │   ├── utils.py                  # 自动重试装饰器
-│   └── sources/                  # 数据源适配
-│       ├── mootdx_source.py      # 通达信：K线、实时行情、股票列表
-│       ├── akshare_source.py     # 新闻、电报、研报、公告、涨停、概念
-│       └── tencent_source.py     # PE / PB 估值
-├── tests/                        # 测试（14 个接口全部可测）
+│   └── sources/                  # 6 源适配
+│       ├── mootdx_source.py          # 通达信：K线、实时行情、股票列表
+│       ├── akshare_source.py         # 新闻、电报、研报、公告、涨停、概念
+│       ├── legulegu_source.py        # PE / PB 估值（纯 requests）
+│       ├── tencent_direct_source.py  # 腾讯直连：实时行情 + K 线
+│       ├── baostock_source.py        # 复权K线 + 财报 + 估值字段
+│       └── efinance_source.py        # 极速K线 + 龙虎榜 + 资金流 + 股东
+├── tests/                        # 测试
 ├── SKILL.md                      # Claude Code Skill 定义
 └── pyproject.toml                # uv 依赖管理
 ```
