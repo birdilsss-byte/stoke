@@ -9,6 +9,8 @@ import logging
 import time
 import functools
 
+import pandas as pd
+
 logger = logging.getLogger(__name__)
 
 # 值得重试的网络异常
