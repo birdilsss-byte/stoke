@@ -178,8 +178,8 @@ class StokeCached:
     def index_pe(self, index_name: str = "上证50") -> pd.DataFrame:
         return self._cached_call(
             "index_pe", index_name,
-            lambda: self._s.tencent.get_index_pe(index_name),
-            lambda: self._s.tencent.get_index_pe(index_name),
+            lambda: self._s.legulegu.get_index_pe(index_name),
+            lambda: self._s.legulegu.get_index_pe(index_name),
             max_age_sec=STORE_TTL["index_pe"], mode="append", key_column="index_name",
             column_map={"日期": "date", "指数": "index_name",
                         "滚动市盈率": "pe_ttm", "静态市盈率": "pe_static"},
@@ -188,8 +188,8 @@ class StokeCached:
     def market_pb(self) -> pd.DataFrame:
         return self._cached_call(
             "market_pb", today_str(),
-            lambda: self._s.tencent.get_market_pb(),
-            lambda: self._s.tencent.get_market_pb(),
+            lambda: self._s.legulegu.get_market_pb(),
+            lambda: self._s.legulegu.get_market_pb(),
             max_age_sec=STORE_TTL["market_pb"], mode="append", key_column="date",
         )
 
