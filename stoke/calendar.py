@@ -11,9 +11,12 @@ from typing import Optional
 
 import pandas as pd
 
+from stoke.rate_limiter import RateLimiter
+
 logger = logging.getLogger(__name__)
 
 _CACHE: Optional[set] = None
+_CALENDAR_LIMITER = RateLimiter(interval=5.0)  # akshare 5 秒限流
 
 
 def _load_trading_days() -> set:
