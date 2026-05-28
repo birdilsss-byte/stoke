@@ -333,11 +333,11 @@ class Stoke:
 
     def stock_industry(self) -> pd.DataFrame:
         """全市场股票行业分类（证监会标准）"""
-        return self.baostock.get_stock_industry()
+        return self._safe_call("stock_industry", self.baostock.get_stock_industry)
 
     def all_stock(self, day: str = "") -> pd.DataFrame:
         """全市场股票列表（含退市/摘牌），day 默认最近交易日"""
-        return self.baostock.get_all_stock(day)
+        return self._safe_call("all_stock", self.baostock.get_all_stock, day)
 
     # ==================== K 线极速版（efinance） ====================
 
