@@ -9,13 +9,15 @@
 
 from stoke.sources.mootdx_source import MootdxSource
 from stoke.sources.akshare_source import AKShareSource
-from stoke.sources.tencent_source import TencentSource
+from stoke.sources.legulegu_source import LeguleguSource
 from stoke.sources.baostock_source import BaostockSource
 from stoke.sources.efinance_source import EFinanceSource
+from stoke.sources.tencent_direct_source import TencentDirectSource
 __all__ = [
     "MootdxSource",
     "AKShareSource",
-    "TencentSource",
+    "LeguleguSource",
     "BaostockSource",
     "EFinanceSource",
+    "TencentDirectSource",
 ]
