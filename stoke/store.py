@@ -540,20 +540,26 @@ class Store:
     def _is_fresh(
         self, table: str, key: str, max_age_sec: int, key_column: str
     ) -> bool:
-        """判断缓存是否在有效期内"""
+        """判断缓存是否在有效期内（按 key 过滤，避免跨 key 误判）"""
         with sqlite3.connect(self.db_path) as conn:
             if max_age_sec == 0:
-                # 永不过期：只要表里有数据就算新鲜
                 row = conn.execute(
                     f"SELECT COUNT(*) FROM \"{table}\""
                 ).fetchone()
                 return row[0] > 0
 
             if max_age_sec > 0:
-                # 查全局最新 fetched_at（不过滤 key，因为每日快照表可能还没今天的数据）
-                row = conn.execute(
-                    f"SELECT MAX(fetched_at) FROM \"{table}\""
-                ).fetchone()
+                # 按具体 key 过滤，避免 A key 缓存导致 B key 误判为"有数据"
+                if key == "all":
+                    row = conn.execute(
+                        f"SELECT MAX(fetched_at) FROM \"{table}\""
+                    ).fetchone()
+                else:
+                    row = conn.execute(
+                        f"SELECT MAX(fetched_at) FROM \"{table}\""
+                        f" WHERE \"{key_column}\" = ?",
+                        (key,),
+                    ).fetchone()
 
                 if row[0] is None:
                     return False
