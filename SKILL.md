@@ -16,7 +16,9 @@ metadata:
       uv:
         - akshare
         - baostock
+        - beautifulsoup4
         - efinance
+        - lxml
         - mootdx
         - pandas
         - requests
@@ -28,7 +30,7 @@ metadata:
         - python3
         - uv
     install:
-      uv: [akshare, baostock, efinance, mootdx, pandas, requests]
+      uv: [akshare, baostock, beautifulsoup4, efinance, lxml, mootdx, pandas, requests]
     postinstall: "cd $STOKE_HOME && uv sync && uv run python3 -c \"from stoke import Stoke; print('OK')\""
 ---
 
