@@ -98,6 +98,23 @@ class Stoke:
         self.zhitu = ZhituSource(token=zhitu_token, rate_limiter=zhitu_limiter)
         logger.info("Stoke 初始化完成（6 源，纯路由）")
 
+    @staticmethod
+    def _safe_call(method_name: str, fn, *args, **kwargs):
+        """统一错误包装：数据源异常 → Stoke 异常，上层可分类处理"""
+        try:
+            result = fn(*args, **kwargs)
+            if isinstance(result, pd.DataFrame) and result.empty:
+                logger.warning("%s 返回空 DataFrame", method_name)
+            return result
+        except (ConnectionError, TimeoutError, OSError) as e:
+            logger.error("%s 网络异常: %s", method_name, e)
+            raise NetworkError(f"{method_name} 网络异常: {e}") from e
+        except SourceNotReadyError:
+            raise
+        except Exception as e:
+            logger.error("%s 异常: %s", method_name, e)
+            raise
+
     # ==================== 健康检查 ====================
 
     def health_check(self) -> dict:
