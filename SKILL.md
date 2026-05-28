@@ -147,17 +147,45 @@ a = AKShareSource()
 | `get_concept_list()` | 概念板块列表 | 信号 |
 | `get_industry_list()` | 行业板块列表 | 信号 |
 
-### 💹 腾讯财经 — 估值层
+### 💹 legulegu（乐咕乐股）— 估值层（纯 requests，零 akshare 依赖）
 
 ```python
-from stoke.sources.tencent_source import TencentSource
-t = TencentSource()
+from stoke.sources.legulegu_source import LeguleguSource
+l = LeguleguSource()
 ```
 
 | 方法 | 说明 | 示例 |
 |------|------|------|
-| `get_index_pe(name)` | 指数PE历史 | `t.get_index_pe("上证50")` |
-| `get_market_pb()` | 全市场PB历史 | `t.get_market_pb()` |
+| `get_index_pe(name)` | 指数PE历史 | `l.get_index_pe("上证50")` |
+| `get_market_pb()` | 全市场PB历史 | `l.get_market_pb()` |
+
+### ⚡ tencent_direct（腾讯直连 qt.gtimg.cn）— 实时行情+K线
+
+```python
+from stoke.sources.tencent_direct_source import TencentDirectSource
+t = TencentDirectSource()
+```
+
+| 方法 | 说明 | 示例 |
+|------|------|------|
+| `get_realtime(symbols)` | 实时行情（50+字段，毫秒级） | `t.get_realtime(["000001"])` |
+| `get_kline(symbol)` | K线（前/后复权） | `t.get_kline("600519")` |
+
+### 🔬 efinance 扩展能力（efinance_source）
+
+| 方法 | 说明 | 示例 |
+|------|------|------|
+| `get_realtime_all()` | 全市场实时快照 | `e.get_realtime_all()` |
+| `get_capital_flow(symbol)` | 个股资金流（主力/大单/中单） | `e.get_capital_flow("600519")` |
+| `get_sector_members(symbol)` | 股票所属板块 | `e.get_sector_members("600519")` |
+
+### 📊 baostock 扩展能力（baostock_source）
+
+| 方法 | 说明 | 示例 |
+|------|------|------|
+| `get_kline_with_valuation(symbol)` | K线+PE/PB/PS/PCF估值 | `b.get_kline_with_valuation("sh.600000")` |
+| `get_profit_data(symbol, year, q)` | 季度利润（ROE/净利率/EPS） | `b.get_profit_data("sh.600000", 2025, 1)` |
+| `get_index_constituents(name)` | 指数成分股 | `b.get_index_constituents("沪深300")` |
 
 ---
 
@@ -175,9 +203,26 @@ s.news("000001")             # 个股新闻     → akshare
 s.research("000001")         # 研报         → akshare
 s.limit_up()                 # 涨停板       → akshare
 s.strong_stocks()            # 强势涨停     → akshare
-s.index_pe("上证50")          # PE估值       → tencent
-s.market_pb()                # PB估值       → tencent
+s.index_pe("上证50")          # PE估值       → legulegu
+s.market_pb()                # PB估值       → legulegu
+s.capital_flow("000001")     # 个股资金流   → efinance
+s.realtime_all()             # 全市场快照   → efinance
+s.kline_with_valuation("sh.600000")  # K线+估值 → baostock
+s.kline_tencent("600519")    # K线（腾讯直连）→ tencent_direct
+s.realtime_tencent(["000001"]) # 实时行情（腾讯）→ tencent_direct
 ```
+
+### FallbackStoke（多源自动备份）
+
+```python
+from stoke import FallbackStoke
+s = FallbackStoke()  # 自动前导探路，5 秒内检测各源健康状态
+
+s.kline("000001")     # mootdx → efinance → baostock → 腾讯直连（4 级）
+s.realtime(["000001"]) # mootdx → 腾讯直连 → 新浪直连 → efinance（4 级）
+```
+
+akshare 不可用时，新闻/研报/涨停等独占方法返回空 DataFrame + warning，不阻塞。
 
 各底层 Source 仍可直接访问：`s.mootdx.get_kline(...)`、`s.akshare.get_news(...)`。
 
