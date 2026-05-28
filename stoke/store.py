@@ -461,7 +461,7 @@ class Store:
               "买入成交额": "buy_amount", "卖出成交额": "sell_amount",
               "持股市值": "hold_balance"}),
             ("market_pb", real_date,
-             lambda: s.tencent.get_market_pb(), "date", "append", None),
+             lambda: s.legulegu.get_market_pb(), "date", "append", None),
             ("dragon_tiger", real_date,
              lambda: s.efinance.get_daily_billboard(), "date", "replace",
              {"股票代码": "symbol", "股票名称": "name", "上榜日期": "date",
