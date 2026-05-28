@@ -35,6 +35,7 @@ def daily_routine() -> MarketContext:
         "突破策略": breakout,
         "放量策略": volume_surge,
         "MACD": macd,
+        "周线RSI": weekly_rsi,
     }
     journal = Journal(s.store)
     executor = Executor(s, ctx)
