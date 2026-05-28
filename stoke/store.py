@@ -400,6 +400,9 @@ class Store:
         df = df.copy()
         if column_map:
             df.rename(columns=column_map, inplace=True)
+        # 自动补 key_column（如 index_pe 表需要 index_name 列）
+        if key_column and key_column not in df.columns:
+            df[key_column] = key
         # 日期列统一为 YYYY-MM-DD 字符串
         if "date" in df.columns:
             df["date"] = pd.to_datetime(df["date"]).dt.strftime("%Y-%m-%d")
@@ -411,10 +414,13 @@ class Store:
             else:
                 df["date"] = str(key)
         # 去重（避免主键冲突导致写入失败）
-        if mode != "overwrite" and "date" in df.columns and "symbol" in df.columns:
-            df = df.drop_duplicates(subset=["date", "symbol"], keep="first")
-        elif mode != "overwrite" and "date" in df.columns:
-            df = df.drop_duplicates(subset=["date"], keep="first")
+        pk_cols = [key_column] if key_column else []
+        if "date" in df.columns:
+            pk_cols.append("date")
+        if mode != "overwrite" and pk_cols:
+            subset = [c for c in pk_cols if c in df.columns]
+            if subset:
+                df = df.drop_duplicates(subset=subset, keep="first")
         df["fetched_at"] = now
         self._write(table, df, mode, key, key_column)
 
