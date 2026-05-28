@@ -6,6 +6,7 @@ StokeCached — 带 SQLite 缓存的 Stoke 包装器
 """
 
 import logging
+import time
 from typing import Optional, Callable
 
 import pandas as pd
