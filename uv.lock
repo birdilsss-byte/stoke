@@ -860,7 +860,9 @@ source = { editable = "." }
 dependencies = [
     { name = "akshare" },
     { name = "baostock" },
+    { name = "beautifulsoup4" },
     { name = "efinance" },
+    { name = "lxml" },
     { name = "mootdx" },
     { name = "pandas" },
     { name = "requests" },
@@ -870,7 +872,9 @@ dependencies = [
 requires-dist = [
     { name = "akshare", specifier = ">=1.18.60" },
     { name = "baostock", specifier = ">=0.9.1" },
+    { name = "beautifulsoup4", specifier = ">=4.12.0" },
     { name = "efinance", specifier = ">=0.5.8" },
+    { name = "lxml", specifier = ">=5.0.0" },
     { name = "mootdx", specifier = ">=0.11.7" },
     { name = "pandas", specifier = ">=3.0.3" },
     { name = "requests", specifier = ">=2.34.2" },
