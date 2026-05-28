@@ -42,7 +42,7 @@ def daily_routine() -> MarketContext:
 
     # 1. 盘前预热（传裸 Stoke，避免缓存回环）
     logger.info("===== Step 1/6: 盘前预热 =====")
-    s.store.warmup(s._s)
+    s.store.warmup(s.raw)
 
     # 2. 时机判断（大脑）
     logger.info("===== Step 2/6: 时机评估 =====")
