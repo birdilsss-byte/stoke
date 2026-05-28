@@ -205,11 +205,8 @@ s.limit_up()                 # 涨停板       → akshare
 s.strong_stocks()            # 强势涨停     → akshare
 s.index_pe("上证50")          # PE估值       → legulegu
 s.market_pb()                # PB估值       → legulegu
-s.capital_flow("000001")     # 个股资金流   → efinance
 s.realtime_all()             # 全市场快照   → efinance
 s.kline_with_valuation("sh.600000")  # K线+估值 → baostock
-s.kline_tencent("600519")    # K线（腾讯直连）→ tencent_direct
-s.realtime_tencent(["000001"]) # 实时行情（腾讯）→ tencent_direct
 ```
 
 ### FallbackStoke（多源自动备份）
