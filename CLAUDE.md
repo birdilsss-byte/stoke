@@ -35,13 +35,13 @@ stoke/
 │   ├── utils.py
 │   ├── exceptions.py         # 预留
 │   ├── normalizer.py         # 预留
-│   └── sources/              # 6 源适配
-│       ├── mootdx_source.py  # TCP 通达信
-│       ├── akshare_source.py # HTTP 东财/同花顺
-│       ├── baostock_source.py# HTTP 复权K线
-│       ├── efinance_source.py# HTTP 极速K线/股东
-│       ├── tencent_source.py # HTTP PE/PB
-│       └── zhitu_source.py   # REST 备用
+│   └── sources/                    # 6 源适配
+│       ├── mootdx_source.py        # TCP 通达信
+│       ├── akshare_source.py       # HTTP 东财/同花顺
+│       ├── baostock_source.py      # HTTP 复权K线+财报+估值
+│       ├── efinance_source.py      # HTTP 极速K线/股东/资金流
+│       ├── legulegu_source.py      # HTTP PE/PB（纯requests）
+│       └── tencent_direct_source.py# HTTP 实时行情+K线（qt.gtimg.cn）
 ├── tests/
 ├── Team/                     # 顾问参考（不动）
 ├── pyproject.toml
