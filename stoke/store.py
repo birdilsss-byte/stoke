@@ -638,11 +638,3 @@ class Store:
                 cols.append(row[1])
         return cols if cols else ["symbol", "date"]  # fallback
 
-    def _table_count(self) -> int:
-        """统计业务表数量"""
-        with sqlite3.connect(self.db_path) as conn:
-            row = conn.execute(
-                "SELECT COUNT(*) FROM sqlite_master "
-                "WHERE type='table' AND name NOT LIKE '\\_%' ESCAPE '\\'"
-            ).fetchone()
-            return row[0]
