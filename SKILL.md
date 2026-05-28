@@ -14,13 +14,22 @@ metadata:
     requires: {}
     install:
       uv:
-        - mootdx
         - akshare
+        - baostock
+        - efinance
+        - mootdx
         - pandas
         - requests
   hermes:
     tags: [stock, finance, a-share, market-data, quant, free, zero-api-key]
     category: finance
+    requires:
+      bins:
+        - python3
+        - uv
+    install:
+      uv: [akshare, baostock, efinance, mootdx, pandas, requests]
+    postinstall: "cd $STOKE_HOME && uv sync && uv run python3 -c \"from stoke import Stoke; print('OK')\""
 ---
 
 # Stoke — A股数据层技能
