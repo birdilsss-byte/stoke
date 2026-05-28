@@ -182,21 +182,31 @@ class Stoke:
 
     def limit_up(self, date: Optional[str] = None) -> pd.DataFrame:
         """涨停板股票池"""
-        return self.akshare.get_limit_up_pool(date)
+        return self._safe_call("limit_up", self.akshare.get_limit_up_pool, date)
 
     def strong_stocks(self, date: Optional[str] = None) -> pd.DataFrame:
         """强势涨停股（含题材归因）"""
-        return self.akshare.get_strong_stocks(date)
+        return self._safe_call("strong_stocks", self.akshare.get_strong_stocks, date)
+
+    # ==================== 估值（tencent） ====================
+
+    def index_pe(self, index_name: str = "上证50") -> pd.DataFrame:
+        """指数 PE 历史"""
+        return self._safe_call("index_pe", self.tencent.get_index_pe, index_name)
+
+    def market_pb(self) -> pd.DataFrame:
+        """全市场 PB 历史"""
+        return self._safe_call("market_pb", self.tencent.get_market_pb)
 
     # ==================== 板块数据（mootdx + akshare） ====================
 
     def concepts(self) -> pd.DataFrame:
         """概念板块列表"""
-        return self.akshare.get_concept_list()
+        return self._safe_call("concepts", self.akshare.get_concept_list)
 
     def industries(self) -> pd.DataFrame:
         """行业板块列表"""
-        return self.akshare.get_industry_list()
+        return self._safe_call("industries", self.akshare.get_industry_list)
 
     def sector_members(self, sector_name: str) -> pd.DataFrame:
         """
@@ -205,7 +215,7 @@ class Stoke:
         Args:
             sector_name: 板块名称，如 '沪深300'、'创业板指'
         """
-        return self.mootdx.get_sector_members(sector_name)
+        return self._safe_call("sector_members", self.mootdx.get_sector_members, sector_name)
 
     def sector_kline(self, symbol: str = "银行",
                      start_date: str = "20250101",
@@ -218,21 +228,21 @@ class Stoke:
             start_date: 起始日期（YYYYMMDD）
             end_date: 截止日期，默认最近交易日
         """
-        return self.akshare.get_sector_kline(symbol, start_date, end_date)
+        return self._safe_call("sector_kline", self.akshare.get_sector_kline, symbol, start_date, end_date)
 
     def sector_rank(self) -> pd.DataFrame:
         """行业板块当日涨跌幅排名"""
-        return self.akshare.get_sector_rank()
+        return self._safe_call("sector_rank", self.akshare.get_sector_rank)
 
     # ==================== 市场宽度（akshare） ====================
 
     def market_breadth(self) -> pd.DataFrame:
         """市场宽度：上证指数日线"""
-        return self.akshare.get_market_breadth()
+        return self._safe_call("market_breadth", self.akshare.get_market_breadth)
 
     def market_volume(self) -> pd.DataFrame:
         """沪深两市每日成交额"""
-        return self.akshare.get_market_volume()
+        return self._safe_call("market_volume", self.akshare.get_market_volume)
 
     # ==================== 资金流（akshare） ====================
 
