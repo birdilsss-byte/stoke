@@ -155,3 +155,51 @@ class EFinanceSource:
         self.limiter.wait()
         logger.info("EFinance 实时行情: %d 只", len(symbols) if symbols else 0)
         return ef.stock.get_realtime_quotes(symbols)
+
+    # ---------- 全市场实时快照 ----------
+
+    @retry_on_failure()
+    def get_realtime_all(self) -> pd.DataFrame:
+        """
+        全市场实时行情快照（所有 A 股）
+
+        Returns:
+            DataFrame，含全市场股票的实时价、涨跌幅、量比、换手率等
+        """
+        self.limiter.wait()
+        logger.info("EFinance 全市场实时快照")
+        return ef.stock.get_realtime_quotes()
+
+    # ---------- 个股资金流 ----------
+
+    @retry_on_failure()
+    def get_capital_flow(self, symbol: str) -> pd.DataFrame:
+        """
+        个股历史每日资金流（主力/超大单/大单/中单/小单）
+
+        Args:
+            symbol: 6 位股票代码，如 '600519'
+
+        Returns:
+            DataFrame，含日期、主力净流入、超大单净流入等列
+        """
+        self.limiter.wait()
+        logger.info("EFinance 资金流: %s", symbol)
+        return ef.stock.get_history_bill(symbol)
+
+    # ---------- 板块成分股 ----------
+
+    @retry_on_failure()
+    def get_sector_members(self, symbol: str) -> pd.DataFrame:
+        """
+        查询股票所属板块/概念
+
+        Args:
+            symbol: 6 位股票代码，如 '600519'
+
+        Returns:
+            DataFrame，含该股票所属的所有板块信息
+        """
+        self.limiter.wait()
+        logger.info("EFinance 板块成分: %s", symbol)
+        return ef.stock.get_belong_board(symbol)
