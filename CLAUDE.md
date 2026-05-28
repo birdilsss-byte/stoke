@@ -12,7 +12,8 @@ A 股量化投研系统。数据获取 → 机会发现 → 时机判断 → 策
 | akshare | HTTP（东财/同花顺/财联社） | 5s | 新闻、研报、涨停、情绪、资金流、行业板块 |
 | baostock | HTTP（证券宝） | 1s | 复权K线、行业分类、股票列表 |
 | efinance | HTTP（新浪/网易/东财） | 0.5s | 极速K线、龙虎榜、十大股东、股东人数 |
-| tencent | HTTP（腾讯lg） | 3s | PE/PB 估值 |
+| legulegu | HTTP（乐咕乐股） | 1s | PE/PB 估值，纯 requests 直连 |
+| tencent_direct | HTTP（腾讯 qt.gtimg.cn） | 0.3s | 实时行情 + K 线，毫秒级 |
 | 智兔数服 | REST API | 1s | 备用行情、技术指标（需 Token） |
 
 ## 项目结构
