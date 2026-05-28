@@ -406,13 +406,9 @@ class Store:
         # 日期列统一为 YYYY-MM-DD 字符串
         if "date" in df.columns:
             df["date"] = pd.to_datetime(df["date"]).dt.strftime("%Y-%m-%d")
-        # 自动补 date 列（如果表有 date 列但数据里没有）
-        if "date" not in df.columns and key not in ("all", "today"):
-            from datetime import date
-            if isinstance(key, str) and len(key) == 8:
-                df["date"] = f"{key[:4]}-{key[4:6]}-{key[6:]}"
-            else:
-                df["date"] = str(key)
+        # 自动补 date 列（仅当 key 是 YYYYMMDD 日期格式时）
+        if "date" not in df.columns and isinstance(key, str) and len(key) == 8 and key.isdigit():
+            df["date"] = f"{key[:4]}-{key[4:6]}-{key[6:]}"
         # 去重（避免主键冲突导致写入失败）
         if mode != "overwrite":
             subset = []
