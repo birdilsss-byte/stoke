@@ -186,15 +186,15 @@ class Stoke:
         """强势涨停股（含题材归因）"""
         return self._safe_call("strong_stocks", self.akshare.get_strong_stocks, date)
 
-    # ==================== 估值（tencent） ====================
+    # ==================== 估值（legulegu） ====================
 
     def index_pe(self, index_name: str = "上证50") -> pd.DataFrame:
         """指数 PE 历史"""
-        return self._safe_call("index_pe", self.tencent.get_index_pe, index_name)
+        return self._safe_call("index_pe", self.legulegu.get_index_pe, index_name)
 
     def market_pb(self) -> pd.DataFrame:
         """全市场 PB 历史"""
-        return self._safe_call("market_pb", self.tencent.get_market_pb)
+        return self._safe_call("market_pb", self.legulegu.get_market_pb)
 
     # ==================== 板块数据（mootdx + akshare） ====================
 
