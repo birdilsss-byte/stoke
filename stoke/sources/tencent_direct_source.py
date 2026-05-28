@@ -181,7 +181,10 @@ class TencentDirectSource:
         if "data" in data and code in data["data"]:
             stock_data = data["data"][code]
             if isinstance(stock_data, dict):
-                klines = stock_data.get(f"{freq}{adjust}") or stock_data.get(freq)
+                # key 格式: qfqday / hfqweek / month（adjust在前，freq在后）
+                klines = (stock_data.get(f"{adjust}{freq}")
+                          or stock_data.get(freq)
+                          or stock_data.get(f"{adjust}day"))
             elif isinstance(stock_data, list):
                 klines = stock_data
 
