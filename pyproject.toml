@@ -9,9 +9,7 @@ dependencies = [
     "efinance>=0.5.8",
     "mootdx>=0.11.7",
     "pandas>=3.0.3",
-    "pytdx>=1.72",
     "requests>=2.34.2",
-    "tickflow>=0.1.21",
 ]
 
 [tool.setuptools.packages.find]
