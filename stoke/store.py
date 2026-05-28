@@ -320,7 +320,12 @@ class Store:
                     last_write  TEXT NOT NULL
                 );
             """)
-        logger.debug("数据库 %d 张表初始化完成", self._table_count())
+        with sqlite3.connect(self.db_path) as conn:
+            row = conn.execute(
+                "SELECT COUNT(*) FROM sqlite_master "
+                "WHERE type='table' AND name NOT LIKE '\\_%' ESCAPE '\\'"
+            ).fetchone()
+        logger.debug("数据库 %d 张表初始化完成", row[0])
 
     # ==================== 核心方法 ====================
 
