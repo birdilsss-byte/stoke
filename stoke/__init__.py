@@ -1,13 +1,12 @@
 """
 Stoke — A股量化投研数据层
 
-6 大源，各司其职：
+5 大源，各司其职，零 API Key：
   mootdx (TCP)     — K线/实时行情/指数/板块，不限速
   akshare (HTTP)   — 新闻/研报/涨停/情绪/资金流/行业，5s限流
   baostock (HTTP)  — 复权K线/行业分类，1s限流
   efinance (HTTP)  — 极速K线/龙虎榜/股东数据，零限制
   tencent (HTTP)   — PE/PB估值，3s限流
-  智兔数服 (REST)  — 备用实时行情/技术指标（需 Token）
 
 用法::
     from stoke import Stoke          # 默认带缓存
