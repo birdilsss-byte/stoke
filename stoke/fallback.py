@@ -105,14 +105,14 @@ class FallbackStoke:
 
     def realtime(self, symbols: List[str]) -> pd.DataFrame:
         """
-        实时行情：mootdx → zhitu 批量
+        实时行情：mootdx → efinance
 
         Args:
             symbols: 股票代码列表
         """
         return self._fallback_call("realtime", [
             lambda: self._s.realtime(symbols),
-            lambda: self._s.zhitu_realtime_batch(symbols),
+            lambda: self._s.efinance.get_realtime(symbols),
         ])
 
     # ==================== 股票列表（3 级备份） ====================
