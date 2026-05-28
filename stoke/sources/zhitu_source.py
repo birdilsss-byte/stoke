@@ -44,6 +44,7 @@ class ZhituSource:
         self.token = token or os.environ.get("ZHITU_API_TOKEN", "")
         self.base_url = base_url or DEFAULT_BASE_URL
         self.limiter = rate_limiter or RateLimiter(interval=1.0)
+        self._session = requests.Session()
 
         if not self.token:
             logger.warning(
