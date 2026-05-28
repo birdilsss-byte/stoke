@@ -115,16 +115,15 @@ class FallbackStoke:
             lambda: self._s.efinance.get_realtime(symbols),
         ])
 
-    # ==================== 股票列表（3 级备份） ====================
+    # ==================== 股票列表（2 级备份） ====================
 
     def stock_list(self) -> pd.DataFrame:
         """
-        全市场股票列表：mootdx → baostock → zhitu
+        全市场股票列表：mootdx → baostock
         """
         return self._fallback_call("stock_list", [
             lambda: self._s.stock_list(),
             lambda: self._s.all_stock(),
-            lambda: self._s.zhitu_stock_list(),
         ])
 
     # ==================== 透传 StokeCached ====================
