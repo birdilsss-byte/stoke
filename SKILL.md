@@ -69,23 +69,50 @@ cd "$STOKE_HOME" && uv run python3 -c "from stoke import Stoke; print('安装成
 
 ---
 
-## Hermes 环境注意事项
+## OpenClaw 安装
 
-在 Hermes / QClaw 平台安装时，请确认以下环境：
+### 方式一：zip 压缩包（推荐）
+
+1. 下载 `stoke-skill.zip`
+2. 在 OpenClaw 中导入：设置 → Skills → Import → 选择 zip 文件
+3. OpenClaw 自动解压、安装依赖、验证
+
+### 方式二：Git 克隆
 
 ```bash
-# 1. 安装 uv（如果还没有）
-brew install uv
-
-# 2. 克隆项目
 git clone https://github.com/birdilsss-byte/stoke.git ~/stoke
 cd ~/stoke && uv sync
-
-# 3. 设置 STOKE_HOME
 export STOKE_HOME=~/stoke
+```
 
-# 4. 验证
-uv run python3 -c "from stoke import Stoke; print('OK')"
+OpenClaw 会自动读取 SKILL.md 中的 `metadata.openclaw` 配置。
+
+---
+
+## Hermes 安装
+
+### 方式一：zip 压缩包（推荐）
+
+1. 下载 `stoke-skill.zip`
+2. 解压到 Hermes skills 目录：
+   ```bash
+   unzip stoke-skill.zip -d ~/.hermes/skills/stoke/
+   cd ~/.hermes/skills/stoke && uv sync
+   ```
+3. 重启 Hermes 或执行 `hermes reload-skills`
+
+### 方式二：Hermes 命令行安装
+
+```bash
+hermes skill install https://github.com/birdilsss-byte/stoke/releases/latest/download/stoke-skill.zip
+```
+
+Hermes 会自动执行 `postinstall`：`cd $STOKE_HOME && uv sync && 验证导入`。
+
+### 手动验证
+
+```bash
+cd ~/.hermes/skills/stoke && uv run python3 -c "from stoke import Stoke; print('OK')"
 ```
 
 ### 常见问题
