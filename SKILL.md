@@ -103,7 +103,10 @@ uv run python3 -c "from stoke import Stoke; print('OK')"
 |--------|---------|------|
 | mootdx | 不限流 | TCP 协议，本地解析 |
 | akshare | **5 秒** | 东财/同花顺/巨潮，必须遵守 |
-| 腾讯财经 | **3 秒** | lg 接口，较为宽松 |
+| legulegu | **1 秒** | 乐咕乐股 PE/PB，纯 requests 直连 |
+| baostock | **1 秒** | 证券宝 HTTP，复权K线+财报+估值 |
+| efinance | **0.5 秒** | 极速K线/龙虎榜/资金流/股东数据 |
+| 腾讯直连 | **0.3 秒** | qt.gtimg.cn 实时行情+K线，毫秒级 |
 
 **同一 Source 实例内调用自动限流。跨实例（akshare + 腾讯）需手动停顿。**
 
