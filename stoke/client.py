@@ -140,7 +140,7 @@ class Stoke:
 
     def realtime(self, symbols: List[str]) -> pd.DataFrame:
         """实时行情（含 5 档盘口）"""
-        return self.mootdx.get_realtime(symbols)
+        return self._safe_call("realtime", self.mootdx.get_realtime, symbols)
 
     def kline(
         self,
@@ -150,15 +150,15 @@ class Stoke:
         offset: int = 800,
     ) -> pd.DataFrame:
         """历史 K 线，默认日线 800 条"""
-        return self.mootdx.get_kline(symbol, frequency, start, offset)
+        return self._safe_call("kline", self.mootdx.get_kline, symbol, frequency, start, offset)
 
     def stock_list(self) -> pd.DataFrame:
         """全市场股票列表"""
-        return self.mootdx.get_stock_list()
+        return self._safe_call("stock_list", self.mootdx.get_stock_list)
 
     def f10(self, symbol: str) -> Optional[dict]:
         """F10 财务快照"""
-        return self.mootdx.get_f10(symbol)
+        return self._safe_call("f10", self.mootdx.get_f10, symbol)
 
     # ==================== 新闻 & 研报 & 公告（akshare） ====================
 
