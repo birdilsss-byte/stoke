@@ -88,8 +88,7 @@ class StokeCached:
             lambda: self._s.akshare.get_limit_up_pool(real_date),
             lambda: self._s.akshare.get_limit_up_pool(date),
             max_age_sec=STORE_TTL["limit_up"], mode="replace", key_column="date",
-            column_map={"代码": "symbol", "名称": "name", "涨跌幅": "change_pct",
-                        "连板数": "board_count", "所属行业": "industry"},
+            column_map={},
         )
 
     def strong_stocks(self, date: Optional[str] = None) -> pd.DataFrame:
