@@ -372,34 +372,3 @@ class Stoke:
         """公司基本信息（efinance 独有）"""
         return self.efinance.get_company_info(symbol)
 
-    # ==================== 智兔数服 REST API ====================
-
-    def zhitu_realtime(self, symbol: str) -> dict:
-        """实时行情快照（智兔，含 PE/PB/市值/换手率一站式）"""
-        return self.zhitu.get_realtime(symbol)
-
-    def zhitu_realtime_batch(self, symbols: list) -> pd.DataFrame:
-        """多股票实时行情批量查询（智兔）"""
-        return self.zhitu.get_realtime_batch(symbols)
-
-    def zhitu_kline(
-        self, symbol: str,
-        start_date: str = "20250101",
-        end_date: str = "",
-        days: int = 100,
-    ) -> pd.DataFrame:
-        """历史 K 线（智兔数服）"""
-        return self.zhitu.get_kline(symbol, start_date, end_date, days)
-
-    def zhitu_macd(
-        self, symbol: str,
-        start_date: str = "20250101",
-        end_date: str = "",
-        days: int = 100,
-    ) -> pd.DataFrame:
-        """MACD 指标（智兔数服）"""
-        return self.zhitu.get_macd(symbol, start_date, end_date, days)
-
-    def zhitu_stock_list(self) -> pd.DataFrame:
-        """A 股全量列表（智兔数服）"""
-        return self.zhitu.get_stock_list()
