@@ -19,7 +19,8 @@ Stoke — A股量化投研数据层
 """
 
 from stoke.client_cached import StokeCached as Stoke
+from stoke.fallback import FallbackStoke
 
 __version__ = "1.3.0"
-__all__ = ["Stoke"]
+__all__ = ["Stoke", "FallbackStoke"]
 
