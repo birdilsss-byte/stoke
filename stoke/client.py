@@ -241,27 +241,27 @@ class Stoke:
 
     def northbound_flow(self) -> pd.DataFrame:
         """北向资金历史每日成交净买额"""
-        return self.akshare.get_northbound_flow()
+        return self._safe_call("northbound_flow", self.akshare.get_northbound_flow)
 
     def dragon_tiger(self) -> pd.DataFrame:
         """龙虎榜营业部资金统计"""
-        return self.efinance.get_daily_billboard()
+        return self._safe_call("dragon_tiger", self.efinance.get_daily_billboard)
 
     def margin_shanghai(self) -> pd.DataFrame:
         """上海市场融资融券余额"""
-        return self.akshare.get_margin_shanghai()
+        return self._safe_call("margin_shanghai", self.akshare.get_margin_shanghai)
 
     def margin_shenzhen(self) -> pd.DataFrame:
         """深圳市场融资融券余额"""
-        return self.akshare.get_margin_shenzhen()
+        return self._safe_call("margin_shenzhen", self.akshare.get_margin_shenzhen)
 
     def market_fund_flow(self) -> pd.DataFrame:
         """市场整体资金流（上证+深证）"""
-        return self.akshare.get_market_fund_flow()
+        return self._safe_call("market_fund_flow", self.akshare.get_market_fund_flow)
 
     def individual_fund_flow(self, symbol: str) -> pd.DataFrame:
         """个股主力资金流向（含超大单/大单/中单/小单细分）"""
-        return self.akshare.get_individual_fund_flow(symbol)
+        return self._safe_call("individual_fund_flow", self.akshare.get_individual_fund_flow, symbol)
 
     # ==================== 情绪：热度（akshare 东财主力） ====================
 
