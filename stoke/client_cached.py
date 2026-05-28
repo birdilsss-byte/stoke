@@ -26,8 +26,13 @@ class StokeCached:
     def __init__(self, stoke: Optional[StokeRaw] = None):
         self._s = stoke or StokeRaw()
         self.store = Store()
-        self._degraded = False
+        self._degraded_at: float = 0.0
         logger.info("StokeCached 初始化完成（缓存已开启）")
+
+    @property
+    def raw(self) -> StokeRaw:
+        """暴露裸 Stoke 实例，供 runner 等需要直接访问源的场景"""
+        return self._s
 
     def _cached_call(
         self,
@@ -40,9 +45,12 @@ class StokeCached:
         key_column: str = "symbol",
         column_map: Optional[dict] = None,
     ) -> pd.DataFrame:
-        """缓存读写 + 故障自动降级，降级后置 _degraded 标志避免重复触发限流"""
-        if self._degraded:
-            return fallback()
+        """缓存读写 + 故障自动降级，30 秒后自动重试缓存"""
+        if self._degraded_at:
+            if time.time() - self._degraded_at < 30:
+                return fallback()
+            logger.info("降级超时已过，重试缓存 %s", table)
+            self._degraded_at = 0.0
         try:
             return self.store.get_or_fetch(
                 table, key, fetcher,
@@ -51,7 +59,7 @@ class StokeCached:
             )
         except Exception:
             logger.exception("缓存故障，降级直连 %s", table)
-            self._degraded = True
+            self._degraded_at = time.time()
             return fallback()
 
     # ===== 12 个缓存方法 =====
