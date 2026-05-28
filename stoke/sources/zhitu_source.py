@@ -71,7 +71,7 @@ class ZhituSource:
         params["token"] = self.token
         url = f"{self.base_url}{path}"
         logger.debug("智兔请求: %s", url)
-        resp = requests.get(url, params=params, timeout=30)
+        resp = self._session.get(url, params=params, timeout=30)
         resp.raise_for_status()
         return resp.json()
 
