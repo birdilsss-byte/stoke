@@ -357,8 +357,8 @@ class Stoke:
         return self.efinance.get_kline(symbol, start_date, end_date)
 
     def daily_billboard(self) -> pd.DataFrame:
-        """今日龙虎榜（efinance，含净买额/上榜原因）"""
-        return self.efinance.get_daily_billboard()
+        """今日龙虎榜 — 同 dragon_tiger()，保留别名兼容"""
+        return self.dragon_tiger()
 
     def top10_holders(self, symbol: str) -> pd.DataFrame:
         """十大股东（efinance 独有）"""
