@@ -7,11 +7,12 @@ import sys
 
 # 限流间隔（秒）
 RATE_LIMIT = {
-    "mootdx": 0.0,       # TCP 协议，不限流
-    "akshare": 5.0,      # 东财系，必须 3-5 秒
-    "tencent": 3.0,      # 腾讯财经 lg 接口
-    "baostock": 1.0,     # 证券宝 HTTP，稳定 1 秒即可
-    "efinance": 0.5,     # 整合多源，无官方限制，0.5 秒即可
+    "mootdx": 0.0,          # TCP 协议，不限流
+    "akshare": 5.0,         # 东财系，必须 3-5 秒
+    "legulegu": 1.0,        # 乐咕乐股 HTTP，1 秒即可
+    "baostock": 1.0,        # 证券宝 HTTP，稳定 1 秒即可
+    "efinance": 0.5,        # 整合多源，无官方限制，0.5 秒即可
+    "tencent_direct": 0.3,  # 腾讯 qt.gtimg.cn，毫秒级响应，0.3 秒即可
 }
 
 
