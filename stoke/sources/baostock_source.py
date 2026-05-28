@@ -176,6 +176,155 @@ class BaostockSource:
         logger.info("Baostock K 线: %s 共 %d 条", symbol, len(df))
         return df
 
+    # ---------- K 线（含估值字段） ----------
+
+    @retry_on_failure()
+    def get_kline_with_valuation(
+        self,
+        symbol: str,
+        frequency: str = "d",
+        start_date: str = "2025-01-01",
+        end_date: str = "",
+        adjust: str = "none",
+    ) -> pd.DataFrame:
+        """
+        获取日 K 线 + PE/PB/PS/PCF 估值字段（baostock 独有）
+
+        Args:
+            symbol: 如 'sh.600000' 或 'sz.000001'
+            frequency: "d"/"w"/"m"
+            start_date: YYYY-MM-DD
+            end_date: YYYY-MM-DD
+            adjust: "none"/"qfq"/"hfq"
+
+        Returns:
+            DataFrame，含 date/open/high/low/close/volume/amount +
+            peTTM/pbMRQ/psTTM/pcfNcfTTM 估值列
+        """
+        adjust_map = {"none": "1", "qfq": "2", "hfq": "3"}
+        adjustflag = adjust_map.get(adjust, "1")
+
+        self._ensure_login()
+        self.limiter.wait()
+
+        import baostock as bs
+        from datetime import date
+
+        if not end_date:
+            end_date = date.today().strftime("%Y-%m-%d")
+
+        logger.info(
+            "Baostock K 线+估值: %s (%s ~ %s)",
+            symbol, start_date, end_date,
+        )
+
+        fields = "date,open,high,low,close,volume,amount,peTTM,pbMRQ,psTTM,pcfNcfTTM"
+        rs = self._safe_call(
+            bs.query_history_k_data_plus,
+            symbol, fields,
+            start_date=start_date, end_date=end_date,
+            frequency=frequency, adjustflag=adjustflag,
+        )
+
+        rows = []
+        while rs.next():
+            row = rs.get_row_data()
+            if row and row[0]:
+                rows.append(row)
+
+        if not rows:
+            logger.warning("Baostock K 线+估值返回空: %s", symbol)
+            return pd.DataFrame()
+
+        df = pd.DataFrame(rows, columns=fields.split(","))
+        for col in ["open", "high", "low", "close", "amount",
+                     "peTTM", "pbMRQ", "psTTM", "pcfNcfTTM"]:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+        df["volume"] = pd.to_numeric(df["volume"], errors="coerce").astype("int64")
+        df["date"] = pd.to_datetime(df["date"])
+
+        logger.info("Baostock K 线+估值: %s 共 %d 条", symbol, len(df))
+        return df
+
+    # ---------- 季度利润 ----------
+
+    @retry_on_failure()
+    def get_profit_data(self, symbol: str, year: int, quarter: int) -> pd.DataFrame:
+        """
+        季度盈利能力数据（ROE/净利率/毛利率/EPS）
+
+        Args:
+            symbol: 如 'sh.600000'
+            year: 年份，如 2025
+            quarter: 季度，1/2/3/4
+
+        Returns:
+            DataFrame，含 ROE、净利率、毛利率、EPS 等字段
+        """
+        self._ensure_login()
+        self.limiter.wait()
+
+        import baostock as bs
+
+        logger.info("Baostock 利润数据: %s %dQ%d", symbol, year, quarter)
+        rs = bs.query_profit_data(code=symbol, year=year, quarter=quarter)
+
+        rows = []
+        while rs.next():
+            row = rs.get_row_data()
+            if row and row[0]:
+                rows.append(row)
+
+        if not rows:
+            return pd.DataFrame()
+
+        df = pd.DataFrame(rows, columns=rs.fields)
+        logger.info("Baostock 利润数据: %s 共 %d 条", symbol, len(df))
+        return df
+
+    # ---------- 指数成分股 ----------
+
+    @retry_on_failure()
+    def get_index_constituents(self, index_name: str) -> pd.DataFrame:
+        """
+        获取指数成分股列表
+
+        Args:
+            index_name: "上证50" / "沪深300" / "中证500"
+
+        Returns:
+            DataFrame，含 code、code_name 列
+        """
+        self._ensure_login()
+        self.limiter.wait()
+
+        import baostock as bs
+
+        index_map = {
+            "上证50": bs.query_sz50_stocks,
+            "沪深300": bs.query_hs300_stocks,
+            "中证500": bs.query_zz500_stocks,
+        }
+        fn = index_map.get(index_name)
+        if not fn:
+            raise ValueError(f"不支持的指数: {index_name}，可选: {list(index_map.keys())}")
+
+        logger.info("Baostock 指数成分股: %s", index_name)
+        rs = fn()
+
+        rows = []
+        while rs.next():
+            row = rs.get_row_data()
+            if row and row[0]:
+                rows.append(row)
+
+        if not rows:
+            return pd.DataFrame()
+
+        df = pd.DataFrame(rows, columns=rs.fields)
+        logger.info("Baostock 指数成分股: %s 共 %d 只", index_name, len(df))
+        return df
+
     # ---------- 行业分类 ----------
 
     @retry_on_failure()
