@@ -412,3 +412,31 @@ class Stoke:
         """公司基本信息（efinance 独有）"""
         return self._safe_call("company_info", self.efinance.get_company_info, symbol)
 
+    def capital_flow(self, symbol: str) -> pd.DataFrame:
+        """个股历史每日资金流（efinance，主力/超大单/大单/中单/小单）"""
+        return self._safe_call("capital_flow", self.efinance.get_capital_flow, symbol)
+
+    def realtime_all(self) -> pd.DataFrame:
+        """全市场实时行情快照（efinance）"""
+        return self._safe_call("realtime_all", self.efinance.get_realtime_all)
+
+    # ==================== 腾讯直连（tencent_direct） ====================
+
+    def realtime_tencent(self, symbols: List[str]) -> pd.DataFrame:
+        """实时行情（腾讯 qt.gtimg.cn，毫秒级，零限制）"""
+        return self._safe_call("realtime_tencent", self.tencent_direct.get_realtime, symbols)
+
+    def kline_tencent(
+        self, symbol: str,
+        freq: str = "day",
+        start_date: str = "",
+        end_date: str = "",
+        adjust: str = "qfq",
+    ) -> pd.DataFrame:
+        """K 线（腾讯直连，前/后复权）"""
+        return self._safe_call(
+            "kline_tencent",
+            self.tencent_direct.get_kline,
+            symbol, freq, start_date, end_date, adjust,
+        )
+
