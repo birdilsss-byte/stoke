@@ -254,13 +254,13 @@ class Store:
                 -- 强势涨停股（每日快照）
                 CREATE TABLE IF NOT EXISTS strong_stocks (
                     date        TEXT NOT NULL,
-                    symbol      TEXT NOT NULL,
-                    name        TEXT,
-                    change_pct  REAL,
-                    reason      TEXT,
-                    industry    TEXT,
+                    代码        TEXT NOT NULL,
+                    名称        TEXT,
+                    涨跌幅       REAL,
+                    入选理由      TEXT,
+                    所属行业      TEXT,
                     fetched_at  TEXT NOT NULL,
-                    PRIMARY KEY (date, symbol)
+                    PRIMARY KEY (date, 代码)
                 );
 
                 -- 热搜关键词（每日快照）
