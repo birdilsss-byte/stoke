@@ -162,12 +162,16 @@ class Store:
                 -- 指数PE（追加模式）
                 CREATE TABLE IF NOT EXISTS index_pe (
                     index_name  TEXT NOT NULL,
-                    date        TEXT NOT NULL,
-                    pe_ttm      REAL,
-                    pe_static   REAL,
-                    close       REAL,
+                    日期        TEXT NOT NULL,
+                    指数        REAL,
+                    等权静态市盈率  REAL,
+                    静态市盈率    REAL,
+                    静态市盈率中位数 REAL,
+                    等权滚动市盈率  REAL,
+                    滚动市盈率    REAL,
+                    滚动市盈率中位数 REAL,
                     fetched_at  TEXT NOT NULL,
-                    PRIMARY KEY (index_name, date)
+                    PRIMARY KEY (index_name, 日期)
                 );
                 CREATE INDEX IF NOT EXISTS idx_pe_index
                     ON index_pe(index_name);
