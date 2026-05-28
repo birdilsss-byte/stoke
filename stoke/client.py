@@ -11,7 +11,8 @@ import pandas as pd
 from stoke.rate_limiter import RateLimiter
 from stoke.sources.mootdx_source import MootdxSource
 from stoke.sources.akshare_source import AKShareSource
-from stoke.sources.tencent_source import TencentSource
+from stoke.sources.legulegu_source import LeguleguSource
+from stoke.sources.tencent_direct_source import TencentDirectSource
 from stoke.sources.baostock_source import BaostockSource
 from stoke.sources.efinance_source import EFinanceSource
 from stoke.exceptions import NetworkError, DataEmptyError, SourceNotReadyError
