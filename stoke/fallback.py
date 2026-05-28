@@ -22,14 +22,21 @@ from stoke.probe import akshare_ok
 
 logger = logging.getLogger(__name__)
 
+# akshare 独占、无备份的方法 — 不可用时优雅降级
+_AKSHARE_ONLY = {
+    "limit_up", "strong_stocks", "limit_down",
+    "sector_rank", "market_breadth", "market_volume",
+    "northbound_flow", "margin_shanghai", "margin_shenzhen",
+    "market_fund_flow", "hot_keywords", "hot_detail",
+    "hot_latest", "hot_realtime", "xueqiu_hot",
+    "stock_comment_all", "stock_desire", "stock_focus",
+    "concepts", "industries", "sector_kline",
+    "news", "telegraph", "research", "announcements",
+}
+
 
 def _sina_realtime(symbols: List[str]) -> pd.DataFrame:
-    """
-    新浪财经实时行情（hq.sinajs.cn），纯 requests，零依赖。
-
-    Args:
-        symbols: 股票代码列表，如 ['000001', '600519']
-    """
+    """新浪财经实时行情（hq.sinajs.cn），纯 requests"""
     codes = []
     for s in symbols:
         s = str(s).zfill(6)
@@ -37,10 +44,7 @@ def _sina_realtime(symbols: List[str]) -> pd.DataFrame:
         codes.append(f"{prefix}{s}")
 
     url = f"https://hq.sinajs.cn/list={','.join(codes)}"
-    r = requests.get(
-        url, timeout=10,
-        headers={"Referer": "https://finance.sina.com.cn"},
-    )
+    r = requests.get(url, timeout=10, headers={"Referer": "https://finance.sina.com.cn"})
     r.encoding = "gbk"
 
     rows = []
@@ -55,7 +59,7 @@ def _sina_realtime(symbols: List[str]) -> pd.DataFrame:
             if len(fields) < 30:
                 continue
             rows.append({
-                "symbol": fields[0] if fields[0] else "",
+                "symbol": fields[0] or "",
                 "name": fields[1] if len(fields) > 1 else "",
                 "price": float(fields[3]) if fields[3] else None,
                 "change_pct": float(fields[4]) if fields[4] else None,
@@ -64,22 +68,10 @@ def _sina_realtime(symbols: List[str]) -> pd.DataFrame:
                 "high": float(fields[5]) if fields[5] else None,
                 "low": float(fields[6]) if fields[6] else None,
                 "open": float(fields[2]) if fields[2] else None,
-                "pre_close": float(fields[3]) if fields[3] else None,
             })
-        except (ValueError, IndexError) as e:
-            logger.debug("新浪实时行情解析跳过: %s", e)
+        except (ValueError, IndexError):
             continue
-
     return pd.DataFrame(rows) if rows else pd.DataFrame()
-
-
-def _graceful_empty(name: str) -> pd.DataFrame:
-    """
-    akshare 不可用时的优雅降级：返回空 DataFrame + warning。
-    不抛异常，不阻塞主流程。
-    """
-    logger.warning("%s: akshare 不可用，返回空数据（优雅降级）", name)
-    return pd.DataFrame()
 
 
 class FallbackStoke:
@@ -91,7 +83,7 @@ class FallbackStoke:
       realtime:      mootdx → 腾讯直连 → 新浪直连 → efinance
       stock_list:    mootdx → baostock
       dragon_tiger:  efinance ↔ akshare
-      capital_flow:  efinance → akshare
+      individual_fund_flow: efinance → akshare
       index_pe:      legulegu → baostock K线估值
       sector_members:mootdx → efinance
       akshare独占:   优雅降级（空DataFrame + warning）
@@ -129,46 +121,28 @@ class FallbackStoke:
 
     def kline(self, symbol: str, frequency: int = 9,
               start: int = 0, offset: int = 800) -> pd.DataFrame:
-        """
-        日 K 线：mootdx → efinance → baostock → 腾讯直连
-
-        Args:
-            symbol: 股票代码，如 '000001'
-            frequency: K 线周期，9=日线（仅日线有备份）
-            start: 起始位置
-            offset: 获取条数
-        """
+        """日 K 线：mootdx → efinance → baostock → 腾讯直连"""
         if frequency != 9:
             return self._s.kline(symbol, frequency, start, offset)
 
         return self._fallback_call("kline", [
-            # Level 0: mootdx（主源，TCP 通达信）
             lambda: self._s.kline(symbol, frequency, start, offset),
-            # Level 1: efinance（极速，~0.3s）
             lambda: self._s.kline_efinance(symbol),
-            # Level 2: baostock（含复权）
             lambda: self._raw.baostock.get_kline(
                 f"sh.{symbol}" if symbol.startswith("6") else f"sz.{symbol}",
                 frequency="d",
             ),
-            # Level 3: 腾讯直连 K 线
             lambda: self._raw.tencent_direct.get_kline(symbol),
         ])
 
     # ==================== 实时行情（4 级备份） ====================
 
     def realtime(self, symbols: List[str]) -> pd.DataFrame:
-        """
-        实时行情：mootdx → 腾讯直连 → 新浪直连 → efinance
-        """
+        """实时行情：mootdx → 腾讯直连 → 新浪直连 → efinance"""
         return self._fallback_call("realtime", [
-            # Level 0: mootdx（TCP，含 5 档盘口）
             lambda: self._s.realtime(symbols),
-            # Level 1: 腾讯直连 qt.gtimg.cn（毫秒级）
             lambda: self._raw.tencent_direct.get_realtime(symbols),
-            # Level 2: 新浪直连 hq.sinajs.cn
             lambda: _sina_realtime(symbols),
-            # Level 3: efinance（15s 延迟）
             lambda: self._raw.efinance.get_realtime(symbols),
         ])
 
@@ -186,8 +160,8 @@ class FallbackStoke:
     def dragon_tiger(self) -> pd.DataFrame:
         """龙虎榜：efinance ↔ akshare 双向备份"""
         return self._fallback_call("dragon_tiger", [
-            lambda: self._s.dragon_tiger(),  # efinance（主源，更详细）
-            lambda: self._raw.akshare.get_dragon_tiger(),  # akshare 备用
+            lambda: self._s.dragon_tiger(),
+            lambda: self._raw.akshare.get_dragon_tiger(),
         ])
 
     # ==================== 资金流（新增备份） ====================
@@ -203,24 +177,12 @@ class FallbackStoke:
 
     def index_pe(self, index_name: str = "上证50") -> pd.DataFrame:
         """指数 PE：legulegu → baostock K 线估值"""
-        def _bs_pe():
-            """从 baostock K 线中提取 PE 估值"""
-            import baostock as bs
-            # 指数成分股取上证50的第一只来代表（近似方案）
-            symbol_map = {
-                "上证50": "sh.600000",
-                "沪深300": "sh.600000",
-                "中证500": "sz.000001",
-            }
-            sym = symbol_map.get(index_name, "sh.600000")
-            df = self._raw.baostock.get_kline_with_valuation(sym)
-            if not df.empty and "peTTM" in df.columns:
-                df = df.rename(columns={"peTTM": "滚动市盈率"})
-            return df
+        symbol_map = {"上证50": "sh.600000", "沪深300": "sh.600000", "中证500": "sz.000001"}
+        sym = symbol_map.get(index_name, "sh.600000")
 
         return self._fallback_call("index_pe", [
-            lambda: self._s.index_pe(index_name),  # legulegu（主源）
-            _bs_pe,  # baostock 估值字段备用
+            lambda: self._s.index_pe(index_name),
+            lambda: self._raw.baostock.get_kline_with_valuation(sym),
         ])
 
     # ==================== 板块成分股（新增备份） ====================
@@ -229,140 +191,22 @@ class FallbackStoke:
         """板块成分股：mootdx → efinance"""
         return self._fallback_call("sector_members", [
             lambda: self._s.sector_members(sector_name),
-            lambda: self._raw.efinance.get_realtime_all(),  # 全市场快照（近似）
+            lambda: self._raw.efinance.get_realtime_all(),
         ])
 
     # ==================== akshare 独占方法：优雅降级 ====================
 
-    def limit_up(self, date=None):
-        if not akshare_ok():
-            return _graceful_empty("limit_up")
-        return self._s.limit_up(date)
-
-    def strong_stocks(self, date=None):
-        if not akshare_ok():
-            return _graceful_empty("strong_stocks")
-        return self._s.strong_stocks(date)
-
-    def limit_down(self, date=None):
-        if not akshare_ok():
-            return _graceful_empty("limit_down")
-        return self._s.limit_down(date)
-
-    def sector_rank(self):
-        if not akshare_ok():
-            return _graceful_empty("sector_rank")
-        return self._s.sector_rank()
-
-    def market_breadth(self):
-        if not akshare_ok():
-            return _graceful_empty("market_breadth")
-        return self._s.market_breadth()
-
-    def market_volume(self):
-        if not akshare_ok():
-            return _graceful_empty("market_volume")
-        return self._s.market_volume()
-
-    def northbound_flow(self):
-        if not akshare_ok():
-            return _graceful_empty("northbound_flow")
-        return self._s.northbound_flow()
-
-    def margin_shanghai(self):
-        if not akshare_ok():
-            return _graceful_empty("margin_shanghai")
-        return self._s.margin_shanghai()
-
-    def margin_shenzhen(self):
-        if not akshare_ok():
-            return _graceful_empty("margin_shenzhen")
-        return self._s.margin_shenzhen()
-
-    def market_fund_flow(self):
-        if not akshare_ok():
-            return _graceful_empty("market_fund_flow")
-        return self._s.market_fund_flow()
-
-    def hot_keywords(self):
-        if not akshare_ok():
-            return _graceful_empty("hot_keywords")
-        return self._s.hot_keywords()
-
-    def hot_detail(self, symbol):
-        if not akshare_ok():
-            return _graceful_empty("hot_detail")
-        return self._s.hot_detail(symbol)
-
-    def hot_latest(self, symbol):
-        if not akshare_ok():
-            return _graceful_empty("hot_latest")
-        return self._s.hot_latest(symbol)
-
-    def hot_realtime(self, symbol):
-        if not akshare_ok():
-            return _graceful_empty("hot_realtime")
-        return self._s.hot_realtime(symbol)
-
-    def xueqiu_hot(self, mode="最热门"):
-        if not akshare_ok():
-            return _graceful_empty("xueqiu_hot")
-        return self._s.xueqiu_hot(mode)
-
-    def stock_comment_all(self):
-        if not akshare_ok():
-            return _graceful_empty("stock_comment_all")
-        return self._s.stock_comment_all()
-
-    def stock_desire(self, symbol):
-        if not akshare_ok():
-            return _graceful_empty("stock_desire")
-        return self._s.stock_desire(symbol)
-
-    def stock_focus(self, symbol):
-        if not akshare_ok():
-            return _graceful_empty("stock_focus")
-        return self._s.stock_focus(symbol)
-
-    def concepts(self):
-        if not akshare_ok():
-            return _graceful_empty("concepts")
-        return self._s.concepts()
-
-    def industries(self):
-        if not akshare_ok():
-            return _graceful_empty("industries")
-        return self._s.industries()
-
-    def sector_kline(self, symbol="银行", start_date="20250101", end_date=""):
-        if not akshare_ok():
-            return _graceful_empty("sector_kline")
-        return self._s.sector_kline(symbol, start_date, end_date)
-
-    def news(self, symbol):
-        if not akshare_ok():
-            return _graceful_empty("news")
-        return self._s.news(symbol)
-
-    def telegraph(self):
-        if not akshare_ok():
-            return _graceful_empty("telegraph")
-        return self._s.telegraph()
-
-    def research(self, symbol):
-        if not akshare_ok():
-            return _graceful_empty("research")
-        return self._s.research(symbol)
-
-    def announcements(self, symbol):
-        if not akshare_ok():
-            return _graceful_empty("announcements")
-        return self._s.announcements(symbol)
-
-    # ==================== 透传 StokeCached ====================
-
     def __getattr__(self, name):
-        """未覆盖的方法直接透传到 StokeCached"""
+        """覆盖 + 透传：akshare 独占方法加优雅降级，其余直通 StokeCached"""
         if name.startswith("_"):
             raise AttributeError(name)
-        return getattr(self._s, name)
+
+        method = getattr(self._s, name)
+        if name in _AKSHARE_ONLY:
+            def _guarded(*args, _m=name, _fn=method, **kwargs):
+                if not akshare_ok():
+                    logger.warning("%s: akshare 不可用，返回空数据（优雅降级）", _m)
+                    return pd.DataFrame()
+                return _fn(*args, **kwargs)
+            return _guarded
+        return method
