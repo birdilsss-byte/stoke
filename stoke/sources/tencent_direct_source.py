@@ -156,7 +156,7 @@ class TencentDirectSource:
         params = {
             "_var": f"kline_{freq}{adjust}{year}",
             "param": f"{code},{freq},{start_date},{end_date},640,{adjust}",
-            "r": str(__import__("random").random()),
+            "r": str(random.random()),
         }
 
         logger.info("腾讯直连 K 线: %s (%s, %s~%s)", symbol, freq, start_date, end_date)
