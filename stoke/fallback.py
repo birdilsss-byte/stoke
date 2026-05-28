@@ -27,8 +27,8 @@ class FallbackStoke:
 
     各方法的 fallback 链：
       - kline:      mootdx → efinance → baostock
-      - realtime:   mootdx → zhitu 批量
-      - stock_list: mootdx → baostock → zhitu
+      - realtime:   mootdx → efinance
+      - stock_list: mootdx → baostock
       - 其余方法直接透传 StokeCached
     """
 
