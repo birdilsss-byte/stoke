@@ -412,10 +412,6 @@ class Stoke:
         """公司基本信息（efinance 独有）"""
         return self._safe_call("company_info", self.efinance.get_company_info, symbol)
 
-    def capital_flow(self, symbol: str) -> pd.DataFrame:
-        """个股历史每日资金流（efinance，主力/超大单/大单/中单/小单）"""
-        return self._safe_call("capital_flow", self.efinance.get_capital_flow, symbol)
-
     def realtime_all(self) -> pd.DataFrame:
         """全市场实时行情快照（efinance）"""
         return self._safe_call("realtime_all", self.efinance.get_realtime_all)
