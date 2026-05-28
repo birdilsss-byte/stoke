@@ -507,7 +507,7 @@ class Store:
             try:
                 self.get_or_fetch(
                     "index_pe", idx_name,
-                    lambda n=idx_name: s.tencent.get_index_pe(n),
+                    lambda n=idx_name: s.legulegu.get_index_pe(n),
                     max_age_sec=TTL["index_pe"], mode="append", key_column="index_name",
                     column_map={"日期": "date", "指数": "index_name",
                                 "滚动市盈率": "pe_ttm", "静态市盈率": "pe_static"},
