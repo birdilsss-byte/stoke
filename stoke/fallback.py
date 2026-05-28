@@ -97,9 +97,15 @@ class FallbackStoke:
       akshare独占:   优雅降级（空DataFrame + warning）
     """
 
-    def __init__(self, stoke: Optional[StokeCached] = None):
+    def __init__(self, stoke: Optional[StokeCached] = None, probe: bool = True):
         self._s = stoke or StokeCached()
         self._raw = self._s.raw
+        if probe:
+            try:
+                from stoke.probe import probe_sources
+                probe_sources(self._raw)
+            except Exception as e:
+                logger.debug("自动探路跳过: %s", e)
         logger.info("FallbackStoke 初始化完成（7 个方法带多级备份）")
 
     def _fallback_call(self, name: str, fns: list) -> pd.DataFrame:
