@@ -1,24 +1,20 @@
 """
-腾讯财经数据源测试
+乐咕乐股估值数据源测试（legulegu — 纯 requests，零 akshare 依赖）
 """
-from stoke.sources.tencent_source import TencentSource
+from stoke.sources.legulegu_source import LeguleguSource
 
-t = TencentSource()
+l = LeguleguSource()
 
 # 连通性
-assert t.health_check(), "腾讯财经不可用!"
-print("✅ 腾讯财经连通性通过")
+assert l.health_check(), "乐咕乐股不可用!"
+print("OK 乐咕乐股连通性通过")
 
-# 上证50 PE
-pe = t.get_index_pe("上证50")
-assert len(pe) > 0, "PE数据为空!"
-print(f"✅ 上证50 PE: {len(pe)} 条历史数据")
-print(f"   最新: {pe['日期'].iloc[-1]}, PE={pe['滚动市盈率'].iloc[-1]:.2f}")
+# 指数 PE
+df = l.get_index_pe("上证50")
+assert len(df) > 100, f"上证50 PE 数据异常: {len(df)} 条"
+print(f"OK 上证50 PE: {len(df)} 条, 最近 PE={df['滚动市盈率'].iloc[-1]:.2f}")
 
 # 全市场 PB
-pb = t.get_market_pb()
-assert len(pb) > 0, "PB数据为空!"
-print(f"✅ 全市场 PB: {len(pb)} 条历史数据")
-print(f"   最新: {pb['date'].iloc[-1]}, middlePB={pb['middlePB'].iloc[-1]:.2f}")
-
-print("\n🎉 腾讯财经全部测试通过!")
+df = l.get_market_pb()
+assert len(df) > 100, f"全市场 PB 数据异常: {len(df)} 条"
+print(f"OK 全市场 PB: {len(df)} 条, 最近 PB={df['middlePB'].iloc[-1]:.2f}")
