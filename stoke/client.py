@@ -70,28 +70,31 @@ class Stoke:
         self,
         mootdx_limiter: Optional[RateLimiter] = None,
         akshare_limiter: Optional[RateLimiter] = None,
-        tencent_limiter: Optional[RateLimiter] = None,
+        legulegu_limiter: Optional[RateLimiter] = None,
         baostock_limiter: Optional[RateLimiter] = None,
         efinance_limiter: Optional[RateLimiter] = None,
+        tencent_direct_limiter: Optional[RateLimiter] = None,
     ):
         """
-        纯路由 Stoke — 只组装 5 个数据源，不做缓存。
+        纯路由 Stoke — 组装 6 个数据源，不做缓存。
 
         Args:
             mootdx_limiter: mootdx 限流器（默认不限流）
             akshare_limiter: akshare 限流器（默认 5 秒）
-            tencent_limiter: 腾讯限流器（默认 3 秒）
+            legulegu_limiter: 乐咕乐股限流器（默认 1 秒）
             baostock_limiter: baostock 限流器（默认 1 秒）
             efinance_limiter: efinance 限流器（默认 0.5 秒）
+            tencent_direct_limiter: 腾讯直连限流器（默认 0.3 秒）
 
         需要缓存？用 StokeCached： from stoke.client_cached import StokeCached
         """
         self.mootdx = MootdxSource(rate_limiter=mootdx_limiter)
         self.akshare = AKShareSource(rate_limiter=akshare_limiter)
-        self.tencent = TencentSource(rate_limiter=tencent_limiter)
+        self.legulegu = LeguleguSource(rate_limiter=legulegu_limiter)
         self.baostock = BaostockSource(rate_limiter=baostock_limiter)
         self.efinance = EFinanceSource(rate_limiter=efinance_limiter)
-        logger.info("Stoke 初始化完成（5 源，纯路由）")
+        self.tencent_direct = TencentDirectSource(rate_limiter=tencent_direct_limiter)
+        logger.info("Stoke 初始化完成（6 源，纯路由）")
 
     @staticmethod
     def _safe_call(method_name: str, fn, *args, **kwargs):
