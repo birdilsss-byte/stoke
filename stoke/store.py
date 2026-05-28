@@ -137,14 +137,14 @@ class Store:
                 -- 涨停板（每日快照）
                 CREATE TABLE IF NOT EXISTS limit_up (
                     date        TEXT NOT NULL,
-                    symbol      TEXT NOT NULL,
-                    name        TEXT,
-                    change_pct  REAL,
-                    board_count INTEGER,
-                    reason      TEXT,
-                    industry    TEXT,
+                    代码        TEXT NOT NULL,
+                    名称        TEXT,
+                    涨跌幅       REAL,
+                    连板数       INTEGER,
+                    入选理由      TEXT,
+                    所属行业      TEXT,
                     fetched_at  TEXT NOT NULL,
-                    PRIMARY KEY (date, symbol)
+                    PRIMARY KEY (date, 代码)
                 );
                 CREATE INDEX IF NOT EXISTS idx_limitup_date
                     ON limit_up(date);
