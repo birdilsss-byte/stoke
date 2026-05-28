@@ -120,14 +120,15 @@ class Stoke:
         检查所有数据源连通性
 
         Returns:
-            dict，如 {"mootdx": True, "akshare": True, "tencent": True}
+            dict，如 {"mootdx": True, "akshare": True, "legulegu": True, ...}
         """
         result = {
             "mootdx": self._safe_call("mootdx.health_check", self.mootdx.health_check),
             "akshare": self._safe_call("akshare.health_check", self.akshare.health_check),
-            "tencent": self._safe_call("tencent.health_check", self.tencent.health_check),
+            "legulegu": self._safe_call("legulegu.health_check", self.legulegu.health_check),
             "baostock": self._safe_call("baostock.health_check", self.baostock.health_check),
             "efinance": self._safe_call("efinance.health_check", self.efinance.health_check),
+            "tencent_direct": self._safe_call("tencent_direct.health_check", self.tencent_direct.health_check),
         }
         status = "全部正常" if all(result.values()) else "部分异常"
         logger.info("全源健康检查: %s %s", result, status)
