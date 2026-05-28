@@ -43,7 +43,6 @@ def retry_on_failure(max_retries: int = 3, base_delay: float = 1.0,
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            import pandas as pd
             last_exc = None
             for attempt in range(max_retries):
                 try:
