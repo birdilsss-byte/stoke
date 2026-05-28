@@ -344,6 +344,41 @@ class Stoke:
         """全市场股票列表（含退市/摘牌），day 默认最近交易日"""
         return self._safe_call("all_stock", self.baostock.get_all_stock, day)
 
+    def kline_with_valuation(
+        self, symbol: str,
+        frequency: str = "d",
+        start_date: str = "2025-01-01",
+        end_date: str = "",
+        adjust: str = "none",
+    ) -> pd.DataFrame:
+        """
+        K 线 + 估值字段（baostock 独有：PE/PB/PS/PCF）
+
+        Args:
+            symbol: 如 'sh.600000'
+            frequency: "d"/"w"/"m"
+            start_date: YYYY-MM-DD
+            end_date: YYYY-MM-DD
+            adjust: "none"/"qfq"/"hfq"
+        """
+        return self._safe_call(
+            "kline_with_valuation",
+            self.baostock.get_kline_with_valuation,
+            symbol, frequency, start_date, end_date, adjust,
+        )
+
+    def profit_data(self, symbol: str, year: int, quarter: int) -> pd.DataFrame:
+        """季度盈利能力（ROE/净利率/毛利率/EPS）"""
+        return self._safe_call(
+            "profit_data", self.baostock.get_profit_data, symbol, year, quarter,
+        )
+
+    def index_constituents(self, index_name: str) -> pd.DataFrame:
+        """指数成分股列表（上证50/沪深300/中证500）"""
+        return self._safe_call(
+            "index_constituents", self.baostock.get_index_constituents, index_name,
+        )
+
     # ==================== K 线极速版（efinance） ====================
 
     def kline_efinance(
