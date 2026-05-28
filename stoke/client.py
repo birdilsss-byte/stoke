@@ -410,13 +410,3 @@ class Stoke:
     def zhitu_stock_list(self) -> pd.DataFrame:
         """A 股全量列表（智兔数服）"""
         return self.zhitu.get_stock_list()
-
-    # ==================== 估值（tencent） ====================
-
-    def index_pe(self, index_name: str = "上证50") -> pd.DataFrame:
-        """指数 PE 历史"""
-        return self.tencent.get_index_pe(index_name)
-
-    def market_pb(self) -> pd.DataFrame:
-        """全市场 PB 历史"""
-        return self.tencent.get_market_pb()
