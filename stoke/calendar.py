@@ -26,6 +26,7 @@ def _load_trading_days() -> set:
         return _CACHE
 
     try:
+        _CALENDAR_LIMITER.wait()
         import akshare as ak
         df = ak.tool_trade_date_hist_sina()
         _CACHE = set(
