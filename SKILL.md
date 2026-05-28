@@ -59,6 +59,42 @@ cd ~/stoke && uv sync
 
 环境变量只需设置一次，重启终端后生效。也可手动 `export` 当前会话立即使用。
 
+**4. 验证安装：**
+
+```bash
+cd "$STOKE_HOME" && uv run python3 -c "from stoke import Stoke; print('安装成功')"
+```
+
+---
+
+## Hermes 环境注意事项
+
+在 Hermes / QClaw 平台安装时，请确认以下环境：
+
+```bash
+# 1. 安装 uv（如果还没有）
+brew install uv
+
+# 2. 克隆项目
+git clone https://github.com/birdilsss-byte/stoke.git ~/stoke
+cd ~/stoke && uv sync
+
+# 3. 设置 STOKE_HOME
+export STOKE_HOME=~/stoke
+
+# 4. 验证
+uv run python3 -c "from stoke import Stoke; print('OK')"
+```
+
+### 常见问题
+
+| 问题 | 原因 | 解决 |
+|------|------|------|
+| `timeout: command not found` | macOS 默认无 GNU timeout | `brew install coreutils` |
+| `numpy` 缺失 | 依赖未正确安装 | `uv sync` 会自动拉取，确认网络通畅 |
+| Python 路径异常 | Hermes 沙盒环境隔离 | 用 `export STOKE_HOME=~/stoke` 指定路径 |
+| `ModuleNotFoundError: stoke` | 包未安装 | `cd "$STOKE_HOME" && uv sync` |
+
 ---
 
 ## ⚠️ 限流铁律
