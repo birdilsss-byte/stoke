@@ -592,13 +592,26 @@ class Store:
     ):
         """写入 SQLite，按模式处理旧数据。自动对齐 DataFrame 列到表结构。"""
         with sqlite3.connect(self.db_path) as conn:
-            # 获取表的实际列名，只写入匹配的列
+            # 自动补全缺失的列（数据源返回列名变化时自动适配）
             table_cols = set(
                 row[1] for row in conn.execute(
                     f"PRAGMA table_info(\"{table}\")"
                 ).fetchall()
             )
-            # 过滤：只保留表中存在的列 + fetched_at
+            for col in df.columns:
+                if col not in table_cols:
+                    try:
+                        conn.execute(
+                            f"ALTER TABLE \"{table}\" ADD COLUMN \"{col}\" TEXT"
+                        )
+                    except sqlite3.OperationalError:
+                        pass  # 列已存在、表锁等，跳过
+            # 刷新表结构
+            table_cols = set(
+                row[1] for row in conn.execute(
+                    f"PRAGMA table_info(\"{table}\")"
+                ).fetchall()
+            )
             write_cols = [c for c in df.columns if c in table_cols]
             df_write = df[write_cols].copy()
 
