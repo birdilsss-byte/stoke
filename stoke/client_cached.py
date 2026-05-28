@@ -99,8 +99,7 @@ class StokeCached:
             lambda: self._s.akshare.get_strong_stocks(real_date),
             lambda: self._s.akshare.get_strong_stocks(date),
             max_age_sec=STORE_TTL["strong_stocks"], mode="replace", key_column="date",
-            column_map={"代码": "symbol", "名称": "name", "涨跌幅": "change_pct",
-                        "入选理由": "reason", "所属行业": "industry"},
+            column_map={},
         )
 
     def sector_rank(self) -> pd.DataFrame:
