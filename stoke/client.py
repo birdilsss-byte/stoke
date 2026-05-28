@@ -362,13 +362,13 @@ class Stoke:
 
     def top10_holders(self, symbol: str) -> pd.DataFrame:
         """十大股东（efinance 独有）"""
-        return self.efinance.get_top10_holders(symbol)
+        return self._safe_call("top10_holders", self.efinance.get_top10_holders, symbol)
 
     def holder_number(self, symbol: str) -> pd.DataFrame:
         """股东人数变化趋势（efinance 独有）"""
-        return self.efinance.get_holder_number(symbol)
+        return self._safe_call("holder_number", self.efinance.get_holder_number, symbol)
 
     def company_info(self, symbol: str) -> pd.DataFrame:
         """公司基本信息（efinance 独有）"""
-        return self.efinance.get_company_info(symbol)
+        return self._safe_call("company_info", self.efinance.get_company_info, symbol)
 
