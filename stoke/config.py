@@ -4,6 +4,12 @@ Stoke 全局配置
 
 import logging
 import sys
+import warnings
+
+# 抑制第三方库的 ResourceWarning（mootdx 裸 open、baostock 未关闭 socket）
+warnings.filterwarnings("ignore", category=ResourceWarning, module="mootdx")
+warnings.filterwarnings("ignore", category=ResourceWarning, module="baostock")
+warnings.filterwarnings("ignore", category=ResourceWarning, module="socketutil")
 
 # 限流间隔（秒）
 RATE_LIMIT = {
