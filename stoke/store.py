@@ -455,8 +455,7 @@ class Store:
         daily_tasks = [
             ("limit_up", real_date,
              lambda: s.akshare.get_limit_up_pool(real_date), "date", "replace",
-             {"代码": "symbol", "名称": "name", "涨跌幅": "change_pct",
-              "连板数": "board_count", "所属行业": "industry"}),
+             {}),
             ("market_breadth", real_date,
              lambda: s.akshare.get_market_breadth(), "date", "replace", None),
             ("northbound_flow", real_date,
