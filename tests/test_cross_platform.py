@@ -228,14 +228,14 @@ print(f"  乐咕乐股: {legulegu_ok}/{legulegu_total} 通过")
 # ========== 5. 总结 ==========
 section("5. 验收总结")
 
-total = mootdx_ok + akshare_ok + tencent_ok
-total_target = mootdx_total + akshare_total + tencent_total  # 14
+total = mootdx_ok + akshare_ok + legulegu_ok
+total_target = mootdx_total + akshare_total + legulegu_total  # 14
 
 print(f"  操作系统: {platform.system()} {platform.release()}")
 print(f"  Python:   {sys.version.split()[0]}")
 print(f"  mootdx:   {mootdx_ok}/{mootdx_total}")
 print(f"  akshare:  {akshare_ok}/{akshare_total}")
-print(f"  腾讯财经: {tencent_ok}/{tencent_total}")
+print(f"  乐咕乐股: {legulegu_ok}/{legulegu_total}")
 print(f"  总计:     {total}/{total_target}")
 
 if total == total_target:
