@@ -325,6 +325,92 @@ class Store:
                     PRIMARY KEY (date, strategy_name)
                 );
 
+                -- 个股研报（东财）
+                CREATE TABLE IF NOT EXISTS research_reports (
+                    symbol      TEXT NOT NULL,
+                    infoCode    TEXT NOT NULL,
+                    title       TEXT,
+                    publishDate TEXT,
+                    orgSName    TEXT,
+                    emRatingName TEXT,
+                    predictThisYearEps REAL,
+                    predictNextYearEps REAL,
+                    indvInduName TEXT,
+                    fetched_at  TEXT NOT NULL,
+                    PRIMARY KEY (symbol, infoCode)
+                );
+                CREATE INDEX IF NOT EXISTS idx_rr_symbol
+                    ON research_reports(symbol);
+
+                -- 行业研报（东财）
+                CREATE TABLE IF NOT EXISTS industry_reports (
+                    industryCode TEXT NOT NULL,
+                    infoCode    TEXT NOT NULL,
+                    title       TEXT,
+                    publishDate TEXT,
+                    orgSName    TEXT,
+                    emRatingName TEXT,
+                    industryName TEXT,
+                    fetched_at  TEXT NOT NULL,
+                    PRIMARY KEY (industryCode, infoCode)
+                );
+
+                -- 一致预期 EPS（同花顺）
+                CREATE TABLE IF NOT EXISTS eps_forecast (
+                    symbol      TEXT NOT NULL,
+                    forecast_year TEXT NOT NULL,
+                    date        TEXT,
+                    eps_mean    REAL,
+                    eps_high    REAL,
+                    eps_low     REAL,
+                    analyst_count INTEGER,
+                    industry    TEXT,
+                    fetched_at  TEXT NOT NULL,
+                    PRIMARY KEY (symbol, forecast_year)
+                );
+                CREATE INDEX IF NOT EXISTS idx_eps_symbol
+                    ON eps_forecast(symbol);
+
+                -- 龙虎榜席位明细（东财数据中心）
+                CREATE TABLE IF NOT EXISTS billboard_seat_detail (
+                    symbol          TEXT NOT NULL,
+                    TRADE_DATE      TEXT NOT NULL,
+                    SECURITY_NAME_ABBR TEXT,
+                    BILLBOARD_NET_AMT REAL,
+                    CHANGE_PCT      REAL,
+                    TURNOVERRATE    REAL,
+                    TOTAL_EXPLAIN   TEXT,
+                    fetched_at      TEXT NOT NULL,
+                    PRIMARY KEY (symbol, TRADE_DATE)
+                );
+
+                -- 全市场龙虎榜（东财数据中心）
+                CREATE TABLE IF NOT EXISTS full_billboard (
+                    TRADE_DATE      TEXT NOT NULL,
+                    SECURITY_CODE   TEXT NOT NULL,
+                    SECURITY_NAME_ABBR TEXT,
+                    BILLBOARD_NET_AMT REAL,
+                    CHANGE_PCT      REAL,
+                    TURNOVERRATE    REAL,
+                    TOTAL_EXPLAIN   TEXT,
+                    fetched_at      TEXT NOT NULL,
+                    PRIMARY KEY (TRADE_DATE, SECURITY_CODE)
+                );
+
+                -- 公告列表（巨潮）
+                CREATE TABLE IF NOT EXISTS announcements (
+                    symbol              TEXT NOT NULL,
+                    announcementId      TEXT NOT NULL,
+                    announcementTitle   TEXT,
+                    announcementTime    TEXT,
+                    adjunctUrl          TEXT,
+                    announcementType    TEXT,
+                    fetched_at          TEXT NOT NULL,
+                    PRIMARY KEY (symbol, announcementId)
+                );
+                CREATE INDEX IF NOT EXISTS idx_ann_symbol
+                    ON announcements(symbol);
+
                 -- 元数据表（跟踪每张表的最后写入时间）
                 CREATE TABLE IF NOT EXISTS _meta (
                     table_name  TEXT PRIMARY KEY,
