@@ -505,7 +505,7 @@ class Store:
         # 去重（避免主键冲突导致写入失败）
         if mode != "overwrite":
             subset = []
-            for c in ["date", "代码", "symbol"]:
+            for c in ["date", "代码", "symbol", "forecast_year", "industryCode"]:
                 if c in df.columns:
                     subset.append(c)
             if subset:
