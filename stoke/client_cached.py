@@ -189,7 +189,69 @@ class StokeCached:
             max_age_sec=STORE_TTL["market_pb"], mode="append", key_column="date",
         )
 
-    # ===== 透传：其余 36 个方法自动代理到裸 Stoke =====
+    # ===== 新增缓存方法（4 个新 Source） =====
+
+    def research_reports(self, symbol: str, max_pages: int = 5) -> pd.DataFrame:
+        return self._cached_call(
+            "research_reports", symbol,
+            lambda: self._s.eastmoney.get_research_reports(symbol, max_pages),
+            lambda: self._s.eastmoney.get_research_reports(symbol, max_pages),
+            max_age_sec=STORE_TTL["research_reports"], mode="replace",
+            key_column="symbol",
+        )
+
+    def industry_reports(self, industry_code: str = "*",
+                         max_pages: int = 5) -> pd.DataFrame:
+        return self._cached_call(
+            "industry_reports", industry_code,
+            lambda: self._s.eastmoney.get_industry_reports(industry_code, max_pages),
+            lambda: self._s.eastmoney.get_industry_reports(industry_code, max_pages),
+            max_age_sec=STORE_TTL["industry_reports"], mode="replace",
+            key_column="industryCode",
+        )
+
+    def eps_forecast(self, symbol: str) -> pd.DataFrame:
+        return self._cached_call(
+            "eps_forecast", symbol,
+            lambda: self._s.ths.get_eps_forecast(symbol),
+            lambda: self._s.ths.get_eps_forecast(symbol),
+            max_age_sec=STORE_TTL["eps_forecast"], mode="replace",
+            key_column="symbol",
+        )
+
+    def billboard_seat_detail(self, code: str,
+                              start_date: str,
+                              end_date: str) -> pd.DataFrame:
+        return self._cached_call(
+            "billboard_seat_detail", code,
+            lambda c=code, s=start_date, e=end_date:
+                self._s.datacenter.get_billboard_seat_detail(c, s, e),
+            lambda c=code, s=start_date, e=end_date:
+                self._s.datacenter.get_billboard_seat_detail(c, s, e),
+            max_age_sec=STORE_TTL["billboard_seat_detail"], mode="replace",
+            key_column="symbol",
+        )
+
+    def full_market_billboard(self, date_str: str) -> pd.DataFrame:
+        return self._cached_call(
+            "full_billboard", date_str,
+            lambda: self._s.datacenter.get_full_market_billboard(date_str),
+            lambda: self._s.datacenter.get_full_market_billboard(date_str),
+            max_age_sec=STORE_TTL["full_billboard"], mode="replace",
+            key_column="TRADE_DATE",
+        )
+
+    def announcements_detailed(self, symbol: str, page_size: int = 30,
+                               page_num: int = 1) -> pd.DataFrame:
+        return self._cached_call(
+            "announcements", symbol,
+            lambda: self._s.cninfo.get_announcements(symbol, page_size, page_num),
+            lambda: self._s.cninfo.get_announcements(symbol, page_size, page_num),
+            max_age_sec=STORE_TTL["announcements"], mode="replace",
+            key_column="symbol",
+        )
+
+    # ===== 透传：其余方法自动代理到裸 Stoke =====
 
     def __getattr__(self, name):
         if name.startswith("_"):
