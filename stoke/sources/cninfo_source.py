@@ -1,16 +1,16 @@
 """
-CninfoSource — 巨潮公告全文
+CninfoSource — 东财公告列表（替代巨潮 cninfo 直连）
 
-数据源: cninfo.com.cn (HTTP, 零鉴权)
-覆盖: 沪深北交所全量公告列表 + 公告全文 HTML + 公告 PDF 下载
+数据源: np-anotice-stock.eastmoney.com (HTTP, 零鉴权)
+覆盖: 沪深北交所个股公告列表 + 公告详情页 + 公告 PDF 下载
 
-关键: 动态 orgId 映射（szse_stock.json，6198 只股缓存），
-      硬编码 gssx0{code} 降为 fallback。
+说明: 原设计对接巨潮 cninfo.com.cn 直连 API，但该 API 已不稳定（2026-06
+      实测返回 500）。转而使用东财公告 API——这也是 akshare 底层实际使用的
+      接口，与 store.py 中现有 announcements 表同源但更可控。
 
-参考: a-stock-data V3.2.4 §7.1
+参考: akshare stock_fundamental/stock_notice.py
 """
 
-import json
 import logging
 from pathlib import Path
 from typing import Optional
@@ -30,15 +30,29 @@ _UA = (
     "Chrome/120.0.0.0 Safari/537.36"
 )
 
+_NOTICE_API = "https://np-anotice-stock.eastmoney.com/api/security/ann"
+_NOTICE_DETAIL_URL = "https://data.eastmoney.com/notices/detail/"
+
+# 公告类型映射
+_REPORT_MAP = {
+    "全部": "0",
+    "重大事项": "1",
+    "财务报告": "2",
+    "融资公告": "3",
+    "风险提示": "4",
+    "资产重组": "5",
+    "信息变更": "6",
+    "持股变动": "7",
+}
+
 
 class CninfoSource:
-    """巨潮公告数据源"""
+    """东财公告列表数据源"""
 
     def __init__(self, rate_limiter: Optional[RateLimiter] = None):
         self.limiter = rate_limiter or RateLimiter(interval=RATE_LIMIT.get("cninfo", 1.0))
         self._session = requests.Session()
         self._session.headers.update({"User-Agent": _UA})
-        self._orgid_cache: dict = {}  # code -> orgId 映射缓存
         logger.info("CninfoSource 初始化完成，限流 %.1fs", self.limiter.interval)
 
     # ==================== 连通性检查 ====================
@@ -54,138 +68,120 @@ class CninfoSource:
             logger.warning("CninfoSource 健康检查失败: %s", e)
             return False
 
-    # ==================== orgId 动态解析 ====================
-
-    def _resolve_org_id(self, code: str) -> str:
-        """
-        动态解析股票代码对应的 orgId。
-
-        先从 szse_stock.json 缓存中查找，
-        找不到则降级为 'gssx0{code}' 回退格式。
-        """
-        if code in self._orgid_cache:
-            return self._orgid_cache[code]
-
-        try:
-            url = "https://www.cninfo.com.cn/new/data/szse_stock.json"
-            r = self._session.get(url, timeout=10)
-            data = r.json()
-            stock_list = data.get("stockList", [])
-            for s in stock_list:
-                sc = s.get("code", "")
-                if sc == code:
-                    org_id = s.get("orgId", "")
-                    if org_id:
-                        self._orgid_cache[code] = org_id
-                        logger.debug("orgId 解析: %s -> %s", code, org_id)
-                        return org_id
-        except Exception as e:
-            logger.warning("orgId 映射表请求失败: %s", e)
-
-        # fallback: 硬编码格式
-        fallback = f"gssx0{code}"
-        self._orgid_cache[code] = fallback
-        logger.debug("orgId 回退: %s -> %s", code, fallback)
-        return fallback
-
     # ==================== 公告列表 ====================
 
     @retry_on_failure()
     def get_announcements(self, symbol: str,
-                          page_size: int = 30,
-                          page_num: int = 1) -> pd.DataFrame:
+                          page_size: int = 100,
+                          page_num: int = 1,
+                          report_type: str = "全部",
+                          begin_date: str = "",
+                          end_date: str = "") -> pd.DataFrame:
         """
-        巨潮个股公告列表。
+        东财个股公告列表。
 
         Args:
             symbol: 6 位股票代码
-            page_size: 每页条数
+            page_size: 每页条数（默认 100）
             page_num: 页码
+            report_type: 公告类型
+            begin_date: 开始日期 YYYY-MM-DD
+            end_date: 结束日期 YYYY-MM-DD
 
         Returns:
             DataFrame 列:
-            announcementId       -- 公告 ID
-            announcementTitle    -- 公告标题
-            announcementTime     -- 公告时间 (YYYY-MM-DD HH:MM)
-            adjunctUrl           -- 公告 PDF 下载相对路径
-            announcementType     -- 公告类型
+            title         -- 公告标题
+            noticeDate    -- 公告日期
+            artCode       -- 公告编码
+            stockList     -- 股票列表
+            noticeType    -- 公告类型
+            url           -- 东财公告详情 URL
         """
         self.limiter.wait()
-        org_id = self._resolve_org_id(symbol)
+        f_node = _REPORT_MAP.get(report_type, "0")
         params = {
-            "stock": f"{org_id},{symbol}",
-            "pageNum": str(page_num),
-            "pageSize": str(page_size),
-            "tabName": "fulltext",
-            "seDate": "",
-            "plate": "",
-            "category": "",
-            "trade": "",
+            "sr": "-1",
+            "page_size": str(page_size),
+            "page_index": str(page_num),
+            "ann_type": "A",
+            "client_source": "web",
+            "f_node": f_node,
+            "s_node": "0",
+            "stock_list": symbol,
         }
-        logger.info("获取公告列表: %s (orgId=%s)", symbol, org_id)
-        r = self._session.post(
-            "http://www.cninfo.com.cn/new/hisAnnouncement/query",
-            params=params, timeout=15,
-            headers={"Referer": "http://www.cninfo.com.cn/"},
-        )
-        d = r.json()
-        rows = (d.get("announcements") or
-                d.get("result") or [])
-        if not rows:
+        if begin_date:
+            params["begin_time"] = begin_date
+        if end_date:
+            params["end_time"] = end_date
+
+        logger.info("获取公告列表: %s (page=%d, type=%s)", symbol, page_num, report_type)
+        try:
+            r = self._session.get(
+                _NOTICE_API, params=params, timeout=15,
+                headers={"Referer": "https://data.eastmoney.com/"},
+            )
+            d = r.json()
+            data = d.get("data") or {}
+            hits = data.get("hits") or []
+        except Exception as e:
+            logger.warning("公告列表请求失败 %s: %s", symbol, e)
+            return pd.DataFrame()
+
+        if not hits:
             logger.info("公告列表: %s 无数据", symbol)
             return pd.DataFrame()
 
-        # 提取关键字段
         records = []
-        for row in rows:
+        for h in hits:
+            source = h.get("_source") or h
+            art_code = source.get("artCode", "")
+            code = symbol
             records.append({
-                "announcementId": row.get("announcementId", ""),
-                "announcementTitle": row.get("announcementTitle", ""),
-                "announcementTime": str(row.get("announcementTime", ""))[:19],
-                "adjunctUrl": row.get("adjunctUrl", ""),
-                "announcementType": row.get("announcementType", ""),
+                "title": source.get("title", ""),
+                "noticeDate": str(source.get("noticeDate", ""))[:10],
+                "artCode": art_code,
+                "noticeType": source.get("noticeType", ""),
+                "url": f"{_NOTICE_DETAIL_URL}{code}/{art_code}.html" if art_code else "",
             })
 
         df = pd.DataFrame(records)
         logger.info("公告列表: %s %d 条", symbol, len(df))
         return df
 
-    # ==================== 公告全文 ====================
+    # ==================== 公告详情 ====================
 
     @retry_on_failure()
-    def get_announcement_detail(self, announcement_id: str) -> str:
+    def get_announcement_detail(self, symbol: str,
+                                art_code: str) -> str:
         """
-        获取公告全文（HTML 文本）。
+        获取公告详情页 HTML。
 
         Args:
-            announcement_id: 公告 ID
+            symbol: 6 位股票代码
+            art_code: 公告编码
 
         Returns:
-            公告全文 HTML 字符串
+            公告详情页 HTML 字符串
         """
         self.limiter.wait()
-        params = {"announcementId": announcement_id}
-        logger.info("获取公告全文: %s", announcement_id)
+        url = f"{_NOTICE_DETAIL_URL}{symbol}/{art_code}.html"
+        logger.info("获取公告详情: %s", url)
         try:
             r = self._session.get(
-                "http://www.cninfo.com.cn/new/disclosure/detail",
-                params=params, timeout=15,
-                headers={"Referer": "http://www.cninfo.com.cn/"},
+                url, timeout=15,
+                headers={"Referer": "https://data.eastmoney.com/"},
             )
-            # 尝试从页面提取公告正文内容
-            text = r.text
-            # 简单的 HTML 正文提取（cninfo 页面结构比较固定）
-            if text and len(text) > 200:
-                logger.info("公告全文: %s (%d 字符)", announcement_id, len(text))
-                return text
+            if r.status_code == 200 and len(r.text) > 200:
+                logger.info("公告详情: %s (%d 字符)", art_code, len(r.text))
+                return r.text
             return ""
         except Exception as e:
-            logger.warning("公告全文获取失败 %s: %s", announcement_id, e)
+            logger.warning("公告详情获取失败 %s: %s", art_code, e)
             return ""
 
     # ==================== 公告 PDF 下载 ====================
 
-    def download_announcement_pdf(self, adjunct_url: str,
+    def download_announcement_pdf(self, url: str,
                                   target_dir: str = "./announcements") -> Optional[str]:
         """
         下载公告 PDF。
@@ -193,38 +189,37 @@ class CninfoSource:
         不走 @retry_on_failure。
 
         Args:
-            adjunct_url: 从 get_announcements 获得的 adjunctUrl 路径
+            url: 公告详情 URL（从 get_announcements 获得的 url 列）
             target_dir: 下载目录
 
         Returns:
             下载文件的本地路径，失败返回 None
         """
-        if not adjunct_url:
-            logger.warning("download_announcement_pdf: adjunct_url 为空")
+        if not url:
+            logger.warning("download_announcement_pdf: url 为空")
             return None
 
-        url = f"http://www.cninfo.com.cn/{adjunct_url}"
-        fname = adjunct_url.split("/")[-1] if "/" in adjunct_url else adjunct_url
+        fname = url.split("/")[-1].replace(".html", ".pdf") if "/" in url else "announcement.pdf"
         target = Path(target_dir) / fname
         if target.exists():
             logger.info("公告 PDF 已存在: %s", target)
             return str(target)
 
-        logger.info("下载公告 PDF: %s", url)
+        logger.info("下载公告: %s", url)
         try:
             self.limiter.wait()
             r = self._session.get(
                 url, timeout=60,
-                headers={"Referer": "http://www.cninfo.com.cn/"},
+                headers={"Referer": "https://data.eastmoney.com/"},
             )
             if r.status_code == 200 and len(r.content) >= 512:
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_bytes(r.content)
-                logger.info("公告 PDF 下载成功: %s (%d KB)", target, len(r.content) // 1024)
+                logger.info("公告下载成功: %s (%d KB)", target, len(r.content) // 1024)
                 return str(target)
             else:
-                logger.warning("公告 PDF 下载失败: HTTP %d", r.status_code)
+                logger.warning("公告下载失败: HTTP %d", r.status_code)
                 return None
         except Exception as e:
-            logger.warning("公告 PDF 下载异常: %s", e)
+            logger.warning("公告下载异常: %s", e)
             return None
