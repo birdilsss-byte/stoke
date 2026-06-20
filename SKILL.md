@@ -187,7 +187,7 @@ l = LeguleguSource()
 | `get_index_pe(name)` | 指数PE历史 | `l.get_index_pe("上证50")` |
 | `get_market_pb()` | 全市场PB历史 | `l.get_market_pb()` |
 
-### ⚡ tencent_direct（腾讯直连 qt.gtimg.cn）— 实时行情+K线
+### ⚡ tencent_direct（腾讯直连 qt.gtimg.cn）— 行情+K线+分钟K线+分时
 
 ```python
 from stoke.sources.tencent_direct_source import TencentDirectSource
@@ -196,8 +196,15 @@ t = TencentDirectSource()
 
 | 方法 | 说明 | 示例 |
 |------|------|------|
-| `get_realtime(symbols)` | 实时行情（50+字段，毫秒级） | `t.get_realtime(["000001"])` |
-| `get_kline(symbol)` | K线（前/后复权） | `t.get_kline("600519")` |
+| `get_realtime(symbols)` | A股实时行情（50+字段） | `t.get_realtime(["000001"])` |
+| `get_kline(symbol)` | K线（日/周/月，前/后复权） | `t.get_kline("600519")` |
+| **`get_market_realtime(codes)`** | **跨市场行情（港股/美股/指数/ETF）** | `t.get_market_realtime(["sh000001","hk00700","usAAPL"])` |
+| **`get_brief_info(codes)`** | **简要信息（12字段轻量级）** | `t.get_brief_info(["sh600519","hk00700"])` |
+| **`get_tick_analysis(symbol)`** | **盘口大单/小单比率** | `t.get_tick_analysis("sh600519")` |
+| **`get_minute_kline(symbol, freq)`** | **分钟K线（m5/m15/m30/m60）** | `t.get_minute_kline("sh600519","m5",240)` |
+| **`get_intraday_line(symbol)`** | **当日分时线（价格/均价/成交量）** | `t.get_intraday_line("sh600519")` |
+| **`get_intraday_mline(symbol)`** | **当日分钟K线（1分钟OHLCV）** | `t.get_intraday_mline("sh600519")` |
+| **`get_fqkline(symbol, freq, adjust)`** | **复权K线（后复权hfq独立端点）** | `t.get_fqkline("sh600519","day","hfq")` |
 
 ### 🔬 efinance 扩展能力（efinance_source）
 
