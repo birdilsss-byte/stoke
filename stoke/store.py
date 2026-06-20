@@ -54,6 +54,13 @@ TTL = {
     "limit_up":          3600,
     "limit_down":        3600,
     "sector_kline":      3600,
+    # 新增源缓存
+    "research_reports":    86400,   # 个股研报：1 天
+    "industry_reports":    86400,   # 行业研报：1 天
+    "eps_forecast":        86400,   # 一致预期 EPS：1 天
+    "billboard_seat_detail": 86400, # 龙虎榜席位：1 天
+    "full_billboard":      86400,   # 全市场龙虎榜：1 天
+    "announcements":        3600,   # 公告列表：1 小时
     # 永不过期（仅首次拉取）
     "permanent":            0,
 }
