@@ -499,3 +499,69 @@ class Stoke:
             symbol, freq, start_date, end_date, adjust,
         )
 
+    # ==================== 研报（EastMoney 新增） ====================
+
+    def research_reports(self, symbol: str, max_pages: int = 5) -> pd.DataFrame:
+        """东财个股研报列表（含盈利预测和 PDF 编号）"""
+        return self._safe_call(
+            "research_reports", self.eastmoney.get_research_reports, symbol, max_pages,
+        )
+
+    def industry_reports(self, industry_code: str = "*",
+                         max_pages: int = 5) -> pd.DataFrame:
+        """东财行业研报列表"""
+        return self._safe_call(
+            "industry_reports", self.eastmoney.get_industry_reports,
+            industry_code, max_pages,
+        )
+
+    def download_report_pdf(self, info_code: str,
+                            target_dir: str = "./reports") -> Optional[str]:
+        """下载研报 PDF（返回本地路径）"""
+        logger.info("下载研报 PDF: %s", info_code)
+        return self.eastmoney.download_report_pdf(info_code, target_dir)
+
+    # ==================== 一致预期（同花顺 新增） ====================
+
+    def eps_forecast(self, symbol: str) -> pd.DataFrame:
+        """同花顺机构一致预期 EPS（含均值/最高/最低/机构数）"""
+        return self._safe_call("eps_forecast", self.ths.get_eps_forecast, symbol)
+
+    # ==================== 龙虎榜明细（Datacenter 新增） ====================
+
+    def billboard_seat_detail(self, code: str,
+                              start_date: str,
+                              end_date: str) -> pd.DataFrame:
+        """龙虎榜席位明细（个股维度，日级别）"""
+        return self._safe_call(
+            "billboard_seat_detail", self.datacenter.get_billboard_seat_detail,
+            code, start_date, end_date,
+        )
+
+    def full_market_billboard(self, date_str: str) -> pd.DataFrame:
+        """全市场龙虎榜每日汇总（按净买入额排序）"""
+        return self._safe_call(
+            "full_market_billboard", self.datacenter.get_full_market_billboard,
+            date_str,
+        )
+
+    # ==================== 公告全文（巨潮 新增） ====================
+
+    def announcements_detailed(self, symbol: str, page_size: int = 30,
+                               page_num: int = 1) -> pd.DataFrame:
+        """巨潮公告列表（含公告全文 URL），区别于 announcements（akshare 版）"""
+        return self._safe_call(
+            "announcements_detailed", self.cninfo.get_announcements,
+            symbol, page_size, page_num,
+        )
+
+    def announcement_detail(self, announcement_id: str) -> str:
+        """获取公告全文 HTML"""
+        logger.info("获取公告全文: %s", announcement_id)
+        return self.cninfo.get_announcement_detail(announcement_id)
+
+    def download_announcement_pdf(self, adjunct_url: str,
+                                  target_dir: str = "./announcements") -> Optional[str]:
+        """下载公告 PDF（返回本地路径）"""
+        logger.info("下载公告 PDF: %s", adjunct_url)
+        return self.cninfo.download_announcement_pdf(adjunct_url, target_dir)
