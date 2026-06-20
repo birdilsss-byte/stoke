@@ -104,10 +104,20 @@ class Timing:
     # ===== 五维评估 =====
 
     def _assess_market(self) -> float:
-        """大盘维度 (0-100)"""
+        """
+        大盘维度 (0-100)
+
+        数据源：腾讯直连（替代原 akshare market_breadth）
+          - 上证指数日K线 → 均线判断（~0.3s）
+          - 跨市场同步性 → 港股/美股对比（~0.3s）
+        """
         try:
-            df = self.s.market_breadth()
+            score = 50.0
+
+            # ---- 维度A：上证指数趋势（腾讯直连，0.3s） ----
+            df = self.s.fqkline("sh000001", freq="day", adjust="qfq")
             if df.empty or len(df) < 20:
+                logger.warning("大盘维度: 腾讯K线数据不足")
                 return 50.0
 
             recent = df.tail(20)
@@ -115,18 +125,35 @@ class Timing:
             ma5 = pd.Series(close).rolling(5).mean().iloc[-1]
             ma20 = pd.Series(close).rolling(20).mean().iloc[-1]
 
-            score = 50.0
             if ma5 > ma20:
-                score += 20  # 短期均线在长期之上
+                score += 20  # 短期均线在长期之上 = 多头
             else:
-                score -= 20
+                score -= 20  # 死叉 = 空头
 
-            # 最近5日涨跌幅
-            chg = (close[-1] / close[-5] - 1) * 100 if len(close) >= 5 else 0
-            score += chg * 2
+            chg5 = (close[-1] / close[-5] - 1) * 100 if len(close) >= 5 else 0
+            score += chg5 * 2
+
+            # ---- 维度B：跨市场同步性（腾讯直连，0.3s） ----
+            try:
+                cross = self.s.market_realtime(["sh000001", "hk00700", "usAAPL"])
+                if not cross.empty and len(cross) >= 3:
+                    # 简单同步性判断：A股、港股、美股同向则加分
+                    changes = pd.to_numeric(cross["change_pct"], errors="coerce").dropna()
+                    up_count = (changes > 0).sum()
+                    down_count = (changes < 0).sum()
+                    if up_count >= 3:
+                        score += 10    # 三市齐涨
+                    elif up_count >= 2:
+                        score += 5     # 多数上涨
+                    elif down_count >= 3:
+                        score -= 10    # 三市齐跌
+                    elif down_count >= 2:
+                        score -= 5     # 多数下跌
+            except Exception as e:
+                logger.debug("跨市场同步性信号失败: %s", e)
+
             score = max(0, min(100, score))
-
-            logger.debug("大盘维度: %.0f (ma5=%.0f ma20=%.0f chg5=%.1f%%)", score, ma5, ma20, chg)
+            logger.debug("大盘维度: %.0f (ma5=%.0f ma20=%.0f chg5=%.1f%%)", score, ma5, ma20, chg5)
             return score
         except Exception as e:
             logger.warning("大盘维度评估失败: %s", e)
