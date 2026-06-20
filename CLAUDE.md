@@ -39,13 +39,17 @@ stoke/
 │   ├── utils.py
 │   ├── exceptions.py         # 预留
 │   ├── normalizer.py         # 预留
-│   └── sources/                    # 6 源适配
+│   └── sources/                    # 10 源适配
 │       ├── mootdx_source.py        # TCP 通达信
 │       ├── akshare_source.py       # HTTP 东财/同花顺
 │       ├── baostock_source.py      # HTTP 复权K线+财报+估值
 │       ├── efinance_source.py      # HTTP 极速K线/股东/资金流
 │       ├── legulegu_source.py      # HTTP PE/PB（纯requests）
-│       └── tencent_direct_source.py# HTTP 实时行情+K线（qt.gtimg.cn）
+│       ├── tencent_direct_source.py# HTTP 实时行情+K线（qt.gtimg.cn）
+│       ├── eastmoney_source.py     # HTTP 东财研报（个股/行业/PDF）
+│       ├── ths_source.py           # HTTP 同花顺一致预期EPS
+│       ├── datacenter_source.py    # HTTP 东财龙虎榜（席位/全市场）
+│       └── cninfo_source.py        # HTTP 东财公告列表
 ├── tests/
 ├── Team/                     # 顾问参考（不动）
 ├── pyproject.toml
