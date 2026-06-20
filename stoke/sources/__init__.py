@@ -13,6 +13,10 @@ from stoke.sources.legulegu_source import LeguleguSource
 from stoke.sources.baostock_source import BaostockSource
 from stoke.sources.efinance_source import EFinanceSource
 from stoke.sources.tencent_direct_source import TencentDirectSource
+from stoke.sources.eastmoney_source import EastMoneySource
+from stoke.sources.ths_source import ThsSource
+from stoke.sources.datacenter_source import DatacenterSource
+from stoke.sources.cninfo_source import CninfoSource
 __all__ = [
     "MootdxSource",
     "AKShareSource",
@@ -20,4 +24,8 @@ __all__ = [
     "BaostockSource",
     "EFinanceSource",
     "TencentDirectSource",
+    "EastMoneySource",
+    "ThsSource",
+    "DatacenterSource",
+    "CninfoSource",
 ]
