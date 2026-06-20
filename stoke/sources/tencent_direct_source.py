@@ -318,10 +318,12 @@ class TencentDirectSource:
         klines = None
         stock_data = data.get("data", {})
         if isinstance(stock_data, dict):
-            klines = stock_data.get(symbol)
+            inner = stock_data.get(symbol)
+            if isinstance(inner, dict):
+                klines = inner.get(freq)  # freq="m5"/"m15"/"m30"/"m60"
 
         if not klines:
-            logger.warning("腾讯分钟 K 线无数据: %s", symbol)
+            logger.warning("腾讯分钟 K 线无数据: %s (%s)", symbol, freq)
             return pd.DataFrame()
 
         rows = []
