@@ -426,6 +426,102 @@ class TencentDirectSource:
         logger.info("腾讯直连分时分钟K线: %s %d 条", symbol, len(rows))
         return pd.DataFrame(rows) if rows else pd.DataFrame()
 
+    # ==================== K 线（日/周/月） ====================
+
+    @retry_on_failure()
+    def get_kline(
+        self,
+        symbol: str,
+        freq: str = "day",
+        start_date: str = "",
+        end_date: str = "",
+        adjust: str = "qfq",
+    ) -> pd.DataFrame:
+        """
+        获取历史 K 线（腾讯 proxy.finance.qq.com）
+
+        Args:
+            symbol: 6 位股票代码，如 '600519'
+            freq: 周期，"day"/"week"/"month"
+            start_date: 起始日期 YYYY-MM-DD，默认 1 年前
+            end_date: 截止日期 YYYY-MM-DD，默认今天
+            adjust: 复权方式，"qfq"(前复权)/"hfq"(后复权)/""(不复权)
+
+        Returns:
+            DataFrame，标准 OHLCV 格式
+        """
+        self.limiter.wait()
+
+        symbol = str(symbol).zfill(6)
+        prefix = "sh" if symbol.startswith(("6", "9")) else "sz"
+        code = f"{prefix}{symbol}"
+
+        today = datetime.now()
+        if not end_date:
+            end_date = today.strftime("%Y-%m-%d")
+        if not start_date:
+            start_date = f"{today.year - 1}-01-01"
+
+        year = today.year
+
+        url = "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get"
+        params = {
+            "_var": f"kline_{freq}{adjust}{year}",
+            "param": f"{code},{freq},{start_date},{end_date},640,{adjust}",
+            "r": str(random.random()),
+        }
+
+        logger.info("腾讯直连 K 线: %s (%s, %s~%s)", symbol, freq, start_date, end_date)
+
+        r = self._session.get(url, params=params, timeout=15)
+        text = r.text
+
+        # 返回是 JSONP: kline_dayqfq2026={...}
+        match = re.search(r'\{.*\}', text, re.DOTALL)
+        if not match:
+            logger.warning("腾讯 K 线返回格式异常: %s", symbol)
+            return pd.DataFrame()
+
+        try:
+            data = json.loads(match.group())
+        except json.JSONDecodeError:
+            logger.warning("腾讯 K 线 JSON 解析失败: %s", symbol)
+            return pd.DataFrame()
+
+        # 提取 K 线数据
+        klines = None
+        if "data" in data and code in data["data"]:
+            stock_data = data["data"][code]
+            if isinstance(stock_data, dict):
+                klines = (stock_data.get(f"{adjust}{freq}")
+                          or stock_data.get(freq)
+                          or stock_data.get(f"{adjust}day"))
+            elif isinstance(stock_data, list):
+                klines = stock_data
+
+        if not klines:
+            logger.warning("腾讯 K 线无数据: %s", symbol)
+            return pd.DataFrame()
+
+        rows = []
+        for item in klines:
+            if len(item) < 6:
+                continue
+            try:
+                rows.append({
+                    "date": item[0],
+                    "open": float(item[1]),
+                    "close": float(item[2]),
+                    "high": float(item[3]),
+                    "low": float(item[4]),
+                    "volume": float(item[5]) if len(item) > 5 else 0,
+                })
+            except (ValueError, TypeError):
+                continue
+
+        logger.info("腾讯直连 K 线: %s 共 %d 条", symbol, len(rows))
+        return pd.DataFrame(rows) if rows else pd.DataFrame()
+
     # ==================== 复权 K 线 ====================
 
     @retry_on_failure()
