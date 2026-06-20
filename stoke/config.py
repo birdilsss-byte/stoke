@@ -19,6 +19,10 @@ RATE_LIMIT = {
     "baostock": 1.0,        # 证券宝 HTTP，稳定 1 秒即可
     "efinance": 0.5,        # 整合多源，无官方限制，0.5 秒即可
     "tencent_direct": 0.3,  # 腾讯 qt.gtimg.cn，毫秒级响应，0.3 秒即可
+    "eastmoney": 1.5,       # 东财研报，≥1.5s 防封
+    "ths": 1.0,             # 同花顺一致预期，1 秒即可
+    "datacenter": 1.5,      # 东财数据中心，≥1.5s 防封
+    "cninfo": 1.0,          # 巨潮公告，1 秒即可
 }
 
 
