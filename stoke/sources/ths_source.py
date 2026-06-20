@@ -57,14 +57,17 @@ class ThsSource:
         同花顺个股机构一致预期 EPS。
 
         直连 basic.10jqka.com.cn，解析 HTML 表格。
-        '均值' 列即机构一致预期 EPS。
 
         Args:
             symbol: 6 位股票代码，如 '600519'
 
         Returns:
-            DataFrame（列名为中文，由 pd.read_html 自动推断，通常包含：
-            预测年度、日期、每股收益(均值/最高/最低)、预测机构数、行业）
+            DataFrame 列:
+            forecast_year  -- 预测年度（如 2026）
+            analyst_count  -- 预测机构数
+            eps_low        -- EPS 最低预测
+            eps_mean       -- EPS 均值（机构一致预期）
+            eps_high       -- EPS 最高预测
         """
         self.limiter.wait()
         url = f"https://basic.10jqka.com.cn/new/{symbol}/worth.html"
@@ -77,16 +80,30 @@ class ThsSource:
                 return pd.DataFrame()
             r.encoding = "gbk"
             dfs = pd.read_html(StringIO(r.text))
+            raw = pd.DataFrame()
             for df in dfs:
                 cols_str = [str(c) for c in df.columns]
                 if any("每股收益" in c or "均值" in c for c in cols_str):
-                    logger.info("一致预期: %s %d 行", symbol, len(df))
-                    return df
-            # fallback: 返回第一个非空表
-            if dfs:
-                logger.info("一致预期: %s 返回第 1 个表格 (%d 行)", symbol, len(dfs[0]))
-                return dfs[0]
-            return pd.DataFrame()
+                    raw = df
+                    break
+            if raw.empty and dfs:
+                raw = dfs[0]
+            if raw.empty:
+                return pd.DataFrame()
+
+            # 统一列名为英文
+            col_map = {
+                "年度": "forecast_year",
+                "预测机构数": "analyst_count",
+                "最小值": "eps_low",
+                "均值": "eps_mean",
+                "最大值": "eps_high",
+            }
+            raw = raw.rename(columns=col_map)
+            keep = [c for c in col_map.values() if c in raw.columns]
+            raw = raw[keep]
+            logger.info("一致预期: %s %d 行", symbol, len(raw))
+            return raw
         except Exception as e:
             logger.warning("一致预期解析失败 %s: %s", symbol, e)
             return pd.DataFrame()
