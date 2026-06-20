@@ -105,6 +105,48 @@ def probe_sources(stoke_raw, timeout: float = 3.0) -> dict:
         results["tencent"] = False
     logger.debug("tencent 探路: %s (%.2fs)", results["tencent"], time.time() - t0)
 
+    # --- eastmoney ---
+    t0 = time.time()
+    try:
+        df = stoke_raw.eastmoney.get_research_reports("600519", max_pages=1)
+        results["eastmoney"] = not df.empty
+    except Exception as e:
+        logger.warning("探路 eastmoney 失败: %s", e)
+        results["eastmoney"] = False
+    logger.debug("eastmoney 探路: %s (%.2fs)", results["eastmoney"], time.time() - t0)
+
+    # --- ths ---
+    t0 = time.time()
+    try:
+        df = stoke_raw.ths.get_eps_forecast("600519")
+        results["ths"] = not df.empty
+    except Exception as e:
+        logger.warning("探路 ths 失败: %s", e)
+        results["ths"] = False
+    logger.debug("ths 探路: %s (%.2fs)", results["ths"], time.time() - t0)
+
+    # --- datacenter ---
+    t0 = time.time()
+    try:
+        from datetime import date, timedelta
+        d = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
+        df = stoke_raw.datacenter.get_full_market_billboard(d)
+        results["datacenter"] = not df.empty
+    except Exception as e:
+        logger.warning("探路 datacenter 失败: %s", e)
+        results["datacenter"] = False
+    logger.debug("datacenter 探路: %s (%.2fs)", results["datacenter"], time.time() - t0)
+
+    # --- cninfo ---
+    t0 = time.time()
+    try:
+        df = stoke_raw.cninfo.get_announcements("000001", page_size=5)
+        results["cninfo"] = not df.empty
+    except Exception as e:
+        logger.warning("探路 cninfo 失败: %s", e)
+        results["cninfo"] = False
+    logger.debug("cninfo 探路: %s (%.2fs)", results["cninfo"], time.time() - t0)
+
     SOURCE_STATUS.update(results)
 
     alive = sum(1 for v in results.values() if v)
