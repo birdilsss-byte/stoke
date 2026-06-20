@@ -502,15 +502,16 @@ class Store:
         # 自动补 date 列（仅当 key 是 YYYYMMDD 日期格式时）
         if "date" not in df.columns and isinstance(key, str) and len(key) == 8 and key.isdigit():
             df["date"] = f"{key[:4]}-{key[4:6]}-{key[6:]}"
-        # 去重（避免主键冲突导致写入失败）
+        # 去重（按表主键，避免 PK 冲突导致写入失败）
         if mode != "overwrite":
-            subset = []
-            for c in ["date", "代码", "symbol", "forecast_year", "industryCode",
-                      "artCode", "SECURITY_CODE", "TRADE_DATE"]:
-                if c in df.columns:
-                    subset.append(c)
+            with sqlite3.connect(self.db_path) as conn:
+                pk_cols = self._pk_columns(conn, table)
+            subset = [c for c in pk_cols if c in df.columns]
             if subset:
+                before = len(df)
                 df = df.drop_duplicates(subset=subset, keep="first")
+                if len(df) < before:
+                    logger.debug("去重: %s %d→%d 行 (subset=%s)", table, before, len(df), subset)
         df["fetched_at"] = now
         self._write(table, df, mode, key, key_column)
 
