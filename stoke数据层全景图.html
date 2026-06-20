@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Stoke 数据获取层全景图</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'neutral',
+    themeVariables: {
+      fontFamily: 'PingFang SC, Microsoft YaHei, sans-serif',
+      fontSize: '14px',
+    },
+    flowchart: {
+      useMaxWidth: true,
+      htmlLabels: true,
+      curve: 'basis',
+      padding: 20,
+    }
+  });
+</script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-family: PingFang SC, Microsoft YaHei, sans-serif;
+    padding: 40px 20px;
+  }
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #16213e;
+    border-radius: 16px;
+    padding: 40px 30px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #e94560, #0f3460);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+    text-align: center;
+    color: #889;
+    margin-bottom: 30px;
+    font-size: 14px;
+  }
+  .mermaid-wrap {
+    background: #0f3460;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    overflow-x: auto;
+  }
+  .mermaid-wrap svg { max-width: 100%; height: auto; }
+
+  /* 底部统计卡片 */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+  .stat-card {
+    background: #1a1a3e;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #2a2a5e;
+    transition: transform 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); }
+  .stat-card .num {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+  .stat-card .label { color: #889; font-size: 13px; }
+  .stat-card.green .num { color: #4caf50; }
+  .stat-card.orange .num { color: #ff9800; }
+  .stat-card.blue .num { color: #2196f3; }
+  .stat-card.purple .num { color: #ab47bc; }
+  .stat-card.red .num { color: #e53935; }
+  .stat-card.yellow .num { color: #fdd835; }
+
+  /* 三类通道面板 */
+  .panels {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+  .panel {
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #2a2a5e;
+  }
+  .panel h3 { margin-bottom: 12px; font-size: 16px; }
+  .panel ul { list-style: none; }
+  .panel li {
+    padding: 6px 0;
+    font-size: 13px;
+    color: #ccc;
+    border-bottom: 1px solid #1a1a3e;
+    display: flex;
+    justify-content: space-between;
+  }
+  .panel li:last-child { border-bottom: none; }
+  .tag {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .tag.green { background: #1b5e20; color: #a5d6a7; }
+  .tag.yellow { background: #f57f17; color: #fff9c4; }
+  .tag.orange { background: #e65100; color: #ffe0b2; }
+  .tag.blue { background: #1565c0; color: #bbdefb; }
+  .tag.purple { background: #6a1b9a; color: #ce93d8; }
+  .tag.red { background: #b71c1c; color: #ef9a9a; }
+
+  .slow-panel { background: #2d1b00; border-color: #e65100; }
+  .slow-panel h3 { color: #ff9800; }
+  .mid-panel { background: #1a2d00; border-color: #689f38; }
+  .mid-panel h3 { color: #8bc34a; }
+  .fast-panel { background: #002d2d; border-color: #0097a7; }
+  .fast-panel h3 { color: #00bcd4; }
+
+  /* 腾讯待实现 */
+  .tencent-future {
+    background: linear-gradient(135deg, #1a1a3e, #2d1b00);
+    border: 2px dashed #f9a825;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+  }
+  .tencent-future h3 {
+    color: #fdd835;
+    margin-bottom: 12px;
+    font-size: 16px;
+  }
+  .future-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+  .future-item {
+    background: #1a1a3e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    font-size: 13px;
+  }
+  .future-item .icon { font-size: 24px; margin-bottom: 4px; }
+  .future-item .name { color: #fdd835; }
+  .future-item .desc { color: #889; font-size: 11px; margin-top: 2px; }
+
+  .footer {
+    text-align: center;
+    color: #667;
+    font-size: 12px;
+    padding-top: 20px;
+    border-top: 1px solid #1a1a3e;
+  }
+
+  @media (max-width: 900px) {
+    .stats { grid-template-columns: repeat(3, 1fr); }
+    .panels { grid-template-columns: 1fr; }
+    .future-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>🔥 Stoke 数据获取层全景图</h1>
+<p class="subtitle">6 数据源 · 40+ 接口 · 3 速度通道 · 7 大类别 · 2026-06-20</p>
+
+<!-- 统计卡片 -->
+<div class="stats">
+  <div class="stat-card green">
+    <div class="num">6</div>
+    <div class="label">数据源</div>
+  </div>
+  <div class="stat-card blue">
+    <div class="num">46</div>
+    <div class="label">已实现接口</div>
+  </div>
+  <div class="stat-card yellow">
+    <div class="num">9</div>
+    <div class="label">待扩展接口<br><span style="font-size:11px;color:#889">(腾讯直连)</span></div>
+  </div>
+  <div class="stat-card purple">
+    <div class="num">7</div>
+    <div class="label">数据类别</div>
+  </div>
+  <div class="stat-card orange">
+    <div class="num">0.06s</div>
+    <div class="label">最快响应</div>
+  </div>
+</div>
+
+<!-- Mermaid 图 -->
+<div class="mermaid-wrap">
+<div class="mermaid">
+flowchart LR
+    %% ===== 第一行：数据源层（横向6源） =====
+    subgraph 数据源层["⚙️ 数据源层"]
+        direction LR
+        subgraph 慢["🐌 akshare（5s）"]
+            AK["东方财富/同花顺/巨潮/财联社"]
+        end
+        subgraph 中["⏱ 中通道（0.5-1s）"]
+            BS["baostock<br/>证券宝"]
+            EF["efinance<br/>新浪/网易/东财"]
+            LL["legulegu<br/>乐咕乐股"]
+        end
+        subgraph 快["⚡ 快通道（0-0.3s）"]
+            MO["mootdx<br/>通达信TCP"]
+            TD["tencent_direct<br/>腾讯qt.gtimg.cn"]
+        end
+    end
+
+    %% ===== 第二行：数据类别（横向7类） =====
+    subgraph 类别["📦 数据类别层 · 7大类"]
+        direction LR
+        subgraph A["📈 行情类"]
+            A1["实时行情<br/>50+字段/五档"]
+            A2["K线<br/>日/周/月"]
+            A3["分钟K线<br/>5/15/30/60分"]
+            A4["分时数据<br/>日内line+mline"]
+        end
+        subgraph B["📊 基本面"]
+            B1["F10/财务<br/>股票列表"]
+            B2["K线+估值<br/>PE/PB/PS"]
+            B3["利润/ROE<br/>EPS/季报"]
+            B4["十大股东<br/>股东人数"]
+        end
+        subgraph C["📰 新闻信号"]
+            C1["个股新闻"]
+            C2["财联社电报"]
+            C3["个股研报"]
+            C4["巨潮公告"]
+        end
+        subgraph D["💰 资金情绪"]
+            D1["北向资金"]
+            D2["龙虎榜"]
+            D3["融资融券"]
+            D4["个股资金流"]
+            D5["全市场情绪"]
+        end
+        subgraph E["🏗 市场结构"]
+            E1["涨停/强势/<br/>跌停板池"]
+            E2["概念/行业<br/>板块列表"]
+            E3["板块成分股<br/>板块K线"]
+            E4["板块排名<br/>轮动"]
+        end
+        subgraph F["📐 估值指数"]
+            F1["指数PE历史"]
+            F2["全市场PB"]
+            F3["大盘指数<br/>实时行情"]
+            F4["指数成分股"]
+        end
+        subgraph G["🌍 跨市场"]
+            G1["港股行情"]
+            G2["美股行情"]
+            G3["ETF/基金"]
+        end
+    end
+
+    %% ===== 第三行：发现层+时机层（横向） =====
+    subgraph 策略["🧠 应用层"]
+        direction LR
+        DP["发现层 Discovery<br/>五通道注意力扫描"]
+        TM["时机层 Timing<br/>五维加权判断"]
+        RV["快慢融合<br/>MarketContext"]
+    end
+
+    %% ---- 连线 1: 数据源 → 数据类别 ----
+    MO --> A1 & A2 & B1
+    AK --> C1 & C2 & C3 & C4 & E1 & E2 & E3 & E4 & D1 & D2 & D3 & D4 & D5
+    BS --> A2 & B2 & B3 & F4
+    EF --> A1 & A2 & B4 & D4 & E3
+    LL --> F1 & F2
+
+    %% tencent 已实现 + 待实现
+    TD -- "✅ 已实现" --> A1 & A2
+    TD -. "🌟 待扩展" .-> A3 & A4 & F3 & G1 & G2 & G3
+
+    %% ---- 连线 2: 数据类别 → 应用层 ----
+    A --> RV
+    G --> RV
+    B --> DP
+    C --> DP
+    D --> DP
+    E --> DP
+    F --> DP
+
+    %% ---- 连线 3: 应用层内部 ----
+    DP --> RV
+    TM --> RV
+
+    %% ---- 样式 ----
+    style 慢 fill:#2d1b00,stroke:#e65100,color:#ff9800
+    style 中 fill:#0a2e0a,stroke:#2e7d32,color:#8bc34a
+    style 快 fill:#002d2d,stroke:#0097a7,color:#00bcd4
+    style AK fill:#3d2b10,stroke:#e65100,color:#ffcc80
+    style BS fill:#1a3d1a,stroke:#2e7d32,color:#a5d6a7
+    style EF fill:#1a3d1a,stroke:#2e7d32,color:#a5d6a7
+    style LL fill:#1a3d1a,stroke:#2e7d32,color:#a5d6a7
+    style MO fill:#003d3d,stroke:#0097a7,color:#80cbc4
+    style TD fill:#003d3d,stroke:#0097a7,color:#80cbc4
+
+    style A fill:#0d253f,stroke:#1565c0,color:#90caf9
+    style B fill:#1a0d2e,stroke:#7b1fa2,color:#ce93d8
+    style C fill:#2d1b00,stroke:#e65100,color:#ffcc80
+    style D fill:#2d0d1a,stroke:#c62828,color:#ef9a9a
+    style E fill:#0a2e0a,stroke:#2e7d32,color:#a5d6a7
+    style F fill:#002d2d,stroke:#00838f,color:#80cbc4
+    style G fill:#2d2d00,stroke:#f57f17,color:#fff9c4
+
+    style 策略 fill:#1a0d2e,stroke:#7b1fa2,stroke-width:2px,color:#e1bee7
+    style DP fill:#2a1a4e,stroke:#7b1fa2,color:#ce93d8
+    style TM fill:#2a1a4e,stroke:#7b1fa2,color:#ce93d8
+    style RV fill:#3a2a5e,stroke:#7b1fa2,color:#e1bee7
+
+    style 数据源层 fill:#1a1a3e,stroke:#333,color:#ccc
+    style 类别 fill:#1a1a3e,stroke:#333,color:#ccc
+</div>
+</div>
+
+<!-- 三通道详情 -->
+<div class="panels">
+  <div class="panel slow-panel">
+    <h3>🐌 慢通道 · akshare（5s限流）</h3>
+    <ul>
+      <li><span>新闻 / 研报 / 公告</span><span class="tag orange">独占</span></li>
+      <li><span>涨停板 / 强势涨停 / 跌停板</span><span class="tag orange">独占</span></li>
+      <li><span>龙虎榜 / 北向资金 / 融资融券</span><span class="tag orange">独占</span></li>
+      <li><span>概念板块 / 行业板块 / 板块K线</span><span class="tag orange">独占</span></li>
+      <li><span>资金流向（个股+全市场）</span><span class="tag orange">独占</span></li>
+      <li><span>热门关键词 / 市场情绪 / 评论</span><span class="tag orange">独占</span></li>
+      <li><span>市场宽度 / 成交量</span><span class="tag orange">独占</span></li>
+    </ul>
+    <p style="color:#ff9800;font-size:12px;margin-top:12px;">⚠ 不可替代 — 找机会、看情绪、抓热点全靠它</p>
+  </div>
+  <div class="panel mid-panel">
+    <h3>⏱ 中通道（0.5-1s限流）</h3>
+    <ul>
+      <li><span>baostock · K线+估值</span><span class="tag green">备份</span></li>
+      <li><span>baostock · 利润表/ROE/EPS</span><span class="tag blue">独占</span></li>
+      <li><span>baostock · 指数成分股</span><span class="tag blue">独占</span></li>
+      <li><span>efinance · 十大股东/股东人数</span><span class="tag blue">独占</span></li>
+      <li><span>efinance · 龙虎榜/公司信息</span><span class="tag blue">独占</span></li>
+      <li><span>efinance · 个股资金流</span><span class="tag green">备份</span></li>
+      <li><span>legulegu · PE/PB估值</span><span class="tag blue">独占</span></li>
+    </ul>
+    <p style="color:#8bc34a;font-size:12px;margin-top:12px;">✅ 各有专长，efinance + baostock 互备</p>
+  </div>
+  <div class="panel fast-panel">
+    <h3>⚡ 快通道（0-0.3s）</h3>
+    <ul>
+      <li><span>mootdx · 实时行情</span><span class="tag green">主源</span></li>
+      <li><span>mootdx · 日K线</span><span class="tag green">主源</span></li>
+      <li><span>mootdx · F10/股票列表</span><span class="tag blue">独占</span></li>
+      <li><span>tencent · 实时行情</span><span class="tag green">备份</span></li>
+      <li><span>tencent · 日/周/月K线</span><span class="tag green">备份</span></li>
+      <li><span>tencent · 分钟K线（m5/15/30/60）</span><span class="tag yellow">待实现 ⭐</span></li>
+      <li><span>tencent · 分时数据（line/mline）</span><span class="tag yellow">待实现 ⭐</span></li>
+      <li><span>tencent · 港股/美股/ETF/指数</span><span class="tag yellow">待实现</span></li>
+    </ul>
+    <p style="color:#00bcd4;font-size:12px;margin-top:12px;">🔥 0.06s响应，时机层的理想输入</p>
+  </div>
+</div>
+
+<!-- 腾讯待实现详情 -->
+<div class="tencent-future">
+  <h3>🌟 tencent_direct 待扩展能力（同一域名 · 零成本扩展）</h3>
+  <div class="future-grid">
+    <div class="future-item">
+      <div class="icon">⏱️</div>
+      <div class="name">分钟K线</div>
+      <div class="desc">5/15/30/60分<br>240条/频</div>
+    </div>
+    <div class="future-item">
+      <div class="icon">📉</div>
+      <div class="name">分时数据</div>
+      <div class="desc">日内line+mline<br>逐笔复权</div>
+    </div>
+    <div class="future-item">
+      <div class="icon">🌐</div>
+      <div class="name">港股行情</div>
+      <div class="desc">hk00700 等<br>50+字段</div>
+    </div>
+    <div class="future-item">
+      <div class="icon">🇺🇸</div>
+      <div class="name">美股行情</div>
+      <div class="desc">usAAPL 等<br>50+字段</div>
+    </div>
+    <div class="future-item">
+      <div class="icon">📊</div>
+      <div class="name">ETF/基金</div>
+      <div class="desc">sz159915 等<br>实时行情</div>
+    </div>
+  </div>
+  <p style="color:#fdd835;font-size:12px;margin-top:12px;text-align:center;">同一个 qt.gtimg.cn · 同一套数据格式 · 已实测全部可用 ✅</p>
+</div>
+
+<!-- 数据流转 -->
+<div style="background:#1a1a3e;border-radius:12px;padding:20px;margin-bottom:20px;">
+  <h3 style="color:#e1bee7;margin-bottom:12px;">🔄 数据流向</h3>
+  <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:8px;align-items:center;text-align:center;font-size:13px;">
+    <div style="background:#0d253f;border-radius:8px;padding:10px;color:#90caf9;">📈 行情</div>
+    <div style="font-size:20px;color:#666;">→</div>
+    <div style="background:#0a2e0a;border-radius:8px;padding:10px;color:#a5d6a7;">🏗 结构</div>
+    <div style="font-size:20px;color:#666;">→</div>
+    <div style="background:#1a0d2e;border-radius:8px;padding:10px;color:#e1bee7;">🧠 发现层<br><span style="font-size:11px;color:#889;">五通道扫描</span></div>
+    <div style="font-size:20px;color:#666;">→</div>
+    <div style="background:#2a1a4e;border-radius:8px;padding:10px;color:#e1bee7;">🎯 时机层<br><span style="font-size:11px;color:#889;">五维加权</span></div>
+    <div style="font-size:20px;color:#666;">→</div>
+    <div style="background:#3a2a5e;border-radius:8px;padding:10px;color:#f8bbd0;">📋 策略</div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;text-align:center;font-size:12px;color:#889;">
+    <div>🐌 akshare 慢扫描</div>
+    <div>⏱ baostock/efinance 基本面</div>
+    <div>⚡ tencent 快通道</div>
+    <div>⚡ mootdx TCP</div>
+  </div>
+</div>
+
+<div class="footer">
+  Stoke Project · /Volumes/Black/Stoke · 6 数据源 7 大类别 46 接口 · 图由 Mermaid 自动渲染
+</div>
+
+</div>
+
+</body>
+</html>

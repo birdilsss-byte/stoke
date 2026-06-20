@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Stoke 功能结构</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      fontFamily: 'PingFang SC, Microsoft YaHei, sans-serif',
+      fontSize: '28px',
+      primaryFontSize: '28px',
+      titleFontSize: '30px',
+      mainBkg: '#ffffff',
+      nodeBorder: '#334466',
+      clusterBkg: '#f0f4ff',
+      clusterBorder: '#334466',
+      lineColor: '#556677',
+      primaryTextColor: '#223344',
+      tertiaryColor: '#e8f0fe',
+      tertiaryBorderColor: '#8899bb',
+    },
+    flowchart: {
+      useMaxWidth: true,
+      htmlLabels: true,
+      curve: 'basis',
+      padding: 35,
+      nodeSpacing: 40,
+      rankSpacing: 50,
+    }
+  });
+</script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #f5f7fa;
+    font-family: PingFang SC, Microsoft YaHei, sans-serif;
+    padding: 30px;
+  }
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  h1 {
+    text-align: center;
+    font-size: 32px;
+    margin-bottom: 4px;
+    color: #223344;
+  }
+  .subtitle {
+    text-align: center;
+    color: #8899aa;
+    margin-bottom: 20px;
+    font-size: 16px;
+  }
+  .mermaid-wrap {
+    background: #fff;
+    border: 1px solid #dde3ed;
+    border-radius: 12px;
+    padding: 30px;
+    overflow-x: auto;
+    min-height: 600px;
+  }
+  .mermaid-wrap svg { max-width: 100%; height: auto; }
+  .footer {
+    text-align: center;
+    color: #aabbcc;
+    font-size: 13px;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #eef2f7;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>Stoke 功能结构全览</h1>
+<p class="subtitle">46 个公开方法 · 6 数据源 · 4 个架构层</p>
+
+<div class="mermaid-wrap">
+<div class="mermaid">
+flowchart TB
+  %% 第1行：入口层
+  subgraph 入口["🏛️ 入口层"]
+    RA["StokeRaw<br/>纯路由 · 6源直连"]
+    CA["StokeCached<br/>12方法 · SQLite缓存"]
+    FA["FallbackStoke<br/>7方法 · 4级自动备份"]
+    ST["Store缓存层<br/>16表 · get_or_fetch"]
+    RA --> CA --> FA
+  end
+
+  %% 第2行：数据供给大类
+  subgraph 数据层["📦 数据供给层 · 9 大类 44 方法"]
+    H["📈 行情<br/>realtime / kline / kline_baostock<br/>kline_efinance / kline_valuation / realtime_all"]
+    F["📊 基本面<br/>f10 / profit_data / company_info<br/>top10_holders / holder_number / stock_industry"]
+    N["📰 新闻信号<br/>news / telegraph / research / announcements"]
+    L["🚦 涨跌信号<br/>limit_up / strong_stocks / limit_down"]
+    M["💰 资金流向<br/>northbound / dragon_tiger / margin<br/>market_fund / individual_fund / daily_billboard"]
+    S["🔥 市场情绪<br/>hot_detail / hot_keywords / xueqiu_hot<br/>stock_comment / stock_desire / stock_focus"]
+    BR["📐 市场结构<br/>market_breadth / market_volume / sector_rank"]
+    SC["🏗 板块行业<br/>concepts / industries / sector_members<br/>sector_kline / index_constituents"]
+    V["📉 估值<br/>index_pe / market_pb"]
+  end
+
+  %% 第3行：发现层+时机层+调度层
+  subgraph 发现["👁️ 发现层 · 五通道"]
+    D1["涨停通道<br/>_channel_limit_up"]
+    D2["强势股通道<br/>_channel_strong"]
+    D3["热点概念通道<br/>_channel_hot_concepts"]
+    D4["北向资金通道<br/>_channel_northbound"]
+    D5["板块轮动通道<br/>_channel_sector"]
+    DS["scan(top_n)<br/>五通道融合→候选股"]
+  end
+
+  subgraph 时机["🧠 时机层 · 五维加权"]
+    T1["市场维度<br/>大盘强弱"]
+    T2["估值维度<br/>PE/PB分位"]
+    T3["板块维度<br/>行业轮动"]
+    T4["情绪维度<br/>市场热度"]
+    T5["资金流维度<br/>主力动向"]
+    TA["assess()<br/>五维融合→MarketContext"]
+  end
+
+  subgraph 调度["⚙️ 调度层"]
+    DR["daily_routine()<br/>预热→扫描→评估→输出<br/>一盘棋全自动"]
+  end
+
+  %% 数据流向
+  入口 --> 数据层
+  数据层 --> 发现
+  数据层 --> 时机
+  发现 --> 时机
+  时机 --> 调度
+
+  %% 颜色
+  style 入口 fill:#e8f0fe,stroke:#334466,stroke-width:2px,color:#223344
+  style 数据层 fill:#f0f4ff,stroke:#334466,stroke-width:2px,color:#223344
+  style 发现 fill:#fff8e1,stroke:#e65100,stroke-width:2px,color:#e65100
+  style 时机 fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#7b1fa2
+  style 调度 fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#2e7d32
+
+  style RA fill:#dce4f5,stroke:#334466,color:#223344
+  style CA fill:#dce4f5,stroke:#334466,color:#223344
+  style FA fill:#dce4f5,stroke:#334466,color:#223344
+  style ST fill:#dce4f5,stroke:#8899bb,color:#556677
+
+  style H fill:#e3f2fd,stroke:#1565c0,color:#1565c0
+  style F fill:#f3e5f5,stroke:#7b1fa2,color:#7b1fa2
+  style N fill:#fff3e0,stroke:#e65100,color:#e65100
+  style L fill:#fce4ec,stroke:#c62828,color:#c62828
+  style M fill:#e8f5e9,stroke:#2e7d32,color:#2e7d32
+  style S fill:#fff8e1,stroke:#f57f17,color:#f57f17
+  style BR fill:#e0f2f1,stroke:#00695c,color:#00695c
+  style SC fill:#e8eaf6,stroke:#283593,color:#283593
+  style V fill:#fce4ec,stroke:#880e4f,color:#880e4f
+
+  style D1 fill:#fff3e0,stroke:#e65100,color:#e65100
+  style D2 fill:#fff3e0,stroke:#e65100,color:#e65100
+  style D3 fill:#fff3e0,stroke:#e65100,color:#e65100
+  style D4 fill:#fff3e0,stroke:#e65100,color:#e65100
+  style D5 fill:#fff3e0,stroke:#e65100,color:#e65100
+  style DS fill:#ffe0b2,stroke:#bf360c,color:#bf360c,stroke-width:2px
+
+  style T1 fill:#f3e5f5,stroke:#7b1fa2,color:#7b1fa2
+  style T2 fill:#f3e5f5,stroke:#7b1fa2,color:#7b1fa2
+  style T3 fill:#f3e5f5,stroke:#7b1fa2,color:#7b1fa2
+  style T4 fill:#f3e5f5,stroke:#7b1fa2,color:#7b1fa2
+  style T5 fill:#f3e5f5,stroke:#7b1fa2,color:#7b1fa2
+  style TA fill:#e1bee7,stroke:#4a148c,color:#4a148c,stroke-width:2px
+
+  style DR fill:#c8e6c9,stroke:#1b5e20,color:#1b5e20,stroke-width:2px
+</div>
+</div>
+
+<div class="footer">
+  数据供给层 9 大类 44 方法 → 发现层 5 通道 → 时机层 5 维度 → 调度层 1 套主线
+</div>
+
+</div>
+</body>
+</html>
