@@ -217,6 +217,14 @@ class StokeCached:
             lambda: self._s.ths.get_eps_forecast(symbol),
             max_age_sec=STORE_TTL["eps_forecast"], mode="replace",
             key_column="symbol",
+            column_map={
+                "年度": "forecast_year",
+                "预测机构数": "analyst_count",
+                "最小值": "eps_low",
+                "均值": "eps_mean",
+                "最大值": "eps_high",
+                "行业平均数": "industry_avg",
+            },
         )
 
     def billboard_seat_detail(self, code: str,
