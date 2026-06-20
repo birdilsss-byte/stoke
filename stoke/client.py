@@ -133,6 +133,10 @@ class Stoke:
             "baostock": self._safe_call("baostock.health_check", self.baostock.health_check),
             "efinance": self._safe_call("efinance.health_check", self.efinance.health_check),
             "tencent_direct": self._safe_call("tencent_direct.health_check", self.tencent_direct.health_check),
+            "eastmoney": self._safe_call("eastmoney.health_check", self.eastmoney.health_check),
+            "ths": self._safe_call("ths.health_check", self.ths.health_check),
+            "datacenter": self._safe_call("datacenter.health_check", self.datacenter.health_check),
+            "cninfo": self._safe_call("cninfo.health_check", self.cninfo.health_check),
         }
         status = "全部正常" if all(result.values()) else "部分异常"
         logger.info("全源健康检查: %s %s", result, status)
