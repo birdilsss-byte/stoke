@@ -100,11 +100,15 @@ def test_get_minute_kline(s: TencentDirectSource) -> bool:
 def test_get_intraday(s: TencentDirectSource) -> bool:
     """7. 分时数据"""
     print("\n[7/9] get_intraday_line + get_intraday_mline（分时数据）")
+    from datetime import datetime
     line = s.get_intraday_line("sh600519")
     mline = s.get_intraday_mline("sh600519")
-    ok = len(line) > 0 or len(mline) > 0
+    # 非交易日返回0条是预期的，不算失败
+    is_weekend = datetime.now().weekday() >= 5
+    ok = (len(line) > 0 or len(mline) > 0) or is_weekend
+    status = "✅" if len(line) > 0 or len(mline) > 0 else ("⏭️ 非交易日无数据" if is_weekend else "❌")
     print(f"  分时线(line): {len(line)} 条")
-    print(f"  分钟K线(mline): {len(mline)} 条")
+    print(f"  分钟K线(mline): {len(mline)} 条 ({status})")
     if not line.empty:
         print(f"  line示例: {line.head(2).to_string()}")
     if not mline.empty:
