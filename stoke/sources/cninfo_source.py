@@ -122,25 +122,26 @@ class CninfoSource:
             )
             d = r.json()
             data = d.get("data") or {}
-            hits = data.get("hits") or []
+            items = data.get("list") or []
         except Exception as e:
             logger.warning("公告列表请求失败 %s: %s", symbol, e)
             return pd.DataFrame()
 
-        if not hits:
+        if not items:
             logger.info("公告列表: %s 无数据", symbol)
             return pd.DataFrame()
 
         records = []
-        for h in hits:
-            source = h.get("_source") or h
-            art_code = source.get("artCode", "")
-            code = symbol
+        for item in items:
+            art_code = item.get("art_code", "")
+            codes = item.get("codes") or []
+            code = codes[0].get("code", symbol) if codes else symbol
             records.append({
-                "title": source.get("title", ""),
-                "noticeDate": str(source.get("noticeDate", ""))[:10],
+                "title": item.get("title", ""),
+                "noticeDate": str(item.get("notice_date", ""))[:10],
                 "artCode": art_code,
-                "noticeType": source.get("noticeType", ""),
+                "noticeType": item.get("columns", [{}])[0].get("column_name", "")
+                           if item.get("columns") else "",
                 "url": f"{_NOTICE_DETAIL_URL}{code}/{art_code}.html" if art_code else "",
             })
 
