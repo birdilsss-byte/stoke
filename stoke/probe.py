@@ -18,6 +18,10 @@ SOURCE_STATUS: dict = {
     "efinance": None,
     "tencent": None,
     "legulegu": None,
+    "eastmoney": None,
+    "ths": None,
+    "datacenter": None,
+    "cninfo": None,
 }
 
 
