@@ -421,3 +421,61 @@ class Stoke:
     # 实时行情和 K 线已由 realtime()/kline() 统一入口覆盖。
     # 需要直接调用腾讯直连？用 s.tencent_direct.get_realtime() / get_kline()。
 
+    # ---------- 腾讯直连扩展方法 ----------
+
+    def market_realtime(self, codes: List[str]) -> pd.DataFrame:
+        """跨市场实时行情（港股/美股/指数/ETF）"""
+        return self._safe_call(
+            "market_realtime", self.tencent_direct.get_market_realtime, codes,
+        )
+
+    def tencent_brief(self, codes: List[str]) -> pd.DataFrame:
+        """腾讯简要信息（价格/涨跌幅/成交额/市值）"""
+        return self._safe_call(
+            "tencent_brief", self.tencent_direct.get_brief_info, codes,
+        )
+
+    def tick_analysis(self, symbol: str) -> pd.DataFrame:
+        """逐笔成交分析（大单/小单买入卖出比例）"""
+        return self._safe_call(
+            "tick_analysis", self.tencent_direct.get_tick_analysis, symbol,
+        )
+
+    def minute_kline(
+        self,
+        symbol: str,
+        freq: str = "m5",
+        count: int = 240,
+    ) -> pd.DataFrame:
+        """分钟级 K 线（m5/m15/m30/m60）"""
+        return self._safe_call(
+            "minute_kline", self.tencent_direct.get_minute_kline,
+            symbol, freq, count,
+        )
+
+    def intraday_line(self, symbol: str) -> pd.DataFrame:
+        """当日分时线（价格/均价/成交量）"""
+        return self._safe_call(
+            "intraday_line", self.tencent_direct.get_intraday_line, symbol,
+        )
+
+    def intraday_mline(self, symbol: str) -> pd.DataFrame:
+        """当日分钟级 K 线（1分钟周期 OHLCV）"""
+        return self._safe_call(
+            "intraday_mline", self.tencent_direct.get_intraday_mline, symbol,
+        )
+
+    def fqkline(
+        self,
+        symbol: str,
+        freq: str = "day",
+        start_date: str = "",
+        end_date: str = "",
+        adjust: str = "hfq",
+    ) -> pd.DataFrame:
+        """复权 K 线（后复权/前复权）"""
+        return self._safe_call(
+            "fqkline", self.tencent_direct.get_fqkline,
+            symbol, freq, start_date, end_date, adjust,
+        )
+
