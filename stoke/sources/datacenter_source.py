@@ -35,13 +35,17 @@ class DatacenterSource:
     # ==================== 连通性检查 ====================
 
     def health_check(self) -> bool:
-        """取最近交易日龙虎榜（1 条即可），验证连通性"""
+        """取最近交易日龙虎榜（向前最多查 5 天），验证连通性"""
         try:
-            yesterday = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
-            df = self.get_full_market_billboard(yesterday)
-            ok = not df.empty
-            logger.info("Datacenter 健康检查 %s", "通过" if ok else "失败")
-            return ok
+            today = date.today()
+            for offset in range(1, 6):
+                check_date = (today - timedelta(days=offset)).strftime("%Y-%m-%d")
+                df = self.get_full_market_billboard(check_date)
+                if not df.empty:
+                    logger.info("Datacenter 健康检查通过 (%s, %d 条)", check_date, len(df))
+                    return True
+            logger.warning("Datacenter 健康检查: 5 天内均无龙虎榜数据")
+            return False
         except Exception as e:
             logger.warning("Datacenter 健康检查失败: %s", e)
             return False
