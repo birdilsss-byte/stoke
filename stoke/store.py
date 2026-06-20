@@ -397,16 +397,16 @@ class Store:
                     PRIMARY KEY (TRADE_DATE, SECURITY_CODE)
                 );
 
-                -- 公告列表（巨潮）
+                -- 公告列表（东财）
                 CREATE TABLE IF NOT EXISTS announcements (
-                    symbol              TEXT NOT NULL,
-                    announcementId      TEXT NOT NULL,
-                    announcementTitle   TEXT,
-                    announcementTime    TEXT,
-                    adjunctUrl          TEXT,
-                    announcementType    TEXT,
-                    fetched_at          TEXT NOT NULL,
-                    PRIMARY KEY (symbol, announcementId)
+                    symbol      TEXT NOT NULL,
+                    artCode     TEXT NOT NULL,
+                    title       TEXT,
+                    noticeDate  TEXT,
+                    noticeType  TEXT,
+                    url         TEXT,
+                    fetched_at  TEXT NOT NULL,
+                    PRIMARY KEY (symbol, artCode)
                 );
                 CREATE INDEX IF NOT EXISTS idx_ann_symbol
                     ON announcements(symbol);
