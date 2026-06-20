@@ -4,7 +4,7 @@
 
 A 股量化投研系统。数据获取 → 机会发现 → 时机判断 → 策略执行 → 复盘迭代。
 
-## 数据源组合（6 源）
+## 数据源组合（10 源）
 
 | 数据源 | 协议/方式 | 限流 | 覆盖层面 |
 |--------|----------|------|---------|
@@ -14,6 +14,10 @@ A 股量化投研系统。数据获取 → 机会发现 → 时机判断 → 策
 | efinance | HTTP（新浪/网易/东财） | 0.5s | 极速K线、龙虎榜、十大股东、股东人数 |
 | legulegu | HTTP（乐咕乐股） | 1s | PE/PB 估值，纯 requests 直连 |
 | tencent_direct | HTTP（腾讯 qt.gtimg.cn） | 0.3s | 实时行情 + K 线，毫秒级 |
+| eastmoney | HTTP（东财 reportapi） | 1.5s | 个股研报、行业研报、PDF 下载 |
+| ths | HTTP（同花顺 10jqka） | 1s | 机构一致预期 EPS |
+| datacenter | HTTP（东财 datacenter） | 1.5s | 龙虎榜席位明细、全市场龙虎榜 |
+| cninfo | HTTP（东财公告） | 1s | 沪深北公告列表 |
 | 智兔数服 | REST API | 1s | 备用行情、技术指标（需 Token） |
 
 ## 项目结构
