@@ -129,7 +129,7 @@ stoke/
 | code-reviewer | 代码审查 | 代码质量、错误处理、性能隐患、密钥安全 | 所有代码改动后 |
 | code-specialist | 代码实现 | 快速编写高质量 Python 代码 | 新功能实现、代码修改 |
 | sqlite-specialist | 数据库专员 | 表结构、索引优化、查询性能、SQL 安全 | store.py 改动、新增缓存表 |
-| data-source-specialist | 数据源适配 | 6 源对接、限流管理、health_check | 新增/修改 Source、调试数据接口 |
+| data-source-specialist | 数据源适配 | 10 源对接、限流管理、health_check | 新增/修改 Source、调试数据接口 |
 | strategy-engineer | 策略工程师 | 发现层/时机层/调度层算法 | 修改 discovery.py/timing.py/runner.py |
 | system-tester | 系统测试 | 压力测试、缓存验证、数据源健康检查 | 跑测试、验证缓存命中率、压测 |
 | code-quality-guard | 代码质量守卫 | 代码审查、重构、SQL 优化、性能分析 | 重构、性能优化、安全审查 |
