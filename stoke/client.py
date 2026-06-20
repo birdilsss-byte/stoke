@@ -547,21 +547,24 @@ class Stoke:
 
     # ==================== 公告全文（巨潮 新增） ====================
 
-    def announcements_detailed(self, symbol: str, page_size: int = 30,
-                               page_num: int = 1) -> pd.DataFrame:
-        """巨潮公告列表（含公告全文 URL），区别于 announcements（akshare 版）"""
+    def announcements_detailed(self, symbol: str, page_size: int = 100,
+                               page_num: int = 1,
+                               report_type: str = "全部",
+                               begin_date: str = "",
+                               end_date: str = "") -> pd.DataFrame:
+        """东财公告列表（含公告编码和详情 URL），区别于 announcements（akshare 版）"""
         return self._safe_call(
             "announcements_detailed", self.cninfo.get_announcements,
-            symbol, page_size, page_num,
+            symbol, page_size, page_num, report_type, begin_date, end_date,
         )
 
-    def announcement_detail(self, announcement_id: str) -> str:
-        """获取公告全文 HTML"""
-        logger.info("获取公告全文: %s", announcement_id)
-        return self.cninfo.get_announcement_detail(announcement_id)
+    def announcement_detail(self, symbol: str, art_code: str) -> str:
+        """获取公告详情页 HTML"""
+        logger.info("获取公告详情: %s", art_code)
+        return self.cninfo.get_announcement_detail(symbol, art_code)
 
-    def download_announcement_pdf(self, adjunct_url: str,
+    def download_announcement_pdf(self, url: str,
                                   target_dir: str = "./announcements") -> Optional[str]:
         """下载公告 PDF（返回本地路径）"""
-        logger.info("下载公告 PDF: %s", adjunct_url)
-        return self.cninfo.download_announcement_pdf(adjunct_url, target_dir)
+        logger.info("下载公告 PDF")
+        return self.cninfo.download_announcement_pdf(url, target_dir)
