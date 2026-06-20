@@ -78,9 +78,13 @@ class Stoke:
         baostock_limiter: Optional[RateLimiter] = None,
         efinance_limiter: Optional[RateLimiter] = None,
         tencent_direct_limiter: Optional[RateLimiter] = None,
+        eastmoney_limiter: Optional[RateLimiter] = None,
+        ths_limiter: Optional[RateLimiter] = None,
+        datacenter_limiter: Optional[RateLimiter] = None,
+        cninfo_limiter: Optional[RateLimiter] = None,
     ):
         """
-        纯路由 Stoke — 组装 6 个数据源，不做缓存。
+        纯路由 Stoke — 组装 10 个数据源，不做缓存。
 
         Args:
             mootdx_limiter: mootdx 限流器（默认不限流）
@@ -89,6 +93,10 @@ class Stoke:
             baostock_limiter: baostock 限流器（默认 1 秒）
             efinance_limiter: efinance 限流器（默认 0.5 秒）
             tencent_direct_limiter: 腾讯直连限流器（默认 0.3 秒）
+            eastmoney_limiter: 东财研报限流器（默认 1.5 秒）
+            ths_limiter: 同花顺一致预期限流器（默认 1 秒）
+            datacenter_limiter: 东财数据中心限流器（默认 1.5 秒）
+            cninfo_limiter: 巨潮公告限流器（默认 1 秒）
 
         需要缓存？用 StokeCached： from stoke.client_cached import StokeCached
         """
@@ -98,7 +106,11 @@ class Stoke:
         self.baostock = BaostockSource(rate_limiter=baostock_limiter)
         self.efinance = EFinanceSource(rate_limiter=efinance_limiter)
         self.tencent_direct = TencentDirectSource(rate_limiter=tencent_direct_limiter)
-        logger.info("Stoke 初始化完成（6 源，纯路由）")
+        self.eastmoney = EastMoneySource(rate_limiter=eastmoney_limiter)
+        self.ths = ThsSource(rate_limiter=ths_limiter)
+        self.datacenter = DatacenterSource(rate_limiter=datacenter_limiter)
+        self.cninfo = CninfoSource(rate_limiter=cninfo_limiter)
+        logger.info("Stoke 初始化完成（10 源，纯路由）")
 
     @staticmethod
     def _safe_call(method_name: str, fn, *args, **kwargs):
